@@ -83,8 +83,8 @@ export default {
       btn: [],
  
       loginForm: {
-        username: "root",
-        password: "123456",
+        username: "",
+        password: "",
        
       },
       loginRules: {
@@ -124,6 +124,7 @@ export default {
               if (res.code == "200") {
                
                 sessionStorage.token = res.data.token;
+                sessionStorage.username=this.loginForm.username
                 this.loading = false;
                  
                   this.$router.push({ path: "/home" });

@@ -1,8 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import HOME_ROUTERS from '../views/home/router'
-import COMMODITY_ROUTERS from '../views/commodity/router'
+import HOME_ROUTERS from './home'
+import COMMODITY_ROUTERS from './commodity'
+import ORDER_ROUTERS from './order'
+import MEMBER_ROUTERS from './member'
+import OPERATE_ROUTERS from './operate'
 import store from '../store/';
 
 import NProgress from 'nprogress' // Progress 进度条
@@ -50,12 +53,12 @@ const routes = new Router({
         },
         {
 
-            path: '/',
+            path: '/order',
             component: Layout,
-
+            redirect: '/order/list',
             meta: { title: '订单', icon: 'el-icon-s-home', hidden: false },
             children: [
-
+                ...ORDER_ROUTERS
             ],
 
 
@@ -63,25 +66,27 @@ const routes = new Router({
         },
         {
 
-            path: '/',
+            path: '/member',
             component: Layout,
-
+            redirect: '/member/list',
             meta: { title: '用户', icon: 'el-icon-s-home', hidden: false },
             children: [
-
+                ...MEMBER_ROUTERS
+            ],
+        },
+        {
+            path: '/operate',
+            component: Layout,
+            meta: { title: '运营', icon: 'el-icon-s-home', hidden: false },
+            children: [
+                ...OPERATE_ROUTERS
             ],
         },
         {
             path: '/',
             component: Layout,
-            meta: { title: '运营', icon: 'el-icon-s-home', hidden: false },
-            children: [],
-        },
-        {
-            path: '/',
-            component: Layout,
 
-            meta: { title: '设置', icon: 'el-icon-s-home', hidden: false },
+            meta: { title: '设置', icon: 'el-icon-s-home', hidden: true },
             children: [
 
             ],

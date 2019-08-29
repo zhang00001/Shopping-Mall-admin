@@ -136,7 +136,8 @@ export default {
       position: relative;
       display: flex;
       align-content: center;
-      span {
+      span {font-size: 20px;
+    color: #fff;
         margin: 0 10px;
       }
       .user-avatar {

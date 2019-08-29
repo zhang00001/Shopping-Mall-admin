@@ -34,7 +34,7 @@
             </template>
           </template>
         </el-table-column>
-
+ 
         <el-table-column prop="goods_num" label="商品数量"></el-table-column>
         <el-table-column prop="show" label="是否显示">
           <template slot-scope="scope">
@@ -67,7 +67,7 @@
           <el-form-item label="排序" :label-width="formLabelWidth" prop="order">
             <el-input v-model="form.order" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="分类图标" :label-width="formLabelWidth" prop="logo">
+          <el-form-item label="品牌logo" :label-width="formLabelWidth" prop="logo">
             <el-upload
               class="avatar-uploader"
               :http-request="uploadFile"
@@ -80,6 +80,21 @@
               <img v-if="imageUrl" :src="imageUrl" class="avatar" />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               <div class="el-upload__tip" slot="tip">图片尺寸为90*90比例，大小不能超过200kB,图片只能为jpg,png,gif格式</div>
+            </el-upload>
+          </el-form-item>
+            <el-form-item label="品牌封面图" :label-width="formLabelWidth" prop="logo">
+            <el-upload
+              class="avatar-uploader"
+              :http-request="uploadFile2"
+               
+              action
+              :show-file-list="false"
+  
+            
+            >
+              <img v-if="imageUrl2" :src="imageUrl2" class="avatar" />
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              <div class="el-upload__tip" slot="tip">图片尺寸为710*272比例，大小不能超过200kB,图片只能为jpg,png,gif格式</div>
             </el-upload>
           </el-form-item>
           <el-form-item label="显示" :label-width="formLabelWidth" prop="show">
@@ -145,10 +160,11 @@ export default {
       title: "新增",
       fileLists: [],
       imageUrl: "",
+      imageUrl2:"",
       showClass2:false,
       form: {
         title: "",
-       
+       img:'',
         logo: "",
         order:"",
         show: true,
@@ -263,6 +279,7 @@ export default {
     },
      cel() {
     this.imageUrl = "";
+    this.imageUrl2 = "";
     this.dialogFormVisible = false;
     this.$refs["form"].resetFields();
   },
@@ -292,12 +309,14 @@ getList(page, title) {
 
           this.$nextTick(() => {
             this.imageUrl = res.data.logo;
+            this.imageUrl2=res.data.img
             this.form = {
               id: e.id,
 
               title: res.data.title,
               order: res.data.order,
               logo: res.data.logo,
+              img:res.data.img,
               show:
                 res.data.show == 1
                   ? (res.data.show = true)
@@ -340,7 +359,27 @@ getList(page, title) {
       });
     },
 // 上传图片
-    uploadFile(item) {
+    uploadFile2(item) {
+      
+      const formdata = new FormData();
+      formdata.append("upload_img", item.file);
+      formdata.append("type", 1);
+      axios
+        .post(process.env.BASE_API + "index/base/upload", formdata)
+        .then(res => {
+          if (res.data.code == 200) {
+            this.$message.success(res.data.msg);
+            this.imageUrl2 = res.data.data.http_image;
+            this.$nextTick(() => {
+              this.form.img = res.data.data.image;
+            });
+          } else {
+            this.$message.warning(res.data.msg);
+          }
+        })
+        .catch(err => {});
+    },
+       uploadFile(item) {
       
       const formdata = new FormData();
       formdata.append("upload_img", item.file);

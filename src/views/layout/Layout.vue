@@ -47,13 +47,14 @@ export default {
       btn: [],
       levelList: null,
       icon: "el-icon-s-fold",
-      isCollapse: true
+      isCollapse: false
     };
   },
   created() {
     this.getBreadcrumb();
-
-    this.name = this.$store.getters.username;
+ 
+    this.name =sessionStorage.getItem('username') ;
+  
   },
 
   watch: {

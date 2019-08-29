@@ -109,6 +109,11 @@
                   <el-input v-model="ruleForm.number"></el-input>
                 </el-form-item>
               </el-col>
+              <el-col :span="12" >
+                <el-form-item label="商品ID" prop="number">
+                  <el-input v-model="ruleForm.goods_id"  ></el-input>
+                </el-form-item>
+              </el-col>
               <el-col :span="12">
                
               </el-col>
@@ -132,6 +137,11 @@
               <el-col :span="12">
                 <el-form-item label="赠送积分" prop="integral">
                   <el-input v-model.number="ruleForm.integral"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="兑换积分" prop="exchange_integral">
+                  <el-input v-model.number="ruleForm.exchange_integral"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="22">
@@ -198,14 +208,15 @@
                   <el-row :gutter="24">
                     <el-col :span="2">尺码：</el-col>
                     <el-col :span="12">
-                      <el-radio-group v-model="checkedCities">
-                        <el-radio
-                          v-for="item in sizes"
-                          :label="item"
-                          :key="item"
-                          style="margin-bottom:15px;"
-                        >{{item}}</el-radio>
-                      </el-radio-group>
+                   
+                       <el-checkbox-group v-model="checkedSizes">
+                         <template  v-for="(item,index) in sizes">
+                           <el-checkbox :label="item"   :key="item" style="margin-bottom:15px;"> </el-checkbox>
+   <br v-if='index==8||index==20'>
+                         </template>
+   
+   
+  </el-checkbox-group>
                     </el-col>
                     <el-col :span="10">
                       <el-input v-model="sizeInput" placeholder="请输入尺码" style="width:150px"></el-input>
@@ -215,14 +226,14 @@
                   <el-row :gutter="24" style="margin-bottom:20px;">
                     <el-col :span="2">颜色：</el-col>
                     <el-col :span="12">
-                      <el-radio-group v-model="checkedColors">
-                        <el-radio
+                      <el-checkbox-group v-model="checkedColors">
+                        <el-checkbox
                           v-for="item in colors"
                           :label="item"
                           :key="item"
                           style="margin-bottom:15px;"
-                        >{{item}}</el-radio>
-                      </el-radio-group>
+                        >{{item}}</el-checkbox>
+                      </el-checkbox-group>
                     </el-col>
                     <el-col :span="10">
                       <el-input v-model="colorInput" placeholder="请输入颜色" style="width:150px"></el-input>
@@ -249,14 +260,28 @@
                
                    <el-table-column label="尺码" prop="size"></el-table-column>
                   <el-table-column label="颜色" prop="color"></el-table-column>
-                  <el-table-column label="销售价格" prop="money">
+                   <el-table-column label="进货价"  >
                     <template slot-scope="scope">
-                      <el-input v-model="scope.row.money"   type="number" placeholder="销售价格"  min="0"></el-input>
+                      <el-input v-model="scope.row.join_money"    placeholder="进货价"  min="0"></el-input>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="销售价格" prop="money">
+                       <template slot-scope="scope">
+                      <el-input v-model="scope.row.money"   type="number" placeholder="销售价格"  min="0" @blur="changeMoney(scope,scope.row)"></el-input>
+                    </template>
+                  </el-table-column>
+                    
+                 
+                  
+                
+                    <el-table-column label="vip价"  >
+                    <template slot-scope="scope">
+                      <el-input v-model="scope.row.vip_money"  type="number"    placeholder="vip价"  min="0" @blur="changeVip(scope,scope.row)"></el-input>
                     </template>
                   </el-table-column>
                   <el-table-column label="商品库存">
                     <template slot-scope="scope">
-                      <el-input v-model="scope.row.stock" type="number" placeholder="商品库存" min="0"></el-input>
+                      <el-input v-model="scope.row.stock" type="number" placeholder="商品库存" min="0" ></el-input>
                     </template>
                   </el-table-column>
                   <el-table-column label="SKU编号">
@@ -291,7 +316,7 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column align="right" width="300px">
+                  <el-table-column align="right"   label="操作">
                    
                     <template slot-scope="scope">
                     
@@ -313,7 +338,8 @@
               <el-col :span="22" style="display:flex;">
                 <div class="block" style="display:flex;" v-if="showFile">
                   <template v-for="(item,index) in fileList">
-                    <div style="height:250px; margin-right:20px; ">
+
+                    <div style="height:250px; margin-right:20px; " v-if="index<=5">
                       <div>
                         <el-image
                           :src="item"
@@ -334,8 +360,9 @@
                   <el-upload
                     class="avatar-uploader"
                     :http-request="uploadFile2"
-                    :limit="5"
+                   
                     action
+                  multiple
                     :show-file-list="false"
                     :file-list="fileLists"
                   >
@@ -349,6 +376,7 @@
             <el-col :span="2">商品详情</el-col>
             <el-col :span="22">
               <editor :init="init" v-model="data"></editor>
+              
             </el-col>
           </el-row>
         </div>
@@ -412,6 +440,7 @@
             </el-col>
             <el-col :span="24">
               <el-transfer
+            @left-check-change='checkChange'
                 @change="handleChange"
                 v-model="value2"
                 :data="data2"
@@ -455,6 +484,7 @@ import "tinymce/plugins/media"; // 插入视频插件
 import "tinymce/plugins/table"; // 插入表格插件
 import "tinymce/plugins/lists"; // 列表插件
 import "tinymce/plugins/wordcount"; // 字数统计插件
+ 
 export default {
   props: {
     plugins: {
@@ -502,6 +532,7 @@ export default {
         // 此处为图片上传处理函数，这个直接用了base64的图片形式上传图片，
         // 如需ajax上传可参考https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_handler
         images_upload_handler: (blobInfo, success, failure) => {
+          debugger
           // const img = 'data:image/jpeg;base64,' + blobInfo.base64()
           // success(img)
           if (blobInfo.blob().size > self.maxSize) {
@@ -535,6 +566,7 @@ export default {
       tableData2: [], //
       search: "",
       ruleForm: {
+        goods_id:"",
         classify_id: "",
         classify_id_two: "",
         type: "",
@@ -547,6 +579,7 @@ export default {
         sales_volume: "",
         warehouse_id: "",
         integral: "",
+        exchange_integral:"",
         production_cycle: "",
         production_cycle_status: true,
         limit_buy: "",
@@ -579,21 +612,30 @@ export default {
         "M",
         "L",
         "XL",
-        "XXL",
-        "XS",
+        "2XL",
+          "3XL",
+            "4XL",
+              "5XL",
+       
         "均码",
+          "25码",
         "26码",
         "27码",
         "28码",
-        "29码"
+        "29码",
+        "30码",
+        "31码","32码","33码","34码","35码","36码",
+        "35","36","37","38","39","40","41","42","43",
       ], //商品尺码
-      checkedCities: [],
+      checkedSizes: [],
+        checkedColors: [],
+        checkList:[],
       sizeInput: "",
       colorInput: "",
       currentRow: "",
       rightData: "",
       colors: ["黑色", "白色", "红色", "蓝色", "黄色"], //商品尺码
-      checkedColors: [],
+    
       showFile: true,
       rules: {
         classify_id: [
@@ -635,6 +677,14 @@ export default {
             trigger: "blur"
           }
         ],
+        exchange_integral: [
+          {
+            required: true,
+            type: "number",
+            message: "请输入兑换积分，必须为数字",
+            trigger: "blur"
+          }
+        ],
         production_cycle: [
           { required: true, message: "请输入生产周期", trigger: "blur" }
         ],
@@ -660,9 +710,34 @@ export default {
     Editor
   },
   mounted() {},
+  watch:{   //监听路由变化
+    $route( to , from ){   
+    
+     if(to.path!=from.path){
+this.resetForm()
+     }
+     },
+//      fileList:function(val){
+//        debugger
+//  if(val.length>5){
+//   debugger
+//  val=  val.splice(0,5)
+  
+//  }
+// }
+},
   created() {
      this.getSeleData();
-    if (this.$route.query.id) {
+this.getUpdate(this.$route.query.id)
+   
+  },
+   
+  methods: {
+
+
+    getUpdate(e){
+    
+    if (e) {
       this.isEdit = true;
       http
         .post("admin/goods/goods_one", { id: this.$route.query.id })
@@ -681,10 +756,11 @@ export default {
                 supplier_id: res.detail.supplier_id,
                 synopsis: res.detail.synopsis,
                 number: res.detail.number,
-
+                goods_id: res.detail.goods_id,
                 sales_volume: res.detail.sales_volume,
                 warehouse_id: res.detail.warehouse_id,
                 integral: res.detail.integral,
+                exchange_integral:res.detail.exchange_integral,
                 production_cycle: res.detail.production_cycle,
                 production_cycle_status:
                   res.detail.production_cycle_status == "1" ? true : false,
@@ -705,6 +781,9 @@ export default {
               this.fileList[0] = res.detail.img;
               this.data = res.detail.detail;
               this.tableData = res.detail.data;
+             this.tableData.forEach(val=>{
+              val.selected= val.selected=='1'?true:false
+             })
             });
           }
         });
@@ -743,9 +822,48 @@ this.ruleForm = JSON.parse(sessionStorage.getItem("product"));
 
     
     }
+    },
+    changeMoney(e,index){
+       this.$nextTick(() => {
+    if(index.money<=index.join_money){
+     
+     
+        this.$message.error("销售价价不能小于进货价")
+       
+ this.tableData[e.$index].money=null
+     
    
-  },
-  methods: {
+
+    }
+    if(index.money<=index.vip_money){
+     
+     
+        this.$message.error("销售价价不能小于Vip价")
+       
+ this.tableData[e.$index].money=null
+     
+   
+
+    }
+  })
+ 
+    },
+     changeVip(e,index){
+       this.$nextTick(() => {
+    if(index.vip_money<index.join_money){
+     
+     
+        this.$message.error("vip价不能小于进货价")
+       
+ this.tableData[e.$index].vip_money=null
+     
+   
+
+    }
+  })
+
+ 
+    },
     changeCode(e,i){
       
 this.$nextTick(() => {
@@ -754,7 +872,7 @@ this.$nextTick(() => {
       if((/[\u4e00-\u9fa5]/).test(e.sku)){
         this.$message.error("不能含有中文字符")
         console.log(i.$index)
- this.tableData[i.$index].sku=''
+ this.tableData[i.$index].sku=0
       } 
    
 
@@ -770,11 +888,24 @@ this.currentRow=e
  check(e){
  
  },
+ checkChange(e){
+
+ 
+ },
     handleChange(value, direction, movedKeys) {
-      this.rightData = movedKeys;
+    
+  this.rightData = movedKeys;
+     
+    
     },
     // 提交商品
     next3() {
+ debugger
+if(this.value2.length>=4){
+ this.$message.error("最多只能选择四个")
+}else{
+
+
       this.$nextTick(() => {
         this.ruleForm.goods_relation = this.rightData.toString();
         this.ruleForm.shelf == true
@@ -859,7 +990,7 @@ this.currentRow=e
         }
       });
       });
-       
+       }
    
     },
     // 设为主图
@@ -925,27 +1056,47 @@ this.currentRow=e
     },
     // 添加商品
     add() {
-      if (this.checkedCities.length < 1 || this.checkedColors.length < 1) {
+      if (this.checkedSizes.length < 1 || this.checkedColors.length < 1) {
         this.$message.error("至少选择一种尺码和颜色");
       } else {
-        let isSel = true;
-        this.tableData.length > 0 ? (isSel = false) : (isSel = true);
-        this.tableData.push({
-          id: "",
-          size: this.checkedCities,
-          color: this.checkedColors,
-          money: 0,
-          stock: 0,
-          img: "",
-          selected: isSel,
-          sku: 0,
-          status: 1
-        });
+        // let color=this.checkedColors
+        // let size=this.checkedSizes
+      
+       
+this.checkedColors.forEach(color=>{
+  this.checkedSizes.forEach(size=>{
 
-        (this.checkedCities = []), (this.checkedColors = []);
+    if(this.tableData.some(val=>val.color==color&&val.size==size)){
+          this.$message.error(color+'和'+size+"已添加")
+        }else{
+           this.tableData.push({
+                      id: "",
+                      size: size,
+                      color:color,
+                      money: 0,
+                      join_money:0,
+                      vip_money:0,
+                      stock: 0,
+                      img: "",
+                      selected: false,
+                      sku: 0,
+                      status: 1
+                    });
+        }
+        
+        })
+  })
+
+
+
+        
+        this.checkedSizes = [] 
+        this.checkedColors = []
+     
+
+       
       }
-      console.log(this.checkedCities);
-      console.log(this.checkedColors);
+     
     },
     handleEdit(index, row) {
       console.log(index, row);
@@ -1100,7 +1251,7 @@ this.currentRow=e
 
     uploadFile(item) {
    
-      const formdata = new FormData();
+const formdata = new FormData();
       formdata.append("upload_img", item.file);
       formdata.append("type", 1);
       axios
@@ -1116,24 +1267,36 @@ this.currentRow=e
           }
         })
         .catch(err => {});
+  
+      
     },
     uploadFile2(item) {
-      const formdata = new FormData();
+       
+ const formdata = new FormData();
       formdata.append("upload_img", item.file);
       formdata.append("type", 1);
       axios
         .post(process.env.BASE_API + "index/base/upload", formdata)
         .then(res => {
           if (res.data.code == 200) {
-            this.$message.success(res.data.msg);
-
-            this.fileList.push(res.data.data.http_image);
+            console.log(this.fileList.length)
+            
+         
+ if(this.fileList.length<5){
+ this.fileList.push(res.data.data.http_image);
+ }else{
+     
+ }
+           
+ 
           } else {
             this.$message.warning(res.data.msg);
           }
         })
         .catch(err => {});
-    }
+      }
+     
+    
   }
 };
 </script>

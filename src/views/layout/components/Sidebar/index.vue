@@ -7,6 +7,7 @@
     active-text-color="#0BB9FF"
    style="height:100%;"
    :collapse="isCollapse" 
+   :unique-opened='true'
   >
     <template v-for="items in routers">
       <template v-if="items.meta.hidden==false">
