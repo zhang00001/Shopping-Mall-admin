@@ -36,7 +36,7 @@
 <script>
 import http from "@/utils/request";
 import { formatDate } from '@/utils/date.js'
-import {admin_log} from "@/api/homeApi"
+import {admin_log} from "@/api/index"
 import axios from "axios";
 export default {
   data() {

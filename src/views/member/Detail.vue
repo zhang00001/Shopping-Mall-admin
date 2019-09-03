@@ -6,10 +6,11 @@
       <el-row :gutter="8">
         <el-col :span="2" class="avatar">
           <el-avatar :size="100" :src="circleUrl"></el-avatar>
-          <p>{{userInfo.nick}}</p>
+          <p>{{userInfo.nick}} -  店长</p>
           <p>
-            店长
-            <i @click="dialogVisible = true" class="el-icon-edit"></i>
+           
+            <el-button @click="dialogVisible = true" size="mini">赠送积分</el-button>
+            <!-- <i @click="dialogVisible = true" class="el-icon-edit"></i> -->
           </p>
         </el-col>
         <el-col :span="4">
@@ -75,7 +76,6 @@
           <div class="out-border">
             <div class="layout-title">
               <span>统计信息</span>
-              <el-button size="mini">查看积分明细</el-button>
             </div>
             <div style="padding:5px 0 20px 10px">
               <el-row class="font-medium">
@@ -101,8 +101,10 @@
             <div class="layout-title">
               <span>财务信息</span>
               <div>
-                <el-date-picker v-model="value2" type="month" placeholder="选择月" size="mini"></el-date-picker>
-                <el-button size="mini">查看资金明细</el-button>
+                <el-date-picker v-model="value2" type="month" placeholder="选择月" size="mini" @change='changeMonth'></el-date-picker>
+                <el-button size="mini" @click="seeIntegral">查看积分明细</el-button>
+                <el-button size="mini" @click="seeGrade">查看等级变更明细</el-button>
+                <el-button size="mini" @click="seeMoney">查看资金明细</el-button>
               </div>
             </div>
             <div style="padding:5px 0 20px 10px ">
@@ -171,28 +173,33 @@
         </el-col>
       </el-row>
     </div>
-    <el-dialog title="编辑用户" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
+    <el-dialog title="设置积分" :visible.sync="dialogVisible" width="30%"  >
       <el-form :model="form">
-        <el-form-item label="手机号" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="会员等级" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="可用积分" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="赠送积分" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
+        <el-form-item label="赠送积分">
+          <el-input v-model="integral"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="giveIntegral">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="积分明细" :visible.sync="dialogVisible2" width="30%" :before-close="handleClose">
-      <el-table :data="tableData" style="width: 100%">
+    <el-dialog title="积分明细" :visible.sync="dialogVisible2" width="50%">
+      <el-table :data="tableDataIntegral" style="width: 100%">
+        <el-table-column prop="id" label="ID"></el-table-column>
+        <el-table-column prop="addtime" label="创建时间"></el-table-column>
+        <el-table-column prop="integral" label="积分"></el-table-column>
+        <el-table-column prop="msg" label="备注"></el-table-column>
+        <el-table-column prop="type" label="类型"></el-table-column>
+      </el-table>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="totalIntegral"
+        @current-change="handleCurrentChangeIntegral"
+      ></el-pagination>
+    </el-dialog>
+    <el-dialog title="等级变更明细" :visible.sync="dialogVisible3" width="50%">
+      <el-table :data="tableDataGrade" style="width: 100%">
         <el-table-column prop="date" label="订单编号"></el-table-column>
         <el-table-column prop="name" label="提交时间"></el-table-column>
         <el-table-column prop="address" label="用户账户"></el-table-column>
@@ -200,24 +207,15 @@
         <el-table-column prop="address" label="支付方式"></el-table-column>
 
         <el-table-column prop="address" label="订单状态"></el-table-column>
-        <el-table-column prop="address" label="操作">
-          <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">查看订单</el-button>
-          </template>
-        </el-table-column>
       </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible2 = false">确 定</el-button>
-      </span>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="total2"
+        @current-change="handleCurrentChange2"
+      ></el-pagination>
     </el-dialog>
-    <el-dialog
-      title="等级变更明细"
-      :visible.sync="dialogVisible3"
-      width="30%"
-      :before-close="handleClose"
-    >
-      <el-table :data="tableData" style="width: 100%">
+    <el-dialog title="资金变更" :visible.sync="dialogVisible4" width="50%">
+      <el-table :data="tableDataMoney" style="width: 100%">
         <el-table-column prop="date" label="订单编号"></el-table-column>
         <el-table-column prop="name" label="提交时间"></el-table-column>
         <el-table-column prop="address" label="用户账户"></el-table-column>
@@ -225,52 +223,42 @@
         <el-table-column prop="address" label="支付方式"></el-table-column>
 
         <el-table-column prop="address" label="订单状态"></el-table-column>
-        <el-table-column prop="address" label="操作">
-          <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">查看订单</el-button>
-          </template>
-        </el-table-column>
+       
       </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible3 = false">确 定</el-button>
-      </span>
-    </el-dialog>
-    <el-dialog title="资金变更" :visible.sync="dialogVisible4" width="30%" :before-close="handleClose">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="date" label="订单编号"></el-table-column>
-        <el-table-column prop="name" label="提交时间"></el-table-column>
-        <el-table-column prop="address" label="用户账户"></el-table-column>
-        <el-table-column prop="address" label="订单金额"></el-table-column>
-        <el-table-column prop="address" label="支付方式"></el-table-column>
-
-        <el-table-column prop="address" label="订单状态"></el-table-column>
-        <el-table-column prop="address" label="操作">
-          <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">查看订单</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible4 = false">确 定</el-button>
-      </span>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="total3"
+        @current-change="handleCurrentChange3"
+      ></el-pagination>
     </el-dialog>
   </div>
 </template>
 <script>
-import { user_one } from "@/api/index";
+import {
+  user_one,
+  user_integral_give,
+  user_integral,
+  user_grade,
+  user_money
+} from "@/api/index";
 export default {
   data() {
     return {
       memberId: "",
+      total3: 0,
+      total2: 0,
       userInfo: null,
+      tableDataMoney: [],
+      tableDataGrade: [],
       tableData: [],
+      tableDataIntegral: [],
+      totalIntegral: 0,
       value2: "",
       dialogVisible: false,
       dialogVisible2: false,
       dialogVisible3: false,
       dialogVisible4: false,
+      integral: "",
       form: {
         name: "",
         region: "",
@@ -290,13 +278,88 @@ export default {
     this.getData();
   },
   methods: {
-    handleClose(done) {
-      this.$confirm("确认关闭？")
-        .then(_ => {
-          done();
-        })
-        .catch(_ => {});
+
+    changeMonth(e){
+      this.value2
+ 
     },
+    // 查看积分明细
+    seeIntegral() {
+      (this.dialogVisible2 = true), this.getIntegral(1);
+    },
+    seeGrade() {
+      (this.dialogVisible3 = true), this.getGrade(1);
+    },
+    seeMoney() {
+      (this.dialogVisible4 = true), this.getMoney(1);
+    },
+    // 赠送积分
+    giveIntegral() {
+      user_integral_give({
+        id: this.$route.query.id,
+        integral: this.integral
+      }).then(res => {
+       
+        if (res.code == 200) {
+          this.$message.success(res.msg);
+          this.dialogVisible = false;
+          this.getData();
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    getGrade(page) {
+     
+      user_grade({
+        page: page,
+        limit: 10,
+        user_id: this.$route.query.id
+      }).then(res => {
+      
+        if (res.code == 200) {
+          this.tableDataGrade = res.data.data;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    getMoney(page) {
+      user_money({
+        page: page,
+        limit: 10,
+        user_id: this.$route.query.id
+      }).then(res => {
+        if (res.code == 200) {
+          this.tableDataMoney = res.data.data;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    getIntegral(page) {
+      user_integral({
+        page: page,
+        limit: 10,
+        user_id: this.$route.query.id
+      }).then(res => {
+        if (res.code == 200) {
+          this.tableDataIntegral = res.data.data;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    handleCurrentChangeIntegral(e) {
+      this.getIntegral(e);
+    },
+    handleCurrentChange2(e) {
+      this.getGrade(e);
+    },
+    handleCurrentChange3(e) {
+      this.getMoney(e);
+    },
+
     getData() {
       user_one({ id: this.$route.query.id }).then(res => {
         if (res.code == 200) {

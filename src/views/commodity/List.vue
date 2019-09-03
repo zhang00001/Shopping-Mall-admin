@@ -6,10 +6,10 @@
 
         <el-row style="margin-bottom:10px;">
           <el-col :span="6" >
-            <span>商品名称</span>
+            <span>商品</span>
 
             <el-input
-              placeholder="请输入内容"
+              placeholder="商品名称/货号/商品Id"
               prefix-icon="el-icon-search"
               v-model="searchTitle"
               style="width:200px;"

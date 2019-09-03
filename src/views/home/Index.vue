@@ -58,8 +58,9 @@
             <div class="layout-title">用户总览</div>
             <div style="padding: 40px">
               <el-row>
-                <el-col :span="6" class="color-danger overview-item-value">{{center.user.register_tatal}}</el-col>
+               
                 <el-col :span="6" class="color-danger overview-item-value">{{center.user.register_today}}</el-col>
+                 <el-col :span="6" class="color-danger overview-item-value">{{center.user.register_tatal}}</el-col>
                 <el-col :span="6" class="color-danger overview-item-value">{{center.user.vip_today}}</el-col>
                 <el-col :span="6" class="color-danger overview-item-value">{{center.user.vip_total}}</el-col>
               </el-row>
@@ -74,55 +75,149 @@
         </el-col>
       </el-row>
     </div>
-     <div class="un-handle-layout">
-      <div class="layout-title">待处理事务</div>
+
+    <el-row :gutter="24">
+  <el-col :span="8">
+    <div class="un-handle-layout">
+      <div class="layout-title">试衣间订单统计</div>
       <div class="un-handle-content">
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">待付款订单</span>
-              <span style="float: right" class="color-danger">{{down.one.data}}</span>
+        <el-row :gutter="24">
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage(down.one.all)">
+              <span class="font-medium">{{down.one.all.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.one.all.num}}</span>
             </div>
           </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">待发货订单</span>
-              <span style="float: right" class="color-danger">{{down.five.data}}</span>
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage(down.one.one)">
+              <span class="font-medium">{{down.one.one.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.one.one.num}}</span>
             </div>
           </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">待处理退款申请</span>
-              <span style="float: right" class="color-danger">{{down.three.data}}</span>
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage(down.one.two)">
+              <span class="font-medium">{{down.one.two.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.one.two.num}}</span>
             </div>
           </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">待处理退货申请</span>
-              <span style="float: right" class="color-danger">{{down.four.data}}</span>
+         
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage(down.one.three)">
+             <span class="font-medium">{{down.one.three.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.one.three.num}}</span>
             </div>
           </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">待处理提现申请</span>
-              <span style="float: right" class="color-danger">{{down.four.data}}</span>
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage(down.one.four)">
+              <span class="font-medium">{{down.one.four.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.one.four.num}}</span>
             </div>
           </el-col>
-          <el-col :span="8">
-            <div class="un-handle-item">
-              <span class="font-medium">已发货订单</span>
-              <span style="float: right" class="color-danger">{{down.four.data}}</span>
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage(down.one.five)">
+             <span class="font-medium">{{down.one.five.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.one.five.num}}</span>
             </div>
           </el-col>
         </el-row>
       
       </div>
     </div>
+  </el-col>
+  <el-col :span="8">
+    <div class="un-handle-layout">
+      <div class="layout-title">品牌订单统计</div>
+      <div class="un-handle-content">
+         <el-row :gutter="24">
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage2(down.two.all)">
+              <span class="font-medium">{{down.two.all.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.two.all.num}}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage2(down.two.one)"> 
+              <span class="font-medium">{{down.two.one.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.two.one.num}}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage2(down.two.two)">
+              <span class="font-medium">{{down.two.two.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.two.two.num}}</span>
+            </div>
+          </el-col>
+         
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage2(down.two.three)">
+             <span class="font-medium">{{down.two.three.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.two.three.num}}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage2(down.two.four)">
+              <span class="font-medium">{{down.two.four.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.two.four.num}}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage2(down.two.five)">
+             <span class="font-medium">{{down.two.five.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.two.five.num}}</span>
+            </div>
+          </el-col>
+        </el-row>
+      
+      </div>
+    </div>
+  </el-col>
+  <el-col :span="8">
+    <div class="un-handle-layout">
+      <div class="layout-title">积分特价订单统计</div>
+      <div class="un-handle-content">
+        <el-row :gutter="24">
+          <el-col :span="12">
+            <div class="un-handle-item" @click="goPage3(down.three.all)">
+              <span class="font-medium">{{down.three.all.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.three.all.num}}</span>
+            </div>
+          </el-col>
+        <el-col :span="12">
+            <div class="un-handle-item"   @click="goPage3(down.three.one)">
+              <span class="font-medium">{{down.three.one.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.three.one.num}}</span>
+            </div>
+          </el-col>
+           <el-col :span="12">
+            <div class="un-handle-item"  @click="goPage3(down.three.two)">
+              <span class="font-medium">{{down.three.two.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.three.two.num}}</span>
+            </div>
+          </el-col>
+         
+          <el-col :span="12">
+            <div class="un-handle-item"  @click="goPage3(down.three.three)">
+             <span class="font-medium">{{down.three.three.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.three.three.num}}</span>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="un-handle-item"  @click="goPage3(down.three.four)">
+              <span class="font-medium">{{down.three.four.msg}}</span>
+              <span style="float: right" class="color-danger">{{down.three.four.num}}</span>
+            </div>
+          </el-col>
+           
+        </el-row>
+      
+      </div>
+    </div>
+  </el-col>
+    </el-row>
+     
      
     </div>
-    <div class="total-layout">
+    <!-- <div class="total-layout">
        <div class="layout-title">快捷入口</div>
       <el-row :gutter="24">
         <el-col :span="4">
@@ -169,14 +264,14 @@
           </div>
         </el-col>
       </el-row>
-    </div>
+    </div> -->
 
   </div>
 </template>
 
 <script>
 import AnimatedNumber from "animated-number-vue";
-import {getIndex} from "@/api/homeApi"
+import {getIndex} from "@/api/index"
 import http from "@/utils/request";
 export default {
   name: "home",
@@ -202,11 +297,7 @@ vip_today: 0,
 vip_total: 0
         }
       },down:{
-        one:{data:0,msg:"待付款订单"},
-        two:{data:0,msg:"待发货订单"},
-        three:{data:0,msg:"待处理退款申请"},
-        four:{data:0,msg:"待处理提现申请"},
-        five:{data:0,msg:"待发货订单"}
+      
       },up:{
         money_today: 0,
 money_total: 0,
@@ -225,6 +316,16 @@ order_today: 0
     this.getList();
   },
   methods: {
+    goPage(e){
+
+this.$router.push({ path: '/order/index',query:{map:JSON.stringify(e) } })
+    },
+       goPage2(e){
+ this.$router.push({ path: '/order/index2',query:{map:JSON.stringify(e) } })
+    },
+       goPage3(e){
+ this.$router.push({ path: '/order/index3',query:{map:JSON.stringify(e) } })
+    },
     getList() {
       getIndex({}).then(res => {
          if(res){
@@ -303,7 +404,7 @@ order_today: 0
   }
   .un-handle-item {
     border-bottom: 1px solid #EBEEF5;
-    padding: 10px;
+    padding: 10px;    cursor: pointer;
   }
   .overview-layout {
     margin-top: 20px;

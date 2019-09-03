@@ -8,11 +8,33 @@ const OPERATE_ROUTERS = [{
 
         ],
     }, {
-        path: 'women',
+        path: 'class',
         component: () =>
             import ('@/views/operate/Women'),
 
-        meta: { title: '女/男/童装', icon: 'el-icon-trans', hidden: false },
+        meta: { title: '首页-分类', icon: 'el-icon-trans', hidden: false },
+        children: [
+
+        ]
+
+    },
+    {
+        path: 'vip',
+        component: () =>
+            import ('@/views/operate/Vip'),
+
+        meta: { title: 'Vip礼包', icon: 'el-icon-trans', hidden: false },
+        children: [
+
+        ]
+
+    },
+    {
+        path: 'banner',
+        component: () =>
+            import ('@/views/operate/Banner'),
+
+        meta: { title: 'Banner管理', icon: 'el-icon-trans', hidden: false },
         children: [
 
         ]

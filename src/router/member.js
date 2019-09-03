@@ -23,7 +23,7 @@ const MEMBER_ROUTERS = [{
         component: () =>
             import ('@/views/member/Grade'),
 
-        meta: { title: '会员等级', icon: 'el-icon-trans', hidden: false },
+        meta: { title: '会员等级', icon: 'el-icon-trans', hidden: true },
         children: [
 
         ]
@@ -45,7 +45,7 @@ const MEMBER_ROUTERS = [{
         component: () =>
             import ('@/views/member/Withdraw_Rule'),
 
-        meta: { title: '提现规则', icon: 'el-icon-trans', hidden: false },
+        meta: { title: '提现规则', icon: 'el-icon-trans', hidden: true },
         children: [
 
         ]

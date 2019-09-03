@@ -2,7 +2,7 @@
   <div>
     <div class="top">
       <div class="demo-input-suffix searchInput">
-        <span>广告名称：</span>
+        <span>名称：</span>
 
         <el-input
           placeholder="请输入内容"
@@ -26,27 +26,26 @@
       >
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="id" label="编号" width="180"></el-table-column>
-        <el-table-column prop="name" label="广告名称" width="180"></el-table-column>
-        <el-table-column prop="position" label="广告位置" width="180"></el-table-column>
-        <el-table-column prop="order" label="排序" width="180"></el-table-column>
-        <el-table-column prop="icon" label="广告图片" width="180">
+        <el-table-column prop="name" label="名称" width="180"></el-table-column>
+        <el-table-column prop="position" label="位置" width="180"></el-table-column>
+        <el-table-column prop="img" label="图片" width="180">
           <template slot-scope="scope">
-            <template v-if="scope.row.icon">
-              <img :src="scope.row.icon" alt style="width:30px;height:30px;" />
+            <template v-if="scope.row.img">
+              <img :src="scope.row.img" alt style="width:30px;height:30px;" />
             </template>
           </template>
         </el-table-column>
+        <el-table-column prop="url" label="跳转链接" width="180"></el-table-column>
 
-        <el-table-column prop="show" label="状态">
+        <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
-            <template v-if="scope.row.show==1">正常</template>
+            <template v-if="scope.row.status==1">正常</template>
             <template v-else>否</template>
           </template>
         </el-table-column>
 
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="editGood(scope.row)">管理商品</el-button>
             <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
             <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
           </template>
@@ -62,10 +61,10 @@
 
       <el-dialog :title="title" :visible.sync="dialogFormVisible">
         <el-form :model="form" ref="form" :rules="rules" label-width="auto">
-          <el-form-item label="广告名称" prop="name">
+          <el-form-item label="名称" prop="name">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
-          <el-form-item label="广告位置" prop="position">
+          <el-form-item label="位置" prop="position">
             <el-select v-model="form.position" placeholder="请选择">
               <el-option
                 v-for="item in position"
@@ -75,16 +74,16 @@
               ></el-option>
             </el-select>
           </el-form-item>
-
-          <el-form-item label="排序" prop="order">
-            <el-input v-model="form.order"></el-input>
+          <el-form-item label="跳转链接" prop="url">
+            <el-input v-model="form.url"></el-input>
           </el-form-item>
-          <el-form-item label="广告图标">
+          <el-form-item label="图片" :label-width="formLabelWidth">
             <el-upload
               class="avatar-uploader"
               :http-request="uploadFile"
               action
               :show-file-list="false"
+              :file-list="fileLists"
             >
               <img v-if="imageUrl" :src="imageUrl" class="avatar" />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -96,40 +95,27 @@
           <el-button type="primary" @click="save">确 定</el-button>
         </div>
       </el-dialog>
-      <el-dialog title="管理商品" :visible.sync="dialogFormVisible2">
-        <SelectGoods :Id='selectId'   :status="'ad'"  ref="headerChild" v-if="dialogFormVisible2"></SelectGoods>
-        <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="saveGood">确 定</el-button>
-        </div>
-      </el-dialog>
     </template>
   </div>
 </template>
 
 <script>
 import http from "@/utils/request";
-import { POSITION } from "@/utils/enums";
 import {
-  advertisement_more,
-  advertisement_manage,
-  advertisement_one,
-  advertisement_del,advertisement_log
+  banner_more,
+  banner_manage,
+  banner_one,
+  banner_del
 } from "@/api/index";
+import { POSITION } from "@/utils/enums";
 import axios from "axios";
-import  SelectGoods  from "./SelectGoods";
 export default {
-  components: {
-    SelectGoods
-  },
   data() {
     return {
       isDisable: true,
-selectId:"",
-serchTitle:"",
+      serchTitle: "",
       tableData: [],
       tableData2: [],
-      position: [],
-      dialogFormVisible2: false,
       multipleSelection: [],
       total: 0,
       total2: 0,
@@ -139,48 +125,32 @@ serchTitle:"",
       imageUrl2: "",
       showClass2: false,
       form: {
-        order: "",
         name: "",
-        icon: "",
+        img: "",
+        url: "",
         position: ""
       },
-     
+      position: [],
+      selectId: "",
       rules: {
         name: [{ required: true, message: "必填字段", trigger: "blur" }],
 
-        position: [{ required: true, message: "必填字段", trigger: "blur" }]
+        url: [{ required: true, message: "必填字段", trigger: "blur" }],
+           position: [{ required: true, message: "必填字段", trigger: "blur" }]
       },
       dialogFormVisible: false,
       formLabelWidth: "120px"
     };
   },
   created() {
-    this.position = POSITION;
     this.getList(1, this.serchTitle);
+    this.position = POSITION;
   },
   methods: {
-    editGood(e) {
-       this.selectId=e.id
-  this.dialogFormVisible2=true
-    },
     add() {
       this.dialogFormVisible = true;
-      this.title = "新增广告";
+      this.title = "新增Banner";
       this.form.id = "";
-    },
-    saveGood(){
-let goods= this.$refs.headerChild.defulGood
- 
-if(goods.length>0){
-  advertisement_log({advertisement_id:this.selectId,goods_id:goods.toString()}).then(res=>{
-   if(res.code==200){
-     this.dialogFormVisible=false
-   this.$message.success(res.msg)
-   }else{
-     this.$message.error(res.msg)
-   }
-  })
-}
     },
     handleCurrentChange(e) {
       this.getList(e, this.serchTitle);
@@ -192,28 +162,6 @@ if(goods.length>0){
       } else {
         this.isDisable = true;
       }
-    },
-    //   批量删除
-    delAll() {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        http
-          .post("admin/goods/batch_del", {
-            id: this.multipleSelection.map(val => val.id).toString(),
-            type: 1
-          })
-          .then(res => {
-            if (res.code == 200) {
-              this.getList(1, this.serchTitle);
-            } else {
-              this.$message.error(res.msg);
-            }
-          })
-          .catch(() => {});
-      });
     },
 
     handleClose(done) {
@@ -233,7 +181,7 @@ if(goods.length>0){
         type: "warning"
       })
         .then(() => {
-          advertisement_del({ id: e.id }).then(res => {
+          banner_del({ id: e.id }).then(res => {
             if (res.data.code == 200) {
               this.$message.success(res.data.msg);
 
@@ -253,7 +201,7 @@ if(goods.length>0){
     },
     // 加载列表
     getList(page) {
-      advertisement_more({
+      banner_more({
         page: page,
         limit: 10
       }).then(res => {
@@ -268,20 +216,19 @@ if(goods.length>0){
     // 编辑回显
     edit(e) {
       (this.dialogFormVisible = true),
-        advertisement_one({ id: e.id }).then(res => {
+        banner_one({ id: e.id }).then(res => {
           if (res.code == 200) {
             this.title = "编辑";
 
             this.$nextTick(() => {
-              this.imageUrl = res.data.icon;
+              this.imageUrl = res.data.img;
 
               this.form = {
                 id: e.id,
 
-                order: res.data.order,
                 name: res.data.name,
-                icon: res.data.icon,
-                position: res.data.position
+                position: res.data.position,
+                url: res.data.url
               };
             });
           } else {
@@ -295,15 +242,16 @@ if(goods.length>0){
         if (valid) {
           console.log(this.form);
 
-          this.form.icon = /(http|https):\/\/([\w.]+\/?)\S*/.test(
-            this.form.icon
+          this.form.logo = /(http|https):\/\/([\w.]+\/?)\S*/.test(
+            this.form.logo
           )
-            ? this.form.icon.split(this.form.icon.split("/upload")[0])[1]
-            : this.form.icon;
+            ? this.form.logo.split(this.form.logo.split("/upload")[0])[1]
+            : this.form.logo;
 
-          advertisement_manage(this.form).then(res => {
-            if (res.code == 200) {
-              this.$message.success(res.msg);
+          banner_manage(this.form).then(res => {
+            debugger;
+            if (res.data.code == 200) {
+              this.$message.success(res.data.msg);
               this.imageUrl = "";
               this.dialogFormVisible = false;
 
@@ -330,7 +278,7 @@ if(goods.length>0){
             this.$message.success(res.data.msg);
             this.imageUrl = res.data.data.http_image;
             this.$nextTick(() => {
-              this.form.icon = res.data.data.image;
+              this.form.img = res.data.data.image;
             });
           } else {
             this.$message.warning(res.data.msg);

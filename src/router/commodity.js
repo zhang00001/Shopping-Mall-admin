@@ -6,6 +6,7 @@
          meta: { title: '商品列表', icon: 'el-icon-trans', hidden: false },
          children: []
      },
+
      {
          path: 'edit',
          component: () =>

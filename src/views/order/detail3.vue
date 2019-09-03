@@ -6,16 +6,10 @@
       </span>
       <span>{{data.status_name}}</span>
       <!-- <el-button size="mini" v-if="data.status==0&&data.confirm==0" type="primary" @click="send">审核</el-button> -->
-     
-      <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send2">发货</el-button>
-      <el-button size="mini" v-if="data.status==1" type="primary" @click="send2">发货</el-button>
-      <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send3">生产</el-button>
-      <el-button
-        size="mini"
-        v-if="data.status==2"
-        type="primary"
-        @click="logistics(data.logistics_number)"
-      >查看物流</el-button>
+      <!-- <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send2">发货</el-button> -->
+      <el-button size="mini" v-if="data.status==0" type="primary" @click="send2">发货</el-button>
+      <!-- <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send3">生产</el-button> -->
+      <el-button size="mini" v-if="data.status==2" type="primary"  @click="logistics(data.logistics_number)">查看物流</el-button>
       <el-button size="mini" v-if="data.status==4" type="primary" @click="send4">退货审核</el-button>
       <!-- <el-button size="mini" v-if="data.status==5" type="primary" @click="dialogFormVisible5=true">查看退货物流信息</el-button> -->
       <el-button size="mini" v-if="data.status==5" type="primary" @click="over">退货完成</el-button>

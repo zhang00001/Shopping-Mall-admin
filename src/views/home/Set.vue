@@ -26,7 +26,7 @@
 
 <script>
 import http from "@/utils/request";
-import {account_set} from "@/api/homeApi"
+import {account_set} from "@/api/index"
   export default {
     data() {
       return {

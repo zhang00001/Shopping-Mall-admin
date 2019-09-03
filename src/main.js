@@ -22,6 +22,13 @@ import ECharts from 'vue-echarts/components/ECharts'
 import 'echarts/lib/chart/line'
 Vue.component('chart', ECharts)
 Vue.config.productionTip = false
+import VueQuillEditor from 'vue-quill-editor'
+// require styles 引入样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+Vue.use(VueQuillEditor)
 
 new Vue({
     el: '#app',

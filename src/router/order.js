@@ -23,11 +23,11 @@ const ORDER_ROUTERS = [{
         children: []
     },
     {
-        path: 'index/detail2',
+        path: 'index2/detail2',
         component: () =>
             import ('@/views/order/detail2'),
 
-        meta: { title: '试衣间订单详情', icon: 'el-icon-trans', hidden: true },
+        meta: { title: '品牌订单详情', icon: 'el-icon-trans', hidden: true },
         children: []
     },
     {
@@ -39,11 +39,19 @@ const ORDER_ROUTERS = [{
         children: []
     },
     {
+        path: 'index3/detail3',
+        component: () =>
+            import ('@/views/order/detail3'),
+
+        meta: { title: '积分特价订单', icon: 'el-icon-trans', hidden: true },
+        children: []
+    },
+    {
         path: 'set',
         component: () =>
             import ('@/views/order/Set'),
 
-        meta: { title: '订单设置', icon: 'el-icon-trans', hidden: false },
+        meta: { title: '订单设置', icon: 'el-icon-trans', hidden: true },
         children: []
     },
     // {
@@ -59,10 +67,17 @@ const ORDER_ROUTERS = [{
         component: () =>
             import ('@/views/order/Refund'),
 
-        meta: { title: '退货管理', icon: 'el-icon-trans', hidden: false },
+        meta: { title: '退款管理', icon: 'el-icon-trans', hidden: false },
         children: []
     },
+    // {
+    //     path: 'refund/detail',
+    //     component: () =>
+    //         import ('@/views/order/Refund_detail'),
 
+    //     meta: { title: '退款详情', icon: 'el-icon-trans', hidden: true },
+    //     children: []
+    // },
 
 
 

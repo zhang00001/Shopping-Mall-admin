@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <el-radio-group v-model="radio1" style="margin-top:20px;">
+      <el-radio-group v-model="radio1" style="margin-top:20px;" @change="changeRadio">
         <el-radio-button v-for="(item,index) in orderType" :key="index" :label="item.value">{{item.label}}</el-radio-button>
       </el-radio-group>
     </div>
@@ -71,17 +71,12 @@
         <el-table-column prop="id" label="订单金额"></el-table-column>
         <el-table-column prop="id" label="支付方式"></el-table-column>
 
-        <el-table-column prop="shelf" label="订单状态">
-          <template slot-scope="scope">
-            <template v-if="scope.row.shelf==0">下架</template>
-            <template v-else>上架</template>
-          </template>
-        </el-table-column>
+           <el-table-column prop="msg" label="订单状态"></el-table-column>
 
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button @click="edit(scope.row)" type="text" size="small">查看</el-button>
-            <el-button @click="edit(scope.row)" type="text" size="small">关闭</el-button>
+            <!-- <el-button @click="edit(scope.row)" type="text" size="small">关闭</el-button> -->
             <!-- <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button> -->
           </template>
         </el-table-column>
@@ -155,12 +150,8 @@ export default {
         { value: "1", label: "待付款" },
         { value: "2", label: "待发货" },
         { value: "3", label: "待收货" },
-        { value: "4", label: "已完成" },
-        { value: "5", label: "已关闭" },
-        { value: "6", label: "待审核" },
-        { value: "7", label: "待评价" },
-        { value: "8", label: "待生产" },
-        { value: "9", label: "生产中" }
+        { value: "4", label: "退货" },
+   
       ],
       isDisable: true,
       multipleSelection: [],
@@ -181,7 +172,7 @@ export default {
       warehouses: [],
       suppliers: [],
       total: 0,
-
+map:{},
       title: "新增",
       fileLists: [],
 
@@ -202,9 +193,63 @@ export default {
     };
   },
   created() {
-    this.getList(1, this.searchTitle);
+   if (this.$route.query.map) {
+     
+      let routerMsg = JSON.parse(this.$route.query.map);
+      switch (routerMsg.msg) {
+        case "全部":
+          this.radio1 = 0;
+          break;
+        case "待付款":
+          this.radio1 = 1;
+          break;
+        case "待发货":
+          this.radio1 = 2;
+          break;
+        case "待收货":
+          this.radio1 = 3;
+          break;
+        case "退货":
+          this.radio1 = 4;
+          break;
+         
+         
+        default:
+          this.radio1 = 0;
+      }
+    
+      this.map=routerMsg.map
+    } else {
+      this.radio1 = "0";
+      this.map = JSON.stringify({ goods_type: 1, show: 1 });
+    }
+    this.getList(1, this.searchTitle, this.map);
   },
   methods: {
+        changeRadio(){
+      
+switch (this.radio1) {
+        case 0:
+        this.map = JSON.stringify({goods_type:["in",[3,3]],show:1} );
+          break;
+        case "1":
+         this.map = JSON.stringify({goods_type:["in",[3,3]],status:0,confirm:2,money_status:0,show:1});
+          break;
+        case "2":
+           this.map = JSON.stringify({goods_type:["in",[3,3]],status:0,confirm:2,money_status:1,show:1});
+          break;
+        case "3":
+       this.map = JSON.stringify({goods_type:["in",[3,3]],status:2,confirm:2,money_status:1,show:1});
+          break;
+        case "4":
+            this.map = JSON.stringify({goods_type:["in",[3,3]],status:4,confirm:2,money_status:1,show:1});
+          break;
+       
+        default:
+        this.map = JSON.stringify({goods_type:1,show:1} );
+     } 
+      this.getList(1, this.searchTitle, this.map);
+     },
     handleCurrentChange(e) {
       this.getList(e, this.searchTitle);
     },
@@ -323,8 +368,8 @@ export default {
     },
 
     // 加载列表
-    getList(page, title) {
-      order_more({ page: page, limit: 10, title: title,type:3 }).then(res => {
+    getList(page, title,map) {
+      order_more({ page: page, limit: 10, title: title,type:3,map:map }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;
           this.total = res.data.count;
@@ -335,7 +380,7 @@ export default {
     },
     // 编辑回显
     edit(e) {
-      this.$router.push({ path: "edit", query: { id: e.id } });
+         this.$router.push({ path: "index3/detail3", query: { id: e.id } });
       // http.post("admin/goods/goods_one", { id: e.id }).then(res => {
       //   if (res.code == 200) {
       //    sessionStorage.setItem("edit",JSON.stringify(res.detail))

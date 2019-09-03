@@ -3,14 +3,16 @@
     <el-header>
       <navbar :info="name"></navbar>
     </el-header>
-    <el-container style="height:100%;min-height: 80vh;">
+    <el-container style="    padding-top: 70px;
+    position: relative;
+    height: 100vh; ">
        
    <sidebar class="sidebar-container" :isCollapse="isCollapse"></sidebar>
      
    
       <el-container>
-        <el-main>
-          <div class="top">
+        <el-main  >
+          <div class="top"  >
             <i :class="icon" @click="changeSidebar"></i>
             <el-breadcrumb separator="/">
               <el-breadcrumb-item
@@ -21,10 +23,20 @@
               >{{item.meta.title}}</el-breadcrumb-item>
             </el-breadcrumb>
           </div>
-          <app-main></app-main>
+          <app-main   ></app-main>
+              <!-- <i class='el-icon-arrow-up' @click="backTop" style="      position: absolute;
+    bottom: 20vh;
+    right: 100px;
+    font-size: 24px;
+    color: rgb(48, 194, 166);
+    border: 1px solid;
+    border-radius: 50%;
+    padding: 5px;"></i> -->
         </el-main>
+      
       </el-container>
     </el-container>
+
   </el-container>
 </template>
 
@@ -38,6 +50,8 @@ export default {
     Sidebar,
     AppMain
   },
+ 
+
 
   computed: {},
   data() {
@@ -62,6 +76,9 @@ export default {
       this.getBreadcrumb();
     }},
     methods: {
+     
+
+ 
       changeSidebar() {
         if (this.isCollapse) {
           this.isCollapse = false;
@@ -72,7 +89,9 @@ export default {
         }
       },
       getBreadcrumb() {
+      
         this.levelList = this.$route.matched.filter(item => item.meta.title);
+    
       }
     }
  
@@ -85,10 +104,13 @@ export default {
   @include clearfix;
   position: relative;
   height: 100%;
-  width: 100%;
+  width: 100%; 
 }
 .el-header {
-  height: 70px !important;
+  height: 70px !important; 
+    position: fixed;
+    top: 0;
+    width: 100vw;  z-index: 999;
 }
 .top {
   display: flex;

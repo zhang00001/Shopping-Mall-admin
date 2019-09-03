@@ -1,8 +1,12 @@
 <template>
   <div>
     <div>
-      <el-radio-group v-model="radio1" style="margin-top:20px;">
-        <el-radio-button v-for="(item,index) in orderType" :key="index" :label="item.value">{{item.label}}</el-radio-button>
+      <el-radio-group v-model="radio1" style="margin-top:20px;" @change="changeRadio">
+        <el-radio-button
+          v-for="(item,index) in orderType"
+          :key="index"
+          :label="item.value"
+        >{{item.label}}</el-radio-button>
       </el-radio-group>
     </div>
     <div class="top">
@@ -66,25 +70,12 @@
       >
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="id" label="编号"></el-table-column>
-        <el-table-column prop="id" label="提交时间"></el-table-column>
-        <el-table-column prop="id" label="用户账户"></el-table-column>
-        <el-table-column prop="id" label="订单金额"></el-table-column>
-        <el-table-column prop="id" label="支付方式"></el-table-column>
+        <el-table-column prop="addtime" label="提交时间"></el-table-column>
+        <el-table-column prop="mobile" label="用户账户"></el-table-column>
+        <el-table-column prop="money" label="订单金额"></el-table-column>
+        <el-table-column prop="pay_type" label="支付方式"></el-table-column>
 
-        <el-table-column prop="status" label="订单状态">
-          <template slot-scope="scope">
-            <template v-if="scope.row.status==0">待审核</template>
-             <template v-if="scope.row.status==1">代付款</template>
-              <template v-if="scope.row.status==2">代发货</template>
-               <template v-if="scope.row.status==3">待收货</template>
-                <template v-if="scope.row.status==4">已完成</template>
-                 <template v-if="scope.row.status==5">已关闭</template>
-                  <template v-if="scope.row.status==6">待评价</template>
-                   <template v-if="scope.row.status==7">生产中</template>
-                    <template v-if="scope.row.status==8">等待生产</template>
-  
-          </template>
-        </el-table-column>
+        <el-table-column prop="msg" label="订单状态"></el-table-column>
 
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -160,19 +151,16 @@ export default {
       value: "",
       orderType: [
         { value: "0", label: "全部订单" },
-        { value: "1", label: "待付款" },
+        { value: "1", label: "待审核" },
         { value: "2", label: "待发货" },
         { value: "3", label: "待收货" },
-        { value: "4", label: "已完成" },
-        { value: "5", label: "已关闭" },
-        { value: "6", label: "待审核" },
-        { value: "7", label: "待评价" },
-        { value: "8", label: "待生产" },
-        { value: "9", label: "生产中" }
+        { value: "4", label: "待支付" },
+        { value: "5", label: "退货" }
       ],
       isDisable: true,
       multipleSelection: [],
       allTitle: "全选",
+      map: {},
       selAll: false,
       supplier: "",
       radio1: "",
@@ -209,10 +197,76 @@ export default {
       formLabelWidth: "120px"
     };
   },
+  watch:{
+ $route( to , from ){   
+    
+     if(from.query){
+ 
+     }
+     },
+  },
   created() {
-    this.getList(1, this.searchTitle);
+    
+    if (this.$route.query.map) {
+     
+      let routerMsg = JSON.parse(this.$route.query.map);
+      switch (routerMsg.msg) {
+        case "全部":
+          this.radio1 = 0;
+          break;
+        case "待审核":
+          this.radio1 = 1;
+          break;
+        case "待发货":
+          this.radio1 = 2;
+          break;
+        case "待收货":
+          this.radio1 = 3;
+          break;
+        case "待支付":
+          this.radio1 = 4;
+          break;
+        case "退货":
+          this.radio1 = 5;
+          break;
+        default:
+          this.radio1 = 0;
+      }
+    
+      this.map=routerMsg.map
+    } else {
+      this.radio1 = "0";
+      this.map = JSON.stringify({ goods_type: 1, show: 1 });
+    }
+    this.getList(1, this.searchTitle, this.map);
   },
   methods: {
+    changeRadio(){
+      
+switch (this.radio1) {
+        case 0:
+        this.map = JSON.stringify({goods_type:1,show:1} );
+          break;
+        case "1":
+         this.map = JSON.stringify({goods_type:1,confirm:0,status:0,money_status:0,show:1});
+          break;
+        case "2":
+           this.map = JSON.stringify({goods_type:1,confirm:2,status:0,money_status:0,show:1});
+          break;
+        case "3":
+       this.map = JSON.stringify({goods_type:1,confirm:2,status:2,money_status:0,show:1});
+          break;
+        case "4":
+            this.map = JSON.stringify({goods_type:1,money_status:0,show:1});
+          break;
+        case "5":
+           this.map = JSON.stringify({goods_type:1,confirm:2,status:4,money_status:0,show:1});
+          break;
+        default:
+        this.map = JSON.stringify({goods_type:1,show:1} );
+     } 
+      this.getList(1, this.searchTitle, this.map);
+     },
     handleCurrentChange(e) {
       this.getList(e, this.searchTitle);
     },
@@ -331,38 +385,17 @@ export default {
     },
 
     // 加载列表
-    getList(page, title) {
-      order_more({ page: page, limit: 10, title: title,type:1 }).then(res => {
+    getList(page, title, map) {
+      order_more({
+        page: page,
+        limit: 10,
+        title: title,
+        type: 1,
+        map: map
+      }).then(res => {
         if (res.code == 200) {
-          // this.tableData = res.data.data;
-          this.tableData=[{
-        id:1,
-        status:1
-      },{
-        id:2,
-        status:2
-      },{
-        id:2,
-        status:2
-      },{
-        id:3,
-        status:3
-      },{
-        id:4,
-        status:4
-      },{
-        id:5,
-        status:5
-      },{
-        id:6,
-        status:6
-      },{
-        id:7,
-        status:7
-      },{
-        id:8,
-        status:8
-      }]
+          this.tableData = res.data.data;
+
           this.total = res.data.count;
         } else {
           this.$message.error(res.msg);

@@ -46,6 +46,13 @@ export const order_logistics_status = data => http.post('/admin/order/order_logi
 export const order_set = data => http.post('/admin/order/order_set', data); //订单设置
 export const order_more = data => http.post('/admin/order/order_more', data); //订单(列表)
 export const order_look = data => http.post('/admin/order/order_look', data); //订单(查看订单)
+export const order_confim = data => http.post('/admin/order/order_confim', data); //订单(试衣间订单审核)
+export const back_confirm = data => http.post('admin/order/back_confirm', data); //订单(退货审核)
+
+export const back_finish = data => http.post('admin/order/back_finish', data); //订单(完成退货)
+export const order_produce = data => http.post('/admin/order/order_produce', data); //订单(品牌订单生产中)
+export const order_cancel = data => http.post('/admin/order/order_cancel', data); //订单(未支付订单取消)
+export const order_back = data => http.post('/admin/order/order_back', data); //订单(退货列表)
 
 // 用户会员
 export const user_integral = data => http.post('/admin/user/user_integral', data); //会员(等级变更明细)
@@ -55,7 +62,8 @@ export const user_del = data => http.post('/admin/user/user_del', data); //会�
 export const user_one = data => http.post('/admin/user/user_one', data); //会员(单条)
 export const user_manage = data => http.post('/admin/user/user_manage', data); //会员(操作)
 export const user_more = data => http.post('/admin/user/user_more', data); //会员(列表)
-
+export const user_integral_give = data => http.post('/admin/user/user_integral_give', data); //会员(积分赠送)
+export const user_grade = data => http.post('/admin/user/user_grade', data); //会员(等级变更明细)
 // 运营
 export const withdraw_status = data => http.post('/admin/operate/withdraw_status', data); //提现管理(打款)
 export const withdraw_more = data => http.post('/admin/operate/withdraw_more', data); //提现管理(列表)
@@ -73,6 +81,17 @@ export const advertisement_del = data => http.post('/admin/operate/advertisement
 export const advertisement_one = data => http.post('/admin/operate/advertisement_one', data); //广告位(单条)
 export const advertisement_manage = data => http.post('/admin/operate/advertisement_manage', data); //广告位(操作)
 export const advertisement_more = data => http.post('/admin/operate/advertisement_more', data); //广告位(列表)
+export const special_more = data => http.post('/admin/operate/special_more', data); //专题管理(列表)
+export const special_goods_del = data => http.post('/admin/operate/special_goods_del', data); // 专题管理(商品批量删除)
+export const special_goods_data = data => http.post('/admin/operate/special_goods_data', data); //专题管理(商品数据)
+export const special_one = data => http.post('/admin/operate/special_one', data); //专题管理(单条)
+export const special_goods_join = data => http.post('/admin/operate/special_goods_join', data); //专题管理(导入产品)
+export const special_del = data => http.post('/admin/operate/special_del', data); //专题管理(删除)
+
+export const special_manage = data => http.post('/admin/operate/special_manage', data); // 专题管理(操作)
+export const advertisement_del_data = data => http.post('admin/operate/advertisement_del_data', data); // 广告位(数据批量删除)
+
+
 
 
 // 设置
@@ -86,3 +105,7 @@ export const config_message = data => http.post('/admin/set/config_message', dat
 // 管理员
 export const login = data => http.post('/admin/base/login', data); //后台登录
 export const reset = data => http.post('/admin/base/reset', data); //后台改密
+
+
+// 第三方数据
+export const logistics = data => http.post('/index/base/logistics', data); //查看物流

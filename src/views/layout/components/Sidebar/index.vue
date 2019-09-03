@@ -87,10 +87,10 @@ export default {
 </style>
 <style  >
    .el-menu-vertical-demo:not(.el-menu--collapse) {
-    width: 210px;
-     min-height: 100vh
+    width: 210px; height: 100vh
+     
   }
    .el-menu-vertical-demo{
-     min-height: 100vh
+     height: 100vh
   }
 </style>

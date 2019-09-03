@@ -6,12 +6,12 @@
 
         <el-row style="margin-bottom:10px;">
           <el-col :span="6" >
-            <span>用户id</span>
+            <span>Vip等级</span>
 
             <el-input
-              placeholder="用户id"
+              placeholder="Vip等级"
               prefix-icon="el-icon-search"
-              v-model="searchTitle"
+              v-model="vip_grade"
               style="width:200px;"
             ></el-input>
           </el-col>
@@ -29,7 +29,7 @@
             <span>注册时间</span>
 
             <el-date-picker
-      v-model="searchTitle"
+      v-model="searchTime"
       type="date"
       placeholder="选择日期">
     </el-date-picker>
@@ -71,14 +71,20 @@
            <el-table-column prop="id" label="订单数量"></el-table-column>
         <el-table-column prop="id" label="可用余额"></el-table-column>
           <el-table-column prop="id" label="可用贷款"></el-table-column>
+          
         <el-table-column prop="shelf" label="账户状态">
              <template slot-scope="scope">
-               <template v-if="scope.row.shelf==0">
-                 禁用
+
+              
+
+               <template>
+                <el-switch
+  v-model="scope.row.status"
+  active-color="#13ce66"
+   @change='changeOption(scope.row)' >
+</el-switch>
                </template>
-               <template v-else>
-                  正常
-               </template>
+               
         
             
           </template>
@@ -89,7 +95,7 @@
             <el-button @click="edit(scope.row)" type="text" size="small">查看</el-button>
              <!-- <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button> -->
             <!-- <el-button @click="edit(scope.row)" type="text" size="small">关闭</el-button> -->
-            <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
+            <!-- <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button> -->
           </template>
         </el-table-column>
       </el-table>
@@ -102,34 +108,19 @@
       :value="item.value">
     </el-option>
   </el-select>
-   <el-button style="    margin-left: 20px;" type="primary" @click="delAll" :disabled='isDisable'>确定</el-button>
+   <!-- <el-button style="    margin-left: 20px;" type="primary" @click="delAll" :disabled='isDisable'>确定</el-button> -->
         <el-pagination layout="prev, pager, next" :total="total"   @current-change="handleCurrentChange"></el-pagination>
       </div>
       
 
-      <el-dialog :title="title" :visible.sync="dialogFormVisible" :before-close="handleClose">
-        <el-form :model="form" ref="form" :rules="rules">
-          <el-form-item label="供货商" :label-width="formLabelWidth" prop="supplier">
-            <el-input v-model="form.supplier" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="联系人" :label-width="formLabelWidth" prop="name">
-            <el-input v-model="form.name" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="联系电话" :label-width="formLabelWidth" prop="mobile">
-            <el-input v-model="form.mobile" autocomplete="off"></el-input>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="save">确 定</el-button>
-        </div>
-      </el-dialog>
+      
     </template>
   </div>
 </template>
 
 <script>
 import http from "@/utils/request";
-import {user_more } from "@/api/index";
+import {user_more ,user_del} from "@/api/index";
 import axios from "axios";
 export default {
   data() {
@@ -149,14 +140,14 @@ export default {
       multipleSelection: [],
       allTitle: "全选",
       selAll: false,
-      supplier: "",
+      supplier: "", 
       tableData: [],
 supplier_id:"",
 warehouse_id:"",
 shelf:"",
 brand_id:"",
 type:"",
-classify_id:"",searchTitle:"",classs:[],brands:[],warehouses:[],suppliers:[],
+classify_id:"",searchTitle:"",vip_grade:"",searchTime:"",classs:[],brands:[],warehouses:[],suppliers:[],
       total: 0,
 
       title: "新增",
@@ -179,13 +170,33 @@ classify_id:"",searchTitle:"",classs:[],brands:[],warehouses:[],suppliers:[],
     };
   },
   created() {
-   this.getList(1, this.searchTitle,this.classify_id,this.type,this.brand_id,this.shelf,this.warehouse_id,this.supplier_id);
+   this.getList(1, this.vip_grade,this.searchTitle,this.searchTime);
   
-        this.geSelectData()
+        
   },
   methods: {
+    changeOption(e){
+this.$confirm('更改用户账户状态, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let state
+          e.status==true?state=0:state=1
+           user_del({id:e.id,state:state}).then(res=>{
+if(res.code==200){
+  this.$message.success(res.msg)
+}
+           })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+    },
     handleCurrentChange(e){
-  this.getList(e, this.searchTitle,this.classify_id,this.type,this.brand_id,this.shelf,this.warehouse_id,this.supplier_id);
+  this.getList(e, this.vip_grade,this.searchTitle,this.searchTime);
   
     },
     handleSelectionChange(val) {
@@ -201,24 +212,10 @@ classify_id:"",searchTitle:"",classs:[],brands:[],warehouses:[],suppliers:[],
       this.dialogFormVisible = false;
     },
     search() {
-    this.getList(1, this.searchTitle);
+     this.getList(1, this.vip_grade,this.searchTitle,this.searchTime);
   
     },
-    geSelectData(){
-
-http.post("admin/goods/goods_class_more",{page:1,limit:10000}).then(res=>{
-  this.classs=res.data.data
-})
-http.post("admin/goods/brand_more",{page:1,limit:10000}).then(res=>{
-  this.brands=res.data.data
-})
-http.post("admin/goods/warehouse_more",{page:1,limit:10000}).then(res=>{
-  this.warehouses=res.data.data
-})
-http.post("admin/goods/supplier_more",{page:1,limit:10000}).then(res=>{
-  this.suppliers=res.data.data
-})
-    },
+  
     toggleSelection() {
       if (this.selAll) {
         this.selAll = false;
@@ -235,79 +232,83 @@ http.post("admin/goods/supplier_more",{page:1,limit:10000}).then(res=>{
       }
     },
     //   批量删除
-    delAll() {
-      let msg
-      let url
-      let data
-      if(this.value==0){
-msg='是否批量下架'
-url='admin/goods/goods_batch_shelf',
-data={
-  id: this.multipleSelection.map(val => val.id).toString(),
-  shelf:0
-}
-      }
-       if(this.value==1){
-msg='是否批量上架'
-url='admin/goods/goods_batch_shelf'
-data={
-  id: this.multipleSelection.map(val => val.id).toString(),
-  shelf:1
-}
-      }
-        if(this.value==2){
-msg='是否批量删除'
-url='admin/goods/goods_batch_del'
-data={
-  id: this.multipleSelection.map(val => val.id).toString(),
+//     delAll() {
+//       let msg
+//       let url
+//       let data
+//       if(this.value==0){
+// msg='是否批量下架'
+// url='admin/goods/goods_batch_shelf',
+// data={
+//   id: this.multipleSelection.map(val => val.id).toString(),
+//   shelf:0
+// }
+//       }
+//        if(this.value==1){
+// msg='是否批量上架'
+// url='admin/goods/goods_batch_shelf'
+// data={
+//   id: this.multipleSelection.map(val => val.id).toString(),
+//   shelf:1
+// }
+//       }
+//         if(this.value==2){
+// msg='是否批量删除'
+// url='admin/goods/goods_batch_del'
+// data={
+//   id: this.multipleSelection.map(val => val.id).toString(),
   
-}
-      }
-      this.$confirm(msg, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        http
-          .post(url, data)
-          .then(res => {
-            if (res.code == 200) {
-               this.getList(1, this.searchTitle,this.classify_id,this.type,this.brand_id,this.shelf,this.warehouse_id,this.supplier_id);
+// }
+//       }
+//       this.$confirm(msg, "提示", {
+//         confirmButtonText: "确定",
+//         cancelButtonText: "取消",
+//         type: "warning"
+//       }).then(() => {
+//         http
+//           .post(url, data)
+//           .then(res => {
+//             if (res.code == 200) {
+//                this.getList(1,  this.vip_grade,this.searchTitle,this.searchTime);
   
-            } else {
-              this.$message.error(res.msg);
-            }
-          })
-          .catch(() => {});
-      });
-    },
+//             } else {
+//               this.$message.error(res.msg);
+//             }
+//           })
+//           .catch(() => {});
+//       });
+//     },
     //删除
-    delect(e) {
-      this.$confirm("此操作将永久删除, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          http.post("admin/goods/goods_del", { id: e.id }).then(res => {
-            if (res.code == 200) {
-              this.$message.success(res.msg);
-              this.getList(1, this.searchTitle,this.classify_id,this.type,this.brand_id,this.shelf,this.warehouse_id,this.supplier_id);
+    // delect(e) {
+    //   this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+    //     confirmButtonText: "确定",
+    //     cancelButtonText: "取消",
+    //     type: "warning"
+    //   })
+    //     .then(() => {
+    //       http.post("admin/goods/goods_del", { id: e.id }).then(res => {
+    //         if (res.code == 200) {
+    //           this.$message.success(res.msg);
+    //           this.getList(1,  this.vip_grade,this.searchTitle,this.searchTime);
   
-            } else {
-              this.$message.error(res.msg);
-            }
-          });
-        })
-        .catch(() => {});
-    },
+    //         } else {
+    //           this.$message.error(res.msg);
+    //         }
+    //       });
+    //     })
+    //     .catch(() => {});
+    // },
 
     // 加载列表
-    getList(page,pid) {
+    getList(page,pid,vip_grade,search,time) {
      
-        user_more({page:page,limit:10,pid:pid}).then(res=>{
+        user_more({page:page,limit:10,pid:pid,vip_grade:vip_grade,search:search,time:time}).then(res=>{
         if (res.code == 200) {
             this.tableData = res.data.data;
+            this.tableData.forEach(val=>{
+
+              val.status==1? val.status=true: val.status=false
+            })
             this.total = res.data.count;
           } else {
             this.$message.error(res.msg);
@@ -319,34 +320,9 @@ data={
     edit(e) {
       
           this.$router.push({path:"detail",query:{id:e.id}})
-        // http.post("admin/goods/goods_one", { id: e.id }).then(res => {
-        //   if (res.code == 200) {
-        //    sessionStorage.setItem("edit",JSON.stringify(res.detail))
-            
-        //   } else {
-        //     this.$message.error(res.msg);
-        //   }
-        // });
-    },
-    // 新增。编辑保存
-    save() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          http.post("admin/goods/supplier_manage", this.form).then(res => {
-            if (res.code == 200) {
-              this.$message.success(res.msg);
 
-              this.dialogFormVisible = false;
-              this.getList(1, this.searchTitle,this.classify_id,this.type,this.brand_id,this.shelf,this.warehouse_id,this.supplier_id);
+    },
   
-              this.$refs["form"].resetFields();
-            } else {
-              this.$message.error(res.msg);
-            }
-          });
-        }
-      });
-    }
   }
 };
 </script>
