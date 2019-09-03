@@ -66,7 +66,12 @@
       >
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="id" label="编号"></el-table-column>
-        <el-table-column prop="id" label="提交时间"></el-table-column>
+        <el-table-column prop="addtime" label="提交时间">
+             <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+        </el-table-column>
         <el-table-column prop="id" label="用户账户"></el-table-column>
         <el-table-column prop="id" label="订单金额"></el-table-column>
         <el-table-column prop="id" label="支付方式"></el-table-column>

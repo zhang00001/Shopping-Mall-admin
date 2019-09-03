@@ -27,7 +27,12 @@
       <el-table-column prop="address" label="提现到"></el-table-column>
       <el-table-column prop="address" label="提现金额"></el-table-column>
       <el-table-column prop="address" label="手续费"></el-table-column>
-      <el-table-column prop="address" label="提现时间"></el-table-column>
+      <el-table-column prop="address" label="提现时间">
+              <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+      </el-table-column>
       <el-table-column prop="address" label="状态"></el-table-column>
       <el-table-column prop="address" label="操作">
         <template slot-scope="scope">

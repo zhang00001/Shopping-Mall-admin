@@ -43,8 +43,13 @@
              <img :src="scope.row.img" alt="" style="width:100px;height:100px;">
            </template>
         </el-table-column>
-        <!-- <el-table-column prop="mobile" label="相关单品"></el-table-column> -->
-         <el-table-column prop="addtime" label="发布时间"></el-table-column>
+ 
+         <el-table-column prop="addtime" label="发布时间">
+                 <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+         </el-table-column>
          
         <el-table-column prop="status" label="是否显示"></el-table-column>
         <el-table-column label="操作">

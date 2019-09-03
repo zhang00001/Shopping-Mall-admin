@@ -9,7 +9,15 @@
     </el-radio-group>
     <el-table :data="tableData" stripe style="width: 100%">
       <el-table-column prop="id" label="ID" width="180"></el-table-column>
-      <el-table-column prop="name" label="申请时间" width="180"></el-table-column>
+      <el-table-column prop="name" label="申请时间" width="180">
+        
+             <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+      
+
+      </el-table-column>
       <el-table-column prop="address" label="用户账户"></el-table-column>
         <el-table-column prop="address" label="退款金额"></el-table-column>
           <el-table-column prop="address" label="申请状态"></el-table-column>

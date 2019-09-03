@@ -11,10 +11,10 @@
   <div>
     <div>
       <el-radio-group v-model="selectClass" style="margin-top:20px;">
-      <el-radio-button :label="item.id" v-for="item in class_more" :key="item.id">{{item.name}}</el-radio-button>
-    </el-radio-group>
+        <el-radio-button :label="item.id" v-for="item in class_more" :key="item.id">{{item.name}}</el-radio-button>
+      </el-radio-group>
 
-   <br />
+      <br />
       <el-radio-group v-model="selectStatus" style="margin-top:20px;" @change="changeSelect">
         <el-radio-button :label="item.id" v-for="item in adverts" :key="item.id">{{item.name}}</el-radio-button>
       </el-radio-group>
@@ -87,8 +87,10 @@ import {
   package_one,
   goods_class_more,
   brand_more,
-  advertisement_more,advertisement_log,
-  advertisement_log_data,advertisement_del_data
+  advertisement_more,
+  advertisement_log,
+  advertisement_log_data,
+  advertisement_del_data
 } from "@/api/index";
 import axios from "axios";
 export default {
@@ -97,52 +99,42 @@ export default {
   },
   data() {
     return {
-      selectClass:"",
-      class_more:[],
+      selectClass: "",
+      class_more: [],
       selectId: "",
       selectStatus: "",
       serchTitle: "",
       imageUrl: "",
-     
       adverts: [], //广告位
       isDisable: true,
-    
       allTitle: "全选",
-     
       supplier: "",
       tableData: [],
-    
       total: 0,
- 
-
-   
-     
- 
       dialogFormVisible: false
     };
   },
   created() {
-  
     this.getAdv();
   },
   methods: {
-   
-      add(){
-this.dialogFormVisible = true
-    this.selectId=this.selectStatus
-      },
+    add() {
+      this.dialogFormVisible = true;
+      this.selectId = this.selectStatus;
+    },
     saveGood() {
       let goods = this.$refs.headerChild.defulGood;
 
       if (goods.length > 0) {
         advertisement_log({
           advertisement_id: this.selectStatus,
-          goods_id: goods.toString()
+          goods_id: goods.toString(),
+          classif_id: this.selectClass
         }).then(res => {
           if (res.code == 200) {
             this.dialogFormVisible = false;
             this.$message.success(res.msg);
-            this.getList(1);
+             this.getList(1,this.selectStatus);
           } else {
             this.$message.error(res.msg);
           }
@@ -150,7 +142,7 @@ this.dialogFormVisible = true
       }
     },
     changeSelect() {
-      this.getList(1);
+      this.getList(1,this.selectStatus);
     },
     getAdv() {
       advertisement_more({ page: 1, limit: 100 }).then(res => {
@@ -158,18 +150,18 @@ this.dialogFormVisible = true
           if (res.data.data.length > 0) {
             this.adverts = res.data.data.filter(val => val.position == 1);
             this.selectStatus = this.adverts.map(val => val.id)[0];
-            this.getList(1);
+            this.getList(1,this.selectStatus);
           }
         }
       });
-       goods_class_more({ page: 1, limit: 100000, pid: 0 }).then(res => {
+      goods_class_more({ page: 1, limit: 100000, pid: 0 }).then(res => {
         this.class_more = res.data.data;
-        this.selectClass= this.class_more.map(val => val.id)[0];
+        this.selectClass = this.class_more.map(val => val.id)[0];
       });
     },
 
     search() {
-      this.getList(1, this.supplier);
+      this.getList(1, this.selectStatus,this.supplier);
     },
 
     //删除
@@ -183,7 +175,7 @@ this.dialogFormVisible = true
           advertisement_del_data({ id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.getList(1, this.supplier);
+             this.getList(1,this.selectStatus);
             } else {
               this.$message.error(res.msg);
             }
@@ -192,13 +184,15 @@ this.dialogFormVisible = true
         .catch(() => {});
     },
     handleCurrentChange(e) {
-      this.getList(e);
+      
+        this.getList(e,this.selectStatus);
     },
     // 加载列表
-    getList(page) {
+    getList(page,selectClass) {
       advertisement_log_data({
         page: page,
         limit: 10,
+        classif_id:selectClass,
         advertisement_id: this.selectStatus
       }).then(res => {
         if (res.code == 200) {

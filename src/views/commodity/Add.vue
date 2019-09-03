@@ -262,7 +262,7 @@
                         type="number"
                         placeholder="vip价"
                         min="0"
-                        @blur="changeVip(scope,scope.row)"
+                        @blur="changeMoney(scope,scope.row)"
                       ></el-input>
                     </template>
                   </el-table-column>
@@ -359,8 +359,7 @@
           <el-row :gutter="24" style="margin-top:20px;">
             <el-col :span="2">商品详情</el-col>
             <el-col :span="22">
-              <!-- <editor :init="init" v-model="data"></editor> -->
-              <quill-editor
+             <!-- <quill-editor
                 v-model="data"
                 ref="myQuillEditor"
                 :options="editorOption"
@@ -374,9 +373,8 @@
                 @change="afterRead"
                 id="avatar-uploader"
                 style="display:none"
-              />
-
-              <!-- <vue-wangeditor id="editor" v-model="data"></vue-wangeditor> -->
+              /> -->
+<Test :describe='describe' ref="describe"></Test>
             </el-col>
           </el-row>
         </div>
@@ -427,7 +425,7 @@
             </el-col>
             <el-col :span="24">
               <el-transfer
-                @left-check-change="checkChange"
+               
                 @change="handleChange"
                 v-model="value2"
                 :data="data2"
@@ -440,7 +438,6 @@
       </template>
 
       <el-form-item>
-        <!-- <el-button type="primary" v-if="active==1" @click="resetForm">下一步,填写规格并上传图片</el-button> -->
         <el-button type="primary" v-if="active==1" @click="next">下一步,填写规格并上传图片</el-button>
         <template v-if="active==2">
           <el-button type="primary" @click="active=1">上一步,填写商品信息</el-button>
@@ -457,82 +454,57 @@
 
  
 <script>
-const toolbarOptions = [
-  ["bold", "italic", "underline", "strike"], // toggled buttons
-  ["blockquote", "code-block"],
+// const toolbarOptions = [
+//   ["bold", "italic", "underline", "strike"], // toggled buttons
+//   ["blockquote", "code-block"],
 
-  [{ header: 1 }, { header: 2 }], // custom button values
-  [{ list: "ordered" }, { list: "bullet" }],
-  [{ script: "sub" }, { script: "super" }], // superscript/subscript
-  [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-  [{ direction: "rtl" }], // text direction
+//   [{ header: 1 }, { header: 2 }], // custom button values
+//   [{ list: "ordered" }, { list: "bullet" }],
+//   [{ script: "sub" }, { script: "super" }], // superscript/subscript
+//   [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
+//   [{ direction: "rtl" }], // text direction
 
-  [
-    {
-      size: [
-        "medium",
-        "small",
-        "large",
-        "huge",
-        "10px",
-        "12px",
-        "14px",
-        "16px",
-        "18px",
-        "20px",
-        "22px",
-        "24px",
-        "26px",
-        "32px",
-        "48px"
-      ]
-    }
-  ], // custom dropdown
-  [{ header: [1, 2, 3, 4, 5, 6, false] }],
+//   [
+//     {
+//       size: [
+//         "medium",
+//         "small",
+//         "large",
+//         "huge",
+//         "10px",
+//         "12px",
+//         "14px",
+//         "16px",
+//         "18px",
+//         "20px",
+//         "22px",
+//         "24px",
+//         "26px",
+//         "32px",
+//         "48px"
+//       ]
+//     }
+//   ], // custom dropdown
+//   [{ header: [1, 2, 3, 4, 5, 6, false] }],
 
-  [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-  [{ font: [] }],
-  [{ align: [] }],
-  ["link", "image", "video"],
-  ["clean"] // remove formatting button
-];
+//   [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+//   [{ font: [] }],
+//   [{ align: [] }],
+//   ["link", "image", "video"],
+//   ["clean"] // remove formatting button
+// ];
 
 import http from "@/utils/request";
 import axios from "axios";
-import tinymce from "tinymce/tinymce";
-import "tinymce/themes/silver/theme.min.js";
-import "tinymce/skins/ui/oxide/skin.min.css";
-import Editor from "@tinymce/tinymce-vue";
-import "tinymce/plugins/image"; // 插入上传图片插件
-import "tinymce/plugins/media"; // 插入视频插件
-import "tinymce/plugins/table"; // 插入表格插件
-import "tinymce/plugins/lists"; // 列表插件
-import "tinymce/plugins/wordcount"; // 字数统计插件
-import vueWangeditor from "vue-wangeditor";
+import {enumSizes,enumColors} from "@/utils/enums"
+import Test from "./test"
+import { goods_class_more,brand_more,supplier_more,warehouse_more} from "@/api/index";
 export default {
-  props: {
-    plugins: {
-      type: [String, Array],
-      default: " image media table wordcount"
-    },
-    toolbar: {
-      type: [String, Array],
-      default:
-        "undo redo |  formatselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | lists image media table | removeformat"
-    }
+  components: {
+    Test
   },
   data() {
-    // const generateData = _ => {
-    //     const data2 = [];
-    //     for (let i = 1; i <= 15; i++) {
-    //       data2.push({
-    //         key: i,
-    //         label: `备选项 ${ i }`,
 
-    //       });
-    //     }
-    //     return data2;
-    //   };
     return {
       content: null,
 
@@ -547,64 +519,23 @@ export default {
       fileLists: [],
       fileList2s: [],
 
-      editorOption: {
-        modules: {
-          toolbar: {
-            container: toolbarOptions, // 工具栏
-            handlers: {
-              image: function(value) {
-                if (value) {
-                  document.querySelector("#avatar-uploader").click();
-                } else {
-                  this.quill.format("image", false);
-                }
-              }
-            }
-          }
-        }
-      },
-      init: {
-        language: "zh_CN",
-        skin_url: "/tinymce/skins/ui/oxide",
-        // skin_url: '/tinymce/skins/ui/oxide-dark',//暗色系
-        height: 300,
-        plugins: this.plugins,
-        toolbar: this.toolbar,
-        branding: false,
-        menubar: false,
-        // 此处为图片上传处理函数，这个直接用了base64的图片形式上传图片，
-        // 如需ajax上传可参考https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_handler
-        images_upload_handler: (blobInfo, success, failure) => {
-         
-          // const img = 'data:image/jpeg;base64,' + blobInfo.base64()
-          // success(img)
-          if (blobInfo.blob().size > self.maxSize) {
-            failure("文件体积过大");
-          }
-          if (blobInfo.blob().type) {
-            uploadPic();
-          } else {
-            failure("图片格式错误");
-          }
-          function uploadPic() {
-            let formData = new FormData();
-            // 服务端接收文件的参数名，文件数据，文件名
-            //  blobInfo.filename()
-            formData.append("upload_img", blobInfo.blob());
-            formData.append("type", 2);
-            axios
-              .post(process.env.BASE_API + "index/base/upload", formData)
-              .then(res => {
-                if (res.data.code == 200) {
-                  success(res.data.data.http_image);
-                } else {
-                  failure(res.data.msg);
-                }
-              })
-              .catch(err => {});
-          }
-        }
-      },
+      // editorOption: {
+      //   modules: {
+      //     toolbar: {
+      //       container: toolbarOptions, // 工具栏
+      //       handlers: {
+      //         image: function(value) {
+      //           if (value) {
+      //             document.querySelector("#avatar-uploader").click();
+      //           } else {
+      //             this.quill.format("image", false);
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      // },
+     
       tableData: [], //前端显示table表格
       tableData2: [], //
       search: "",
@@ -652,47 +583,15 @@ export default {
       brands: [], //商品品牌
       suppliers: [], //g供货商
       warehouses: [], //仓库
-      sizes: [
-        "S",
-        "M",
-        "L",
-        "XL",
-        "2XL",
-        "3XL",
-        "4XL",
-        "5XL",
-
-        "均码",
-        "25码",
-        "26码",
-        "27码",
-        "28码",
-        "29码",
-        "30码",
-        "31码",
-        "32码",
-        "33码",
-        "34码",
-        "35码",
-        "36码",
-        "35",
-        "36",
-        "37",
-        "38",
-        "39",
-        "40",
-        "41",
-        "42",
-        "43"
-      ], //商品尺码
+      sizes:enumSizes, //商品尺码
       checkedSizes: [],
       checkedColors: [],
       checkList: [],
       sizeInput: "",
       colorInput: "",
       currentRow: "",
-      rightData: "",
-      colors: ["黑色", "白色", "红色", "蓝色", "黄色"], //商品尺码
+      rightData: "",describe:"",
+      colors:enumColors , //商品尺码
 
       showFile: true,
       rules: {
@@ -764,10 +663,7 @@ export default {
       }
     };
   },
-  components: {
-    Editor,
-    vueWangeditor
-  },
+  
   mounted() {},
   watch: {
     //监听路由变化
@@ -776,19 +672,13 @@ export default {
         this.resetForm();
       }
     }
-    //      fileList:function(val){
-    //        debugger
-    //  if(val.length>5){
-    //   debugger
-    //  val=  val.splice(0,5)
-
-    //  }
-    // }
+ 
   },
   computed: {
-    editor() {
-      return this.$refs.myQuillEditor.quill;
-    }
+    
+    // editor() {
+    //   return this.$refs.myQuillEditor.quill;
+    // }
   },
   created() {
     this.getSeleData();
@@ -796,15 +686,15 @@ export default {
   },
 
   methods: {
-    onEditorReady(editor) {
-      // 准备编辑器
-    },
-    onEditorBlur() {}, // 失去焦点事件
-    onEditorFocus() {}, // 获得焦点事件
-    onEditorChange() {}, // 内容改变事件
-    saveHtml: function(event) {
-      alert(this.content);
-    },
+    // onEditorReady(editor) {
+    //   // 准备编辑器
+    // },
+    // onEditorBlur() {}, // 失去焦点事件
+    // onEditorFocus() {}, // 获得焦点事件
+    // onEditorChange() {}, // 内容改变事件
+    // saveHtml: function(event) {
+    //   alert(this.content);
+    // },
     change(status) {
       // this.$Message.info("开关状态：" + status);
       if (status == false) {
@@ -814,46 +704,44 @@ export default {
         this.banstatus = 1;
       }
     },
-    upload(url) {
-      let quill = this.$refs.myQuillEditor.quill;
-      // 获取光标所在位置
-      let length = quill.getSelection().index;
-      // 插入图片  res.info为服务器返回的图片地址
-      quill.insertEmbed(length, "image", url);
-      // 调整光标到最后
-      quill.setSelection(length + 1);
-    },
-    afterRead() {
-      let files = event.target.files;
+    // upload(url) {
+    //   let quill = this.$refs.myQuillEditor.quill;
+    //   // 获取光标所在位置
+    //   let length = quill.getSelection().index;
+    //   // 插入图片  res.info为服务器返回的图片地址
+    //   quill.insertEmbed(length, "image", url);
+    //   // 调整光标到最后
+    //   quill.setSelection(length + 1);
+    // },
+    // afterRead() {
+    //   let files = event.target.files;
      
-      if (files.length > 0) {
-        Array.prototype.forEach.call(files, file => {
-          var that = this;
-          var form = new FormData();
-          form.append("upload_img", file);
-          form.append("type", 2);
-          //   form.append("token", this.$common._getCookie("ht_token"));
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", process.env.BASE_API + "index/base/upload", true);
-          xhr.onreadystatechange = callback;
-          xhr.send(form);
+    //   if (files.length > 0) {
+    //     Array.prototype.forEach.call(files, file => {
+    //       var that = this;
+    //       var form = new FormData();
+    //       form.append("upload_img", file);
+    //       form.append("type", 2);
+    //       //   form.append("token", this.$common._getCookie("ht_token"));
+    //       var xhr = new XMLHttpRequest();
+    //       xhr.open("POST", process.env.BASE_API + "index/base/upload", true);
+    //       xhr.onreadystatechange = callback;
+    //       xhr.send(form);
 
-          function callback(res) {
-            if (xhr.readyState == 4) {
-              if (xhr.status == 200) {
+    //       function callback(res) {
+    //         if (xhr.readyState == 4) {
+    //           if (xhr.status == 200) {
                
-                let url = JSON.parse(res.currentTarget.response).data;
-                console.log(url);
-                that.upload(url.http_image);
-              } else return false;
-            }
-          }
-        });
-      }
-      //   let file = event.target.files;
-      //   // 此时可以自行将文件上传至服务器
-      //   console.log(file);
-    },
+    //             let url = JSON.parse(res.currentTarget.response).data;
+    //             console.log(url);
+    //             that.upload(url.http_image);
+    //           } else return false;
+    //         }
+    //       }
+    //     });
+    //   }
+
+    // },
 
     getUpdate(e) {
       if (e) {
@@ -900,7 +788,7 @@ export default {
 
                 this.fileList = res.detail.imgs ? res.detail.imgs : [];
                 this.fileList[0] = res.detail.img;
-                this.data = res.detail.detail;
+                this.describe = res.detail.detail;
                 this.tableData = res.detail.data;
                 this.tableData.forEach(val => {
                   val.selected = val.selected == "1" ? true : false;
@@ -927,8 +815,8 @@ export default {
                   sessionStorage.getItem("tableData")
                 );
               }
-              if (sessionStorage.getItem("data")) {
-                this.data = JSON.parse(sessionStorage.getItem("data"));
+              if (sessionStorage.getItem("describe")) {
+                this.data = JSON.parse(sessionStorage.getItem("describe"));
               }
               if (sessionStorage.getItem("fileList")) {
                 this.fileList = JSON.parse(sessionStorage.getItem("fileList"));
@@ -953,11 +841,7 @@ export default {
 
           this.tableData[e.$index].money = null;
         }
-      });
-    },
-    changeVip(e, index) {
-      this.$nextTick(() => {
-        if (Number(index.vip_money) < Number(index.join_money)) {
+            if (Number(index.vip_money) < Number(index.join_money)) {
           this.$message.error("vip价不能小于进货价");
 
           this.tableData[e.$index].vip_money = null;
@@ -969,6 +853,7 @@ export default {
         }
       });
     },
+ 
     changeCode(e, i) {
       this.$nextTick(() => {
         if (e.sku !== null) {
@@ -984,13 +869,10 @@ export default {
       this.currentRow = e;
     },
     searchRelation() {
-      this.loadProduct(this.classify_id, this.brand_id, this.title);
+      this.loadProduct(this.classify_id1, this.classify_id2, this.title);
     },
     check(e) {},
-    checkChange(e) {
-      
     
-    },
     handleChange(value, direction, movedKeys) {
       this.rightData = movedKeys;
     },
@@ -1141,16 +1023,13 @@ export default {
         })
         .catch(() => {});
     },
-    handleCurrentChange(val) {
-      this.currentRow = val;
-    },
+ 
     // 添加商品
     add() {
       if (this.checkedSizes.length < 1 || this.checkedColors.length < 1) {
         this.$message.error("至少选择一种尺码和颜色");
       } else {
-        // let color=this.checkedColors
-        // let size=this.checkedSizes
+
 
         this.checkedColors.forEach(color => {
           this.checkedSizes.forEach(size => {
@@ -1180,32 +1059,21 @@ export default {
         this.checkedColors = [];
       }
     },
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
-    },
-    handleRemove(file) {
-      console.log(file);
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    handleDownload(file) {
-      console.log(file);
-    },
+ 
+   
+ 
     next2() {
+      this.describe=this.$refs.describe.describe
       if (this.fileList.length <= 0) {
         return this.$message.error("请上传商品图");
       } else {
         sessionStorage.setItem("fileList", JSON.stringify(this.fileList));
       }
-      if (this.data == "") {
+      if (this.describe == "") {
         return this.$message.error("请输入商品详情");
       } else {
-        sessionStorage.setItem("data", JSON.stringify(this.data));
+       
+        sessionStorage.setItem("describe", JSON.stringify(this.describe));
       }
       if (this.tableData.length > 0) {
         sessionStorage.setItem("tableData", JSON.stringify(this.tableData));
@@ -1261,8 +1129,7 @@ export default {
 
     // 获取下拉数据
     getSeleData() {
-      http
-        .post("admin/goods/goods_class_more", { page: 1, limit: 10000, pid: 0 })
+     goods_class_more({ page: 1, limit: 10000, pid: 0 })
         .then(res => {
           if (res.code == 200) {
             this.classOnes = res.data.data;
@@ -1270,8 +1137,7 @@ export default {
             this.$message.error(res.msg);
           }
         }),
-        http
-          .post("admin/goods/brand_more", { page: 1, limit: 10000 })
+      brand_more({ page: 1, limit: 10000 })
           .then(res => {
             if (res.code == 200) {
               this.brands = res.data.data;
@@ -1279,8 +1145,7 @@ export default {
               this.$message.error(res.msg);
             }
           });
-      http
-        .post("admin/goods/supplier_more", { page: 1, limit: 10000 })
+    supplier_more( { page: 1, limit: 10000 })
         .then(res => {
           if (res.code == 200) {
             this.suppliers = res.data.data;
@@ -1288,8 +1153,7 @@ export default {
             this.$message.error(res.msg);
           }
         });
-      http
-        .post("admin/goods/warehouse_more", { page: 1, limit: 10000 })
+   warehouse_more( { page: 1, limit: 10000 })
         .then(res => {
           if (res.code == 200) {
             this.warehouses = res.data.data;
@@ -1304,8 +1168,7 @@ export default {
       if (e == "") {
         this.classify_id2 = "";
       } else {
-        http
-          .post("admin/goods/goods_class_more", {
+       goods_class_more({
             page: 1,
             limit: 10000,
             pid: e
@@ -1322,8 +1185,7 @@ export default {
     loadClassTwo(e) {
       this.ruleForm.classify_id_two = "";
 
-      http
-        .post("admin/goods/goods_class_more", { page: 1, limit: 10000, pid: e })
+     goods_class_more( { page: 1, limit: 10000, pid: e })
         .then(res => {
           if (res.code == 200) {
             this.classTwos = res.data.data;
@@ -1343,7 +1205,7 @@ export default {
     },
 
     resetForm() {
-      sessionStorage.setItem("data", "");
+      sessionStorage.setItem("describe", "");
       sessionStorage.setItem("tableData", "");
       sessionStorage.setItem("del", "");
       sessionStorage.setItem("fileList", "");
@@ -1358,6 +1220,7 @@ export default {
       axios
         .post(process.env.BASE_API + "index/base/upload", formdata)
         .then(res => {
+          debugger
           if (res.data.code == 200) {
             this.$message.success(res.data.msg);
 
@@ -1376,12 +1239,20 @@ export default {
       axios
         .post(process.env.BASE_API + "index/base/upload", formdata)
         .then(res => {
+        
           if (res.data.code == 200) {
+            
             console.log(this.fileList.length);
-
+ 
             if (this.fileList.length < 5) {
+             
               this.fileList.push(res.data.data.http_image);
+              console.log("cjdai")
+              debugger
+              console.log('jdoka ')
+              debugger
             } else {
+              debugger
             }
           } else {
             this.$message.warning(res.data.msg);

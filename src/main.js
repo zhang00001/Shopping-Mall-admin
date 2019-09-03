@@ -27,8 +27,12 @@ import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-
+import { formatDate } from '@/utils/date.js'
 Vue.use(VueQuillEditor)
+Vue.filter('formatDate', function(time) {
+    var date = new Date(time * 1000);
+    return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
+});
 
 new Vue({
     el: '#app',

@@ -125,7 +125,8 @@ this.dialogFormVisible = true
       if (goods.length > 0) {
         advertisement_log({
           advertisement_id: this.selectStatus,
-          goods_id: goods.toString()
+          goods_id: goods.toString(),
+          classif_id:0,
         }).then(res => {
           if (res.code == 200) {
             this.dialogFormVisible = false;
@@ -183,6 +184,7 @@ this.dialogFormVisible = true
       advertisement_log_data({
         page: page,
         limit: 10,
+classif_id:0,
         advertisement_id: this.selectStatus
       }).then(res => {
         if (res.code == 200) {

@@ -96,7 +96,12 @@
             </div>
             <el-table :data="tableData2" style="width: 100%">
               <el-table-column prop="id" label="ID"></el-table-column>
-              <el-table-column prop="addtime" label="时间"></el-table-column>
+              <el-table-column prop="addtime" label="提交时间">
+             <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+        </el-table-column>
               <el-table-column prop="img" label="图片"></el-table-column>
               <el-table-column prop="mobile" label="手机号"></el-table-column>
               <el-table-column prop="logistics_company" label="物流公司"></el-table-column>

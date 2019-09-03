@@ -38,7 +38,7 @@
           </div>
           <div class="info">
             <p>注册时间：</p>
-            <span>{{userInfo.addtime}}</span>
+            <span>{{userInfo.addtime|formatDate}}</span>
           </div>
           <div class="info">
             <p>推荐人ID：</p>
@@ -156,7 +156,12 @@
             <div style="padding:5px 0 20px 10px ">
               <el-table :data="tableData" style="width: 100%">
                 <el-table-column prop="date" label="订单编号"></el-table-column>
-                <el-table-column prop="name" label="提交时间"></el-table-column>
+                <el-table-column prop="addtime" label="提交时间">
+                   <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+                </el-table-column>
                 <el-table-column prop="address" label="用户账户"></el-table-column>
                 <el-table-column prop="address" label="订单金额"></el-table-column>
                 <el-table-column prop="address" label="支付方式"></el-table-column>
@@ -187,7 +192,12 @@
     <el-dialog title="积分明细" :visible.sync="dialogVisible2" width="50%">
       <el-table :data="tableDataIntegral" style="width: 100%">
         <el-table-column prop="id" label="ID"></el-table-column>
-        <el-table-column prop="addtime" label="创建时间"></el-table-column>
+        <el-table-column prop="addtime" label="创建时间">
+                <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+        </el-table-column>
         <el-table-column prop="integral" label="积分"></el-table-column>
         <el-table-column prop="msg" label="备注"></el-table-column>
         <el-table-column prop="type" label="类型"></el-table-column>
@@ -201,7 +211,12 @@
     <el-dialog title="等级变更明细" :visible.sync="dialogVisible3" width="50%">
       <el-table :data="tableDataGrade" style="width: 100%">
         <el-table-column prop="date" label="订单编号"></el-table-column>
-        <el-table-column prop="name" label="提交时间"></el-table-column>
+        <el-table-column prop="name" label="提交时间">
+                <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+        </el-table-column>
         <el-table-column prop="address" label="用户账户"></el-table-column>
         <el-table-column prop="address" label="订单金额"></el-table-column>
         <el-table-column prop="address" label="支付方式"></el-table-column>
@@ -217,7 +232,12 @@
     <el-dialog title="资金变更" :visible.sync="dialogVisible4" width="50%">
       <el-table :data="tableDataMoney" style="width: 100%">
         <el-table-column prop="date" label="订单编号"></el-table-column>
-        <el-table-column prop="name" label="提交时间"></el-table-column>
+        <el-table-column prop="name" label="提交时间">
+                <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+        </el-table-column>
         <el-table-column prop="address" label="用户账户"></el-table-column>
         <el-table-column prop="address" label="订单金额"></el-table-column>
         <el-table-column prop="address" label="支付方式"></el-table-column>

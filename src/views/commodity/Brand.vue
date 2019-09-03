@@ -11,6 +11,7 @@
           style="width:200px;"
         ></el-input>
       </div>
+        <el-button type="primary" @click="search">搜索</el-button>
       <el-button type="primary" @click="add">添加</el-button>
       <el-button type="primary" :disabled="isDisable" @click="delAll">批量删除</el-button>
       <el-button type="primary" :disabled="isDisable" @click="closeAll(0)">批量关闭</el-button>
@@ -187,6 +188,9 @@ export default {
     this.getList(1, this.serchTitle);
   },
   methods: {
+    search(){
+ this.getList(1, this.serchTitle);
+    },
     add(){
      this.dialogFormVisible = true
      this.title='新增分类'

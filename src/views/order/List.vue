@@ -70,13 +70,19 @@
       >
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="id" label="编号"></el-table-column>
-        <el-table-column prop="addtime" label="提交时间"></el-table-column>
+        <el-table-column prop="addtime" label="提交时间">
+             <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+        </el-table-column>
         <el-table-column prop="mobile" label="用户账户"></el-table-column>
         <el-table-column prop="money" label="订单金额"></el-table-column>
         <el-table-column prop="pay_type" label="支付方式"></el-table-column>
 
         <el-table-column prop="msg" label="订单状态"></el-table-column>
-
+  <el-table-column prop="money_status" label="支付状态"></el-table-column>
+    <el-table-column prop="confirm" label="审核状态"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button @click="edit(scope.row)" type="text" size="small">查看</el-button>
