@@ -35,7 +35,7 @@
 
 <script>
 import http from "@/utils/request";
-import { formatDate } from '@/utils/date.js'
+ 
 import {admin_log} from "@/api/index"
 import axios from "axios";
 export default {
@@ -54,12 +54,7 @@ export default {
      
     
     };
-  },filters: {
-    formatDate(time) {
-    var date = new Date(time*1000);
-    return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
-   }
-},
+  }, 
   created() {
     this.getList(1);
   },

@@ -41,10 +41,13 @@
       <i class='el-icon-remove-outline' @click="remove"></i>-->
       <ul class="infinite-list" style="overflow:auto;height:300px;width:400px;">
         <!-- <li  class="infinite-list-item">{{ i }}</li> -->
-        <!-- 已选择
-        <el-checkbox-group v-model="checkList2">
-          <el-checkbox v-for="item in goodcounts2" :key="item.id"   :label="item">{{item.title}}</el-checkbox>
-        </el-checkbox-group>-->
+        <!-- 已选择 -->
+        <li v-for="item in goodcounts2">
+{{item.title}}
+        </li>
+        <!-- <el-checkbox-group v-model="checkList2">
+          <el-checkbox  :key="item.id"   :label="item">{{item.title}}</el-checkbox>
+        </el-checkbox-group>  -->
       </ul>
     </div>
     <!-- <div style="margin-top:20px;" class="transfer">
@@ -78,7 +81,7 @@ export default {
       page: 0
     };
   },
-  props: ["Id", "status", "isintegral"],
+  props: ["Id", "status", "isintegral","goodcounts2"],
   created() {
     this.getClsss();
 

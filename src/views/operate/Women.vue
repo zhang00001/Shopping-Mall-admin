@@ -10,7 +10,7 @@
 <template>
   <div>
     <div>
-      <el-radio-group v-model="selectClass" style="margin-top:20px;">
+      <el-radio-group v-model="selectClass" style="margin-top:20px;" @change="changeSelect">
         <el-radio-button :label="item.id" v-for="item in class_more" :key="item.id">{{item.name}}</el-radio-button>
       </el-radio-group>
 
@@ -90,7 +90,7 @@ import {
   advertisement_more,
   advertisement_log,
   advertisement_log_data,
-  advertisement_del_data
+  advertisement_del_data,classify
 } from "@/api/index";
 import axios from "axios";
 export default {
@@ -123,7 +123,7 @@ export default {
       this.selectId = this.selectStatus;
     },
     saveGood() {
-      let goods = this.$refs.headerChild.defulGood;
+      let goods = this.$refs.headerChild.checkList.map(val=>val.id);
 
       if (goods.length > 0) {
         advertisement_log({
@@ -134,7 +134,7 @@ export default {
           if (res.code == 200) {
             this.dialogFormVisible = false;
             this.$message.success(res.msg);
-             this.getList(1,this.selectStatus);
+             this.getList(1,this.selectClass);
           } else {
             this.$message.error(res.msg);
           }
@@ -142,26 +142,35 @@ export default {
       }
     },
     changeSelect() {
-      this.getList(1,this.selectStatus);
+       this.getList(1,this.selectClass);
     },
     getAdv() {
-      advertisement_more({ page: 1, limit: 100 }).then(res => {
+       classify({}).then(res => {
+     
+        this.class_more = res.data;
+            this.selectClass = this.class_more.map(val => val.id)[0];
+          advertisement_more({ page: 1, limit: 100 }).then(res => {
         if (res.code == 200) {
           if (res.data.data.length > 0) {
+          
             this.adverts = res.data.data.filter(val => val.position == 1);
             this.selectStatus = this.adverts.map(val => val.id)[0];
-            this.getList(1,this.selectStatus);
+            this.getList(1,this.selectClass);
           }
         }
       });
-      goods_class_more({ page: 1, limit: 100000, pid: 0 }).then(res => {
-        this.class_more = res.data.data;
-        this.selectClass = this.class_more.map(val => val.id)[0];
       });
+     
+      // goods_class_more({ page: 1, limit: 100000, pid: 0 }).then(res => {
+      //   // this.class_more = res.data.data;
+      //   this.selectClass = this.class_more.map(val => val.id)[0];
+      // });
+      
+      
     },
 
     search() {
-      this.getList(1, this.selectStatus,this.supplier);
+      this.getList(1, this.selectClass,this.supplier);
     },
 
     //删除
@@ -175,7 +184,7 @@ export default {
           advertisement_del_data({ id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-             this.getList(1,this.selectStatus);
+             this.getList(1,this.selectClass);
             } else {
               this.$message.error(res.msg);
             }
@@ -185,10 +194,11 @@ export default {
     },
     handleCurrentChange(e) {
       
-        this.getList(e,this.selectStatus);
+        this.getList(e,this.selectClass);
     },
     // 加载列表
     getList(page,selectClass) {
+      
       advertisement_log_data({
         page: page,
         limit: 10,

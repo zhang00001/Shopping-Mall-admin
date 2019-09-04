@@ -46,7 +46,7 @@
 
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="editGood(scope.row)">管理商品</el-button>
+            <!-- <el-button type="text" size="small" @click="editGood(scope.row)">管理商品</el-button> -->
             <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
             <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
           </template>

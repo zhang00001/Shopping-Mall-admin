@@ -65,16 +65,17 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="id" label="编号"></el-table-column>
+      <el-table-column prop="id" label="ID"></el-table-column>
+          <el-table-column prop="order_sn" label="订单编号"></el-table-column>
         <el-table-column prop="addtime" label="提交时间">
              <template slot-scope="scope">
             <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
             
           </template>
         </el-table-column>
-        <el-table-column prop="id" label="用户账户"></el-table-column>
-        <el-table-column prop="id" label="订单金额"></el-table-column>
-        <el-table-column prop="id" label="支付方式"></el-table-column>
+        <el-table-column prop="mobile" label="用户账户"></el-table-column>
+        <el-table-column prop="money" label="订单金额"></el-table-column>
+        <el-table-column prop="pay_type" label="支付方式"></el-table-column>
 
            <el-table-column prop="msg" label="订单状态"></el-table-column>
 

@@ -45,7 +45,7 @@
          <el-col :span="6">
  <el-button type="primary" @click="search">查询</el-button>
   
-      <el-button type="primary" @click="toggleSelection">{{allTitle}}</el-button>
+      <!-- <el-button type="primary" @click="toggleSelection">{{allTitle}}</el-button> -->
     
          </el-col>
           </el-row>
@@ -65,11 +65,11 @@
         <el-table-column prop="id" label="用户ID"></el-table-column>
           <el-table-column prop="mobile" label="用户账户"></el-table-column>
             <el-table-column prop="nick" label="用户昵称"></el-table-column>
-              <el-table-column prop="id" label="微型化"></el-table-column>
+              <el-table-column prop="weixin" label="微信号"></el-table-column>
                 <el-table-column prop="id" label="消费金额"></el-table-column>
                 
-           <el-table-column prop="id" label="订单数量"></el-table-column>
-        <el-table-column prop="id" label="可用余额"></el-table-column>
+           <el-table-column prop="order_num" label="订单数量"></el-table-column>
+        <el-table-column prop="money" label="可用余额"></el-table-column>
           <el-table-column prop="id" label="可用贷款"></el-table-column>
           
         <el-table-column prop="shelf" label="账户状态">
@@ -100,14 +100,14 @@
         </el-table-column>
       </el-table>
        <div class="block">
-          <el-select v-model="value" :disabled='isDisable' placeholder="批量操作">
+          <!-- <el-select v-model="value" :disabled='isDisable' placeholder="批量操作">
     <el-option
       v-for="item in options"
       :key="item.value"
       :label="item.label"
       :value="item.value">
     </el-option>
-  </el-select>
+  </el-select> -->
    <!-- <el-button style="    margin-left: 20px;" type="primary" @click="delAll" :disabled='isDisable'>确定</el-button> -->
         <el-pagination layout="prev, pager, next" :total="total"   @current-change="handleCurrentChange"></el-pagination>
       </div>

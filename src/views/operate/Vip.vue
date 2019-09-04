@@ -77,25 +77,12 @@
           </el-upload>
           </el-form-item>
         </el-form>
-        <div style="display:flex">
-         <p style="margin-right:20px;"> 选择商品</p>
-          <el-select v-model="classify_id" placeholder="一级分类" clearable>
-            <el-option label="全部" value></el-option>
-            <el-option :key="item.id" :label="item.name" :value="item.id" v-for="item in classOnes"></el-option>
-          </el-select>
-          <el-select v-model="brand_id" placeholder="全部品牌" clearable>
-            <el-option label="全部" value></el-option>
-            <el-option :key="item.id" :label="item.name" :value="item.id" v-for="item in classTwos"></el-option>
-          </el-select>
-          <el-input v-model="serchTitle" placeholder="关键词" style="width:200px;"></el-input>
-          <el-button type="primary" @click="searchRelation">搜索</el-button>
-          
-        </div>
-        <div style="margin-top:20px;">
-            <el-transfer v-model="value" :data="data"></el-transfer>
-        </div>
+        <div >
+         
+           <AddGoods   :status="'Vip'" ref="headerChild" :goodcounts2="goodcounts2"  ></AddGoods>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="save">确 定</el-button>
+        </div>
         </div>
       </el-dialog>
     </template>
@@ -104,6 +91,7 @@
 
 <script>
 import http from "@/utils/request";
+import AddGoods from "./../commodity/AddGoods";
 import {
   package_manage,
   package_more,
@@ -115,12 +103,15 @@ import {
 } from "@/api/index";
 import axios from "axios";
 export default {
+   components: {
+    AddGoods
+  },
   data() {
     return {
       serchTitle: "",
       imageUrl:"",
       data: [],
-      value: [],
+  goodcounts2:[],
       isDisable: true,
       multipleSelection: [],
       multipleSelection2: [],
@@ -286,7 +277,7 @@ export default {
         package_one({ id: e.id }).then(res => {
           if (res.code == 200) {
             this.title = "编辑";
-            this.value = [];
+           
             this.$nextTick(() => {
               this.form = {
                 id: e.id,
@@ -295,7 +286,7 @@ export default {
                 order: res.data.order,
                 goods_id: res.data.goods_id
               };
-              this.value = res.data.goods_id.map(val => val.id);
+              this.goodcounts2 = res.data.goods_id.map(val => val.id);
             });
           } else {
             this.$message.error(res.msg);
@@ -336,12 +327,12 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.$nextTick(() => {
-            this.form.goods_id = this.value.toString();
+            this.form.goods_id = this.$refs.headerChild.checkList.map(val=>val.id);
 
             package_manage(this.form).then(res => {
               if (res.code == 200) {
                 this.$message.success(res.msg);
-                this.value = [];
+              
                 this.dialogFormVisible = false;
                 this.getList(1, this.supplier);
                 this.$refs["form"].resetFields();

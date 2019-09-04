@@ -90,6 +90,7 @@ export const special_del = data => http.post('/admin/operate/special_del', data)
 
 export const special_manage = data => http.post('/admin/operate/special_manage', data); // 专题管理(操作)
 export const advertisement_del_data = data => http.post('admin/operate/advertisement_del_data', data); // 广告位(数据批量删除)
+export const classify = data => http.post('admin/operate/classify', data); // 首页_分类
 
 
 

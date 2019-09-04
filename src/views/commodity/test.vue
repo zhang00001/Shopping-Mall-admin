@@ -1,21 +1,21 @@
 <template>
-    <div>
-         <quill-editor
-                v-model="describe"
-                ref="myQuillEditor"
-                :options="editorOption"
-                @blur="onEditorBlur($event)"
-                @focus="onEditorFocus($event)"
-                @change="onEditorChange($event)"
-              ></quill-editor>
-              <input
-                type="file"
-                multiple="multiple"
-                @change="afterRead"
-                id="avatar-uploader2"
-                style="display:none"
-              />
-    </div>
+  <div>
+    <quill-editor
+      v-model="describeChild"
+      ref="myQuillEditor"
+      :options="editorOption"
+      @blur="onEditorBlur($event)"
+      @focus="onEditorFocus($event)"
+      @change="onEditorChange($event)"
+    ></quill-editor>
+    <input
+      type="file"
+      multiple="multiple"
+      @change="afterRead"
+      id="avatar-uploader2"
+      style="display:none"
+    />
+  </div>
 </template>
 <script>
 const toolbarOptions = [
@@ -59,9 +59,9 @@ const toolbarOptions = [
 ];
 
 export default {
-    data(){
-        return{
- editorOption: {
+  data() {
+    return {
+      editorOption: {
         modules: {
           toolbar: {
             container: toolbarOptions, // 工具栏
@@ -77,26 +77,31 @@ export default {
           }
         }
       },
-        }
-    },
-    props:['describe'],
-    computed:{
-          editor() {
+      describeChild: ""
+    };
+  },
+  props: ["describe"],
+  created() {
+    this.describeChild = describe;
+  },
+  computed: {
+    editor() {
       return this.$refs.myQuillEditor.quill;
     }
-    },
-    methods:{
-            onEditorReady(editor) {
+  },
+  methods: {
+    onEditorReady(editor) {
       // 准备编辑器
     },
     onEditorBlur(e) {
-        console.log(this.describe)
+      console.log(this.describe);
     }, // 失去焦点事件
     onEditorFocus() {}, // 获得焦点事件
     onEditorChange(e) {
-   console.log(this.describe)
+      console.log(this.describe);
     }, // 内容改变事件
-   upload(url) {
+    upload(url) {
+        debugger
       let quill = this.$refs.myQuillEditor.quill;
       // 获取光标所在位置
       let length = quill.getSelection().index;
@@ -107,7 +112,7 @@ export default {
     },
     afterRead() {
       let files = event.target.files;
-     
+
       if (files.length > 0) {
         Array.prototype.forEach.call(files, file => {
           var that = this;
@@ -123,7 +128,6 @@ export default {
           function callback(res) {
             if (xhr.readyState == 4) {
               if (xhr.status == 200) {
-               
                 let url = JSON.parse(res.currentTarget.response).data;
                 console.log(url);
                 that.upload(url.http_image);
@@ -132,8 +136,7 @@ export default {
           }
         });
       }
-
-    },
     }
-}
+  }
+};
 </script>

@@ -8,6 +8,15 @@ const OPERATE_ROUTERS = [{
 
         ],
     }, {
+        path: 'integral',
+        component: () =>
+            import ('@/views/operate/Integral'),
+
+        meta: { title: '积分商城', icon: 'el-icon-trans', hidden: false },
+        children: [
+
+        ],
+    }, {
         path: 'class',
         component: () =>
             import ('@/views/operate/Women'),

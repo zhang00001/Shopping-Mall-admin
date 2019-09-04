@@ -69,7 +69,9 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="id" label="编号"></el-table-column>
+        <el-table-column prop="id" label="ID"></el-table-column>
+          <el-table-column prop="order_sn" label="订单编号"></el-table-column>
+      
         <el-table-column prop="addtime" label="提交时间">
              <template slot-scope="scope">
             <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>

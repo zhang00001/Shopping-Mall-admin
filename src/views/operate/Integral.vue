@@ -57,7 +57,7 @@
       </div>
 
       <el-dialog title="管理商品" :visible.sync="dialogFormVisible">
-        <SelectGoods :Id="selectId" :status="'ad'" ref="headerChild" v-if="dialogFormVisible" :isintegral="'true'"></SelectGoods>
+        <SelectGoods :Id="selectId" :status="'ad'" ref="headerChild" v-if="dialogFormVisible"  :isintegral="isintegral"></SelectGoods>
 
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="saveGood">确 定</el-button>
@@ -87,7 +87,7 @@ export default {
     SelectGoods
   },
   data() {
-    return {
+    return {isintegral:true,
       selectId: "",
       selectStatus: "",
       serchTitle: "",
@@ -121,12 +121,12 @@ this.dialogFormVisible = true
       },
     saveGood() {
       let goods = this.$refs.headerChild.checkList.map(val=>val.id);
-
+ 
       if (goods.length > 0) {
         advertisement_log({
           advertisement_id: this.selectStatus,
           goods_id: goods.toString(),
-          classif_id:0,
+          classif_id:'-3',
         }).then(res => {
           if (res.code == 200) {
             this.dialogFormVisible = false;
@@ -145,7 +145,7 @@ this.dialogFormVisible = true
       advertisement_more({ page: 1, limit: 100 }).then(res => {
         if (res.code == 200) {
           if (res.data.data.length > 0) {
-            this.adverts = res.data.data.filter(val => val.position == 0);
+            this.adverts = res.data.data.filter(val => val.position == 2);
             this.selectStatus = this.adverts.map(val => val.id)[0];
             this.getList(1);
           }
@@ -184,7 +184,7 @@ this.dialogFormVisible = true
       advertisement_log_data({
         page: page,
         limit: 10,
-classif_id:0,
+classif_id:'-3',
         advertisement_id: this.selectStatus
       }).then(res => {
         if (res.code == 200) {
