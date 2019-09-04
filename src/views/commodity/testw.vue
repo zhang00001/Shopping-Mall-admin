@@ -46,14 +46,9 @@
         <!-- <li  class="infinite-list-item">{{ i }}</li> -->
         已选择
         <div style="    margin-top: 32px;">
-          <!-- <template v-if="isShow">
-            <div class="row" v-for="(item,index) in selectGoods" :key="index">
-              <i class="el-icon-circle-close" @click="delGood(item)"></i>
-              <p>{{item.title}}</p>
-            </div>
-          </template>-->
+          
           <template v-if="isShow">
-            <div class="row" v-for="(item,index) in goods" :key="index">
+            <div class="row" v-for="(item,index) in selectGoods" :key="index">
               <i class="el-icon-circle-close" @click="delGood(item)"></i>
               <p>{{item.title}}</p>
             </div>
@@ -63,7 +58,6 @@
     </div>
   </div>
 </template>
- 
 <script>
 import {
   goods_class_more,
@@ -86,7 +80,7 @@ export default {
       serchTitle: "",
       classOnes: [],
       classTwos: [],
-goods:[],
+
       checkList2: [],
       page: 0
     };
@@ -98,38 +92,15 @@ goods:[],
     // 新商品
     this.getGoods1(1, this.classify_id, this.classify_id_two, this.serchTitle);
 
-     
-    this.goods = this.$store.state.selectGood; 
+    this.selectGoods = this.$store.state.selectGood;
   },
+  computed:{
+      selectGood:function(){
+        debugger
+        return this.$store.getters.selectGood
+      }  
+    },
   methods: {
-    delGood(e) {
-      
-     this.goods= this.goods.filter(val => val.id != e.id);
-
-      
-    },
-     load() {
-      this.page = this.page + 1;
-      this.getGoods1(
-        this.page,
-        this.classify_id,
-        this.classify_id_two,
-        this.serchTitle
-      );
-    },
-    searchRelation() {
-      this.getGoods1(
-        1,
-        this.classify_id,
-        this.classify_id_two,
-        this.serchTitle
-      );
-    },
-    getClsss() {
-      goods_class_more({ page: 1, limit: 10000, pid: 0 }).then(res => {
-        this.classOnes = res.data.data;
-      });
-    },
     loadClassTwo2(e) {
       this.classify_id2 = "";
       this.classTwos2 = [];
@@ -149,17 +120,27 @@ goods:[],
         });
       }
     },
-      add() {
+    delGood(e) {
+     
+      this.selectgoods = this.$store.state.selectGood.filter(
+        val => val.id != e.id
+      );
+  this.$store.dispatch('asveselectGood', this.selectgoods)
+      this.selectgoods = [];
+
+      debugger;
+    },
+    add() {
       if (this.status == "Vip") {
         if (this.checkList.length > 1) {
           this.$message.error("Vip最多添加一个商品");
           this.checkList = [];
         } else {
-          this.goods = this.checkList;
+          this.selectgoods = this.checkList;
           this.checkList = [];
         }
       } else {
-        let a = this.goods;
+        let a = this.selectGoods;
         this.checkList = this.checkList.filter(e => {
           if (a.some(val => val.id == e.id)) {
             this.$message.error(e.title + "已添加");
@@ -176,12 +157,40 @@ goods:[],
           this.$nextTick(() => {
             let b = a.concat(this.checkList);
 
-            this.goods = b;
+            this.selectGoods = b;
             this.checkList = [];
           });
         }
       }
     },
+    remove() {
+      this.checkList = [];
+    },
+    load() {
+      this.page = this.page + 1;
+      this.getGoods1(
+        this.page,
+        this.classify_id,
+        this.classify_id_two,
+        this.serchTitle
+      );
+    },
+
+    searchRelation() {
+      this.getGoods1(
+        1,
+        this.classify_id,
+        this.classify_id_two,
+        this.serchTitle
+      );
+    },
+    getClsss() {
+      goods_class_more({ page: 1, limit: 10000, pid: 0 }).then(res => {
+        this.classOnes = res.data.data;
+      });
+    },
+
+    // 积分商城
     getGoods1(page, classify_id, classify_id_two, serchTitle) {
       let parmas = {
         page: page,
@@ -217,7 +226,6 @@ goods:[],
   }
 };
 </script>
-
 <style scoped>
 .transfer .el-transfer-panel {
   width: 400px;
@@ -246,3 +254,4 @@ goods:[],
 }
 </style>
   
+ 

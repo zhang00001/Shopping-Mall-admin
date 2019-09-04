@@ -1,5 +1,7 @@
 <template>
-  <div class="con">
+  <div class="con"  v-loading="loading" element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+   >
     <el-steps :active="active" style="margin-buttom:20px">
       <el-step v-if="isEdit" title="编辑商品信息" icon="el-icon-edit"></el-step>
       <el-step v-else title="填写商品信息" icon="el-icon-edit"></el-step>
@@ -243,17 +245,7 @@
                       <el-input v-model="scope.row.join_money" placeholder="进货价" min="0"></el-input>
                     </template>
                   </el-table-column>
-                  <el-table-column label="销售价格" prop="money">
-                    <template slot-scope="scope">
-                      <el-input
-                        v-model="scope.row.money"
-                        type="number"
-                        placeholder="销售价格"
-                        min="0"
-                        @blur="changeMoney(scope,scope.row)"
-                      ></el-input>
-                    </template>
-                  </el-table-column>
+                 
 
                   <el-table-column label="vip价">
                     <template slot-scope="scope">
@@ -262,7 +254,18 @@
                         type="number"
                         placeholder="vip价"
                         min="0"
-                        @blur="changeVip(scope,scope.row)"
+                     
+                      ></el-input>
+                    </template>
+                  </el-table-column>
+                   <el-table-column label="销售价格" prop="money">
+                    <template slot-scope="scope">
+                      <el-input
+                        v-model="scope.row.money"
+                        type="number"
+                        placeholder="销售价格"
+                        min="0"
+                      
                       ></el-input>
                     </template>
                   </el-table-column>
@@ -359,8 +362,7 @@
           <el-row :gutter="24" style="margin-top:20px;">
             <el-col :span="2">商品详情</el-col>
             <el-col :span="22">
-              <!-- <editor :init="init" v-model="data"></editor> -->
-              <quill-editor
+   <quill-editor
                 v-model="data"
                 ref="myQuillEditor"
                 :options="editorOption"
@@ -376,8 +378,7 @@
                 style="display:none"
               />
 
-              <!-- <vue-wangeditor id="editor" v-model="data"></vue-wangeditor> -->
-            </el-col>
+ </el-col>
           </el-row>
         </div>
       </template>
@@ -385,56 +386,12 @@
         <div>
           <el-row :gutter="24">
             <el-col :span="2">关联商品</el-col>
-            <el-col :span="22">
-              <el-col :span="24">
-                <el-col :span="12">
-                  <el-col :span="8">
-                    <el-select
-                      v-model="classify_id1"
-                      placeholder="全部分类"
-                      @change="loadClassTwo2"
-                      clearable
-                    >
-                      <el-option label="全部分类" value></el-option>
-                      <el-option
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id"
-                        v-for="item in classOnes"
-                      ></el-option>
-                    </el-select>
-                  </el-col>
+              <el-col :span="22">
 
-                  <el-col :span="8">
-                    <el-select v-model="classify_id2" placeholder="二级分类" clearable>
-                      <el-option label="二级分类" value></el-option>
-                      <el-option
-                        :key="item.id"
-                        :label="item.name"
-                        :value="item.id"
-                        v-for="item in classTwos2"
-                      ></el-option>
-                    </el-select>
-                  </el-col>
-                  <el-col :span="6">
-                    <el-input v-model="title" placeholder="关键词"></el-input>
-                  </el-col>
-                  <el-col :span="1">
-                    <el-button type="primary" @click="searchRelation">搜索</el-button>
-                  </el-col>
-                </el-col>
+                       <AddGoods :Id='addId'  :status="'Add'" ref="headerChild"   ></AddGoods>
+     
               </el-col>
-            </el-col>
-            <el-col :span="24">
-              <el-transfer
-                @left-check-change="checkChange"
-                @change="handleChange"
-                v-model="value2"
-                :data="data2"
-                :button-texts="[ '移除','关联']"
-                :titles="['选择关联商品', '已关联商品']"
-              ></el-transfer>
-            </el-col>
+
           </el-row>
         </div>
       </template>
@@ -493,19 +450,17 @@ const toolbarOptions = [
   ["link", "image", "video"],
   ["clean"] // remove formatting button
 ];
+import {enumSizes ,enumColors} from "@/utils/enums"
+import AddGoods from "./AddGoods";
 import http from "@/utils/request";
 import axios from "axios";
-import tinymce from "tinymce/tinymce";
-import "tinymce/themes/silver/theme.min.js";
-import "tinymce/skins/ui/oxide/skin.min.css";
-import Editor from "@tinymce/tinymce-vue";
-import "tinymce/plugins/image"; // 插入上传图片插件
-import "tinymce/plugins/media"; // 插入视频插件
-import "tinymce/plugins/table"; // 插入表格插件
-import "tinymce/plugins/lists"; // 列表插件
-import "tinymce/plugins/wordcount"; // 字数统计插件
-import vueWangeditor from "vue-wangeditor";
+ 
+ 
 export default {
+  components: {
+    AddGoods,  
+     
+  },
   props: {
     plugins: {
       type: [String, Array],
@@ -518,20 +473,12 @@ export default {
     }
   },
   data() {
-    // const generateData = _ => {
-    //     const data2 = [];
-    //     for (let i = 1; i <= 15; i++) {
-    //       data2.push({
-    //         key: i,
-    //         label: `备选项 ${ i }`,
-    //       });
-    //     }
-    //     return data2;
-    //   };
+
     return {
       content: null,
       data2: [],
-      value2: [1, 4],
+      addId:"",
+      // value2: [1, 4],
       data: "",
       isEdit: false,
       fileList: [],
@@ -539,7 +486,7 @@ export default {
       classify_id: "", //第三步分类
       brand_id: "", //第三步品牌
       fileLists: [],
-      fileList2s: [],
+      fileList2s: [], 
       editorOption: {
         modules: {
           toolbar: {
@@ -556,51 +503,10 @@ export default {
           }
         }
       },
-      init: {
-        language: "zh_CN",
-        skin_url: "/tinymce/skins/ui/oxide",
-        // skin_url: '/tinymce/skins/ui/oxide-dark',//暗色系
-        height: 300,
-        plugins: this.plugins,
-        toolbar: this.toolbar,
-        branding: false,
-        menubar: false,
-        // 此处为图片上传处理函数，这个直接用了base64的图片形式上传图片，
-        // 如需ajax上传可参考https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_handler
-        images_upload_handler: (blobInfo, success, failure) => {
-         
-          // const img = 'data:image/jpeg;base64,' + blobInfo.base64()
-          // success(img)
-          if (blobInfo.blob().size > self.maxSize) {
-            failure("文件体积过大");
-          }
-          if (blobInfo.blob().type) {
-            uploadPic();
-          } else {
-            failure("图片格式错误");
-          }
-          function uploadPic() {
-            let formData = new FormData();
-            // 服务端接收文件的参数名，文件数据，文件名
-            //  blobInfo.filename()
-            formData.append("upload_img", blobInfo.blob());
-            formData.append("type", 2);
-            axios
-              .post(process.env.BASE_API + "index/base/upload", formData)
-              .then(res => {
-                if (res.data.code == 200) {
-                  success(res.data.data.http_image);
-                } else {
-                  failure(res.data.msg);
-                }
-              })
-              .catch(err => {});
-          }
-        }
-      },
+   
       tableData: [], //前端显示table表格
       tableData2: [], //
-      search: "",
+      search: "",goods_relation:[],
       ruleForm: {
         goods_id: "",
         classify_id: "",
@@ -625,7 +531,7 @@ export default {
         shelf: true,
         evaluate_status: true,
         goods_attribute: "",
-        goods_relation: "",
+        goods_relation: [],
         img: "",
         imgs: [],
         detail: ""
@@ -636,53 +542,22 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       disabled: false,
-      active: 1,
+      active:1,
       value: false,
       classOnes: [], //一级分类数组
       classTwos: [], //二级分类数组
       brands: [], //商品品牌
       suppliers: [], //g供货商
       warehouses: [], //仓库
-      sizes: [
-        "S",
-        "M",
-        "L",
-        "XL",
-        "2XL",
-        "3XL",
-        "4XL",
-        "5XL",
-        "均码",
-        "25码",
-        "26码",
-        "27码",
-        "28码",
-        "29码",
-        "30码",
-        "31码",
-        "32码",
-        "33码",
-        "34码",
-        "35码",
-        "36码",
-        "35",
-        "36",
-        "37",
-        "38",
-        "39",
-        "40",
-        "41",
-        "42",
-        "43"
-      ], //商品尺码
+      sizes: enumSizes, //商品尺码
       checkedSizes: [],
       checkedColors: [],
       checkList: [],
       sizeInput: "",
       colorInput: "",
       currentRow: "",
-      rightData: "",
-      colors: ["黑色", "白色", "红色", "蓝色", "黄色"], //商品尺码
+      rightData: "",loading:false,
+      colors: enumColors, //商品尺码
       showFile: true,
       rules: {
         classify_id: [
@@ -752,10 +627,7 @@ export default {
       }
     };
   },
-  components: {
-    Editor,
-    vueWangeditor
-  },
+ 
   mounted() {},
   watch: {
     //监听路由变化
@@ -764,13 +636,7 @@ export default {
         this.resetForm();
       }
     }
-    //      fileList:function(val){
-    //        debugger
-    //  if(val.length>5){
-    //   debugger
-    //  val=  val.splice(0,5)
-    //  }
-    // }
+ 
   },
   computed: {
     editor() {
@@ -848,6 +714,10 @@ export default {
             if (res.code == 200) {
               this.loadClassTwo(res.detail.classify_id);
               this.$nextTick(() => {
+                this.addId=res.detail.id,
+                  this.$store.commit("set_selectGood", res.detail.realtion);
+             
+                
                 this.ruleForm = {
                   id: res.detail.id,
                   classify_id: res.detail.classify_id,
@@ -877,8 +747,9 @@ export default {
                   shelf: res.detail.shelf == "1" ? true : false,
                   evaluate_status:
                     res.detail.evaluate_status == "1" ? true : false,
-                  goods_relation: res.detail.realtion
+                 
                 };
+               
                 this.fileList = res.detail.imgs ? res.detail.imgs : [];
                 this.fileList[0] = res.detail.img;
                 this.data = res.detail.detail;
@@ -921,31 +792,31 @@ export default {
         }
       }
     },
-    changeMoney(e, index) {
-      this.$nextTick(() => {
+    // changeMoney(e, index) {
+    //   this.$nextTick(() => {
        
-        if (Number(index.money) < Number(index.join_money)) {
-          this.$message.error("销售价价不能小于进货价");
-          this.tableData[e.$index].money = null;
-        }
-        if (Number(index.money) < Number(index.vip_money)) {
-          this.$message.error("销售价价不能小于Vip价");
-          this.tableData[e.$index].money = null;
-        }
-      });
-    },
-    changeVip(e, index) {
-      this.$nextTick(() => {
-        if (Number(index.vip_money) < Number(index.join_money)) {
-          this.$message.error("vip价不能小于进货价");
-          this.tableData[e.$index].vip_money = null;
-        }
-        if (Number(index.vip_money) > Number(index.money)) {
-          this.$message.error("vip价不能大于销售价");
-          this.tableData[e.$index].vip_money = null;
-        }
-      });
-    },
+    //     if (Number(index.money) < Number(index.join_money)) {
+    //       this.$message.error("销售价价不能小于进货价");
+    //       this.tableData[e.$index].money = null;
+    //     }
+    //     if (Number(index.money) < Number(index.vip_money)) {
+    //       this.$message.error("销售价价不能小于Vip价");
+    //       this.tableData[e.$index].money = null;
+    //     }
+    //   });
+    // },
+    // changeVip(e, index) {
+    //   this.$nextTick(() => {
+    //     if (Number(index.vip_money) < Number(index.join_money)) {
+    //       this.$message.error("vip价不能小于进货价");
+    //       this.tableData[e.$index].vip_money = null;
+    //     }
+    //     if (Number(index.vip_money) > Number(index.money)) {
+    //       this.$message.error("vip价不能大于销售价");
+    //       this.tableData[e.$index].vip_money = null;
+    //     }
+    //   });
+    // },
     changeCode(e, i) {
       this.$nextTick(() => {
         if (e.sku !== null) {
@@ -973,12 +844,11 @@ export default {
     },
     // 提交商品
     next3() {
-     
-      if (this.value2.length >= 4) {
-        this.$message.error("最多只能选择四个");
-      } else {
+       this.loading=true
         this.$nextTick(() => {
-          this.ruleForm.goods_relation = this.rightData.toString();
+          console.log(this.$refs.headerChild.goods)
+          this.ruleForm.goods_relation =this.$refs.headerChild.goods.map(val=>val.id).toString();
+   console.log(this.ruleForm.goods_relation)
           this.ruleForm.shelf == true
             ? (this.ruleForm.shelf = "1")
             : (this.ruleForm.shelf = "0");
@@ -1038,6 +908,7 @@ export default {
             this.ruleForm.goods_attribute = this.tableData;
           }
           http.post("admin/goods/goods_manage", this.ruleForm).then(res => {
+            this.loading=false
             if (res.code == 200) {
               this.$message.success(res.msg);
               this.$nextTick(() => {
@@ -1053,7 +924,7 @@ export default {
             }
           });
         });
-      }
+     
     },
     // 设为主图
     setImg(item, index) {
@@ -1147,22 +1018,8 @@ export default {
         this.checkedColors = [];
       }
     },
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
-    handleDelete(index, row) {
-      console.log(index, row);
-    },
-    handleRemove(file) {
-      console.log(file);
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    handleDownload(file) {
-      console.log(file);
-    },
+   
+   
     next2() {
       if (this.fileList.length <= 0) {
         return this.$message.error("请上传商品图");
@@ -1180,7 +1037,7 @@ export default {
       } else {
         this.$message.error("请填写商品规格");
       }
-      this.value2 = this.ruleForm.goods_relation.map(val => val.id);
+      // this.value2 = this.ruleForm.goods_relation.map(val => val.id);
       this.loadProduct(this.classify_id1, this.classify_id2, this.title);
     },
     loadProduct(classify_id, classify_id_two, title) {

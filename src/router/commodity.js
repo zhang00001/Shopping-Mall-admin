@@ -11,7 +11,7 @@
          component: () =>
              import ('@/views/commodity/test'),
 
-         meta: { title: 'test', icon: 'el-icon-trans', hidden: false },
+         meta: { title: 'test', icon: 'el-icon-trans', hidden: true },
          children: []
      },
      {

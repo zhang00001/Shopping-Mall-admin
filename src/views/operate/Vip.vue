@@ -277,7 +277,8 @@ export default {
         package_one({ id: e.id }).then(res => {
           if (res.code == 200) {
             this.title = "编辑";
-           
+            debugger
+           this.$store.commit("set_selectGood", res.data.goods_id);
             this.$nextTick(() => {
               this.form = {
                 id: e.id,
@@ -286,7 +287,7 @@ export default {
                 order: res.data.order,
                 goods_id: res.data.goods_id
               };
-              this.goodcounts2 = res.data.goods_id.map(val => val.id);
+              this.goodcounts2 = res.data.goods_id
             });
           } else {
             this.$message.error(res.msg);
@@ -327,7 +328,7 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.$nextTick(() => {
-            this.form.goods_id = this.$refs.headerChild.checkList.map(val=>val.id);
+            this.form.goods_id = this.$refs.headerChild.goods.map(val=>val.id).toString();
 
             package_manage(this.form).then(res => {
               if (res.code == 200) {

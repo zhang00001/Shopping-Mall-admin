@@ -140,7 +140,7 @@ export default {
   }
 };
 </script>
-<style >
+<style scoped >
 .transfer .el-transfer-panel {
   width: 400px;
 }
