@@ -1,7 +1,10 @@
 <template>
-  <div class="con"  v-loading="loading" element-loading-text="拼命加载中"
+  <div
+    class="con"
+    v-loading="loading"
+    element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading"
-   >
+  >
     <el-steps :active="active" style="margin-buttom:20px">
       <el-step v-if="isEdit" title="编辑商品信息" icon="el-icon-edit"></el-step>
       <el-step v-else title="填写商品信息" icon="el-icon-edit"></el-step>
@@ -235,9 +238,25 @@
                   </el-col>
                 </el-card>
               </el-col>
+              <el-col :span="24" style="margin:20px 0;">
+                <el-col :span="3" style="margin-top:10px;">批量输入价格：</el-col>
+                <el-col :span="4">
+                  <el-input v-model="buyPrice" placeholder="进货价" min="0"></el-input>
+                </el-col>
+                <el-col :span="4">
+                  <el-input v-model="vipPrice" placeholder="Vip价" min="0"></el-input>
+                </el-col>
+                <el-col :span="4">
+                  <el-input v-model="salePrice" placeholder="销售价格" min="0"></el-input>
+                </el-col>
+                <el-col :span="4">
+                  <el-button type="primary" @click="okMoney">确认价格</el-button>
+                </el-col>
+              </el-col>
 
               <el-col :span="24">
                 <el-table :data="tableData" style="width: 100%" border highlight-current-row>
+                    <!-- <el-table-column label="id" prop="id" v-if='false'></el-table-column> -->
                   <el-table-column label="尺码" prop="size"></el-table-column>
                   <el-table-column label="颜色" prop="color"></el-table-column>
                   <el-table-column label="进货价">
@@ -245,7 +264,6 @@
                       <el-input v-model="scope.row.join_money" placeholder="进货价" min="0"></el-input>
                     </template>
                   </el-table-column>
-                 
 
                   <el-table-column label="vip价">
                     <template slot-scope="scope">
@@ -254,18 +272,17 @@
                         type="number"
                         placeholder="vip价"
                         min="0"
-                     
                       ></el-input>
                     </template>
                   </el-table-column>
-                   <el-table-column label="销售价格" prop="money">
+                  <el-table-column label="销售价格" prop="money">
                     <template slot-scope="scope">
                       <el-input
                         v-model="scope.row.money"
                         type="number"
                         placeholder="销售价格"
                         min="0"
-                      
+                        @blur="checkMoney(scope.row,scope)"
                       ></el-input>
                     </template>
                   </el-table-column>
@@ -362,7 +379,7 @@
           <el-row :gutter="24" style="margin-top:20px;">
             <el-col :span="2">商品详情</el-col>
             <el-col :span="22">
-   <quill-editor
+              <quill-editor
                 v-model="data"
                 ref="myQuillEditor"
                 :options="editorOption"
@@ -377,8 +394,7 @@
                 id="avatar-uploader"
                 style="display:none"
               />
-
- </el-col>
+            </el-col>
           </el-row>
         </div>
       </template>
@@ -386,12 +402,9 @@
         <div>
           <el-row :gutter="24">
             <el-col :span="2">关联商品</el-col>
-              <el-col :span="22">
-
-                       <AddGoods :Id='addId'  :status="'Add'" ref="headerChild"   ></AddGoods>
-     
-              </el-col>
-
+            <el-col :span="22">
+              <AddGoods :Id="addId" :status="'Add'" ref="headerChild"></AddGoods>
+            </el-col>
           </el-row>
         </div>
       </template>
@@ -450,16 +463,14 @@ const toolbarOptions = [
   ["link", "image", "video"],
   ["clean"] // remove formatting button
 ];
-import {enumSizes ,enumColors} from "@/utils/enums"
+import { enumSizes, enumColors } from "@/utils/enums";
 import AddGoods from "./AddGoods";
 import http from "@/utils/request";
 import axios from "axios";
- 
- 
+
 export default {
   components: {
-    AddGoods,  
-     
+    AddGoods
   },
   props: {
     plugins: {
@@ -473,11 +484,13 @@ export default {
     }
   },
   data() {
-
     return {
+      buyPrice: "",
+      vipPrice: "",
+      salePrice: "",
       content: null,
       data2: [],
-      addId:"",
+      addId: "",
       // value2: [1, 4],
       data: "",
       isEdit: false,
@@ -486,7 +499,7 @@ export default {
       classify_id: "", //第三步分类
       brand_id: "", //第三步品牌
       fileLists: [],
-      fileList2s: [], 
+      fileList2s: [],
       editorOption: {
         modules: {
           toolbar: {
@@ -503,10 +516,11 @@ export default {
           }
         }
       },
-   
+
       tableData: [], //前端显示table表格
       tableData2: [], //
-      search: "",goods_relation:[],
+      search: "",
+      goods_relation: [],
       ruleForm: {
         goods_id: "",
         classify_id: "",
@@ -542,7 +556,7 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       disabled: false,
-      active:1,
+      active: 1,
       value: false,
       classOnes: [], //一级分类数组
       classTwos: [], //二级分类数组
@@ -556,7 +570,8 @@ export default {
       sizeInput: "",
       colorInput: "",
       currentRow: "",
-      rightData: "",loading:false,
+      rightData: "",
+      loading: false,
       colors: enumColors, //商品尺码
       showFile: true,
       rules: {
@@ -627,7 +642,7 @@ export default {
       }
     };
   },
- 
+
   mounted() {},
   watch: {
     //监听路由变化
@@ -636,7 +651,6 @@ export default {
         this.resetForm();
       }
     }
- 
   },
   computed: {
     editor() {
@@ -648,6 +662,47 @@ export default {
     this.getUpdate(this.$route.query.id);
   },
   methods: {
+    // 批量添加价格
+    okMoney() {
+      if (this.tableData.length > 0) {
+        this.tableData.forEach(val => {
+          if (this.buyPrice != "") {
+            val.join_money = this.buyPrice;
+          }
+          if (this.vipPrice != "") {
+            val.vip_money = this.vipPrice;
+          }
+          if (this.salePrice != "") {
+            val.money = this.salePrice;
+          }
+        });
+      } else {
+        this.$message.error("暂无商品规格");
+      }
+ 
+    },
+    // 积分商品价格检查
+    checkMoney(e) {
+      if (this.ruleForm.type == "3") {
+        
+        if (this.tableData.length > 0) {
+          if (this.tableData.some(val => val.money != "")) {
+            this.tableData.forEach(val => {
+              if (
+               
+                Number(e.money) != Number(val.money) &&
+                val.money != ""
+              ) {
+                this.$message.error("积分商品的销售价格请保持一致");
+                e.money = "";
+              }
+            });
+          } else {
+          }
+        }
+      }
+    },
+
     onEditorReady(editor) {
       // 准备编辑器
     },
@@ -677,7 +732,7 @@ export default {
     },
     afterRead() {
       let files = event.target.files;
-     
+
       if (files.length > 0) {
         Array.prototype.forEach.call(files, file => {
           var that = this;
@@ -692,7 +747,6 @@ export default {
           function callback(res) {
             if (xhr.readyState == 4) {
               if (xhr.status == 200) {
-               
                 let url = JSON.parse(res.currentTarget.response).data;
                 console.log(url);
                 that.upload(url.http_image);
@@ -705,6 +759,7 @@ export default {
       //   // 此时可以自行将文件上传至服务器
       //   console.log(file);
     },
+   
     getUpdate(e) {
       if (e) {
         this.isEdit = true;
@@ -714,10 +769,9 @@ export default {
             if (res.code == 200) {
               this.loadClassTwo(res.detail.classify_id);
               this.$nextTick(() => {
-                this.addId=res.detail.id,
+                (this.addId = res.detail.id),
                   this.$store.commit("set_selectGood", res.detail.realtion);
-             
-                
+
                 this.ruleForm = {
                   id: res.detail.id,
                   classify_id: res.detail.classify_id,
@@ -746,10 +800,9 @@ export default {
                     res.detail.vip_buy_status == "1" ? true : false,
                   shelf: res.detail.shelf == "1" ? true : false,
                   evaluate_status:
-                    res.detail.evaluate_status == "1" ? true : false,
-                 
+                    res.detail.evaluate_status == "1" ? true : false
                 };
-               
+
                 this.fileList = res.detail.imgs ? res.detail.imgs : [];
                 this.fileList[0] = res.detail.img;
                 this.data = res.detail.detail;
@@ -794,7 +847,7 @@ export default {
     },
     // changeMoney(e, index) {
     //   this.$nextTick(() => {
-       
+
     //     if (Number(index.money) < Number(index.join_money)) {
     //       this.$message.error("销售价价不能小于进货价");
     //       this.tableData[e.$index].money = null;
@@ -835,96 +888,98 @@ export default {
       this.loadProduct(this.classify_id, this.brand_id, this.title);
     },
     check(e) {},
-    checkChange(e) {
-      
-    
-    },
+    checkChange(e) {},
     handleChange(value, direction, movedKeys) {
       this.rightData = movedKeys;
     },
+   
     // 提交商品
     next3() {
-       this.loading=true
-        this.$nextTick(() => {
-          console.log(this.$refs.headerChild.goods)
-          this.ruleForm.goods_relation =this.$refs.headerChild.goods.map(val=>val.id).toString();
-   console.log(this.ruleForm.goods_relation)
-          this.ruleForm.shelf == true
-            ? (this.ruleForm.shelf = "1")
-            : (this.ruleForm.shelf = "0");
-          this.ruleForm.production_cycle_status == true
-            ? (this.ruleForm.production_cycle_status = "1")
-            : (this.ruleForm.production_cycle_status = "0");
-          this.ruleForm.limit_buy_status == true
-            ? (this.ruleForm.limit_buy_status = "1")
-            : (this.ruleForm.limit_buy_status = "0");
-          this.ruleForm.freight_status == true
-            ? (this.ruleForm.freight_status = "1")
-            : (this.ruleForm.freight_status = "0");
-          this.ruleForm.vip_buy_status == true
-            ? (this.ruleForm.vip_buy_status = "1")
-            : (this.ruleForm.vip_buy_status = "0");
-          this.ruleForm.evaluate_status == true
-            ? (this.ruleForm.evaluate_status = "1")
-            : (this.ruleForm.evaluate_status = "0");
-          /(http|https):\/\/([\w.]+\/?)\S*/.test(this.fileList[0])
-            ? (this.ruleForm.img = this.fileList[0].split(
-                this.fileList[0].split("/upload")[0]
-              )[1])
-            : this.fileList[0],
-            (this.ruleForm.imgs = []);
-          this.fileList.forEach(val => {
-            if (/(http|https):\/\/([\w.]+\/?)\S*/.test(val)) {
-              this.ruleForm.imgs.push(val.split(val.split("/upload")[0])[1]);
-            } else {
-              this.ruleForm.imgs.push(val);
-            }
-          }),
-            (this.ruleForm.detail = this.data);
-          this.tableData.forEach(val => {
-            val.selected == true ? (val.selected = "1") : (val.selected = "0"),
-              (val.img = /(http|https):\/\/([\w.]+\/?)\S*/.test(val.img)
-                ? val.img.split(val.img.split("/upload")[0])[1]
-                : val.img);
-          });
-          if (this.$route.query.id) {
-            sessionStorage.getItem("del")
-              ? (this.tableData2 = JSON.parse(sessionStorage.getItem("del")))
-              : (this.tableData2 = []);
-            if (this.tableData2.length > 0) {
-              this.tableData2.forEach(val => {
-                val.img = /(http|https):\/\/([\w.]+\/?)\S*/.test(val.img)
-                  ? val.img.split(val.img.split("/upload")[0])[1]
-                  : val.img;
-                val.selected == "true"
-                  ? (val.selected = "1")
-                  : (val.selected = "0");
-              });
-            }
-            this.ruleForm.goods_attribute = this.tableData.concat(
-              this.tableData2
-            );
+      this.loading = true;
+      this.$nextTick(() => {
+        console.log(this.$refs.headerChild.goods);
+
+        this.$refs.headerChild.goods.length > 0
+          ? (this.ruleForm.goods_relation = this.$refs.headerChild.goods
+              .map(val => val.id)
+              .toString())
+          : (this.ruleForm.goods_relation = "");
+        console.log(this.ruleForm.goods_relation);
+        this.ruleForm.shelf == true
+          ? (this.ruleForm.shelf = "1")
+          : (this.ruleForm.shelf = "0");
+        this.ruleForm.production_cycle_status == true
+          ? (this.ruleForm.production_cycle_status = "1")
+          : (this.ruleForm.production_cycle_status = "0");
+        this.ruleForm.limit_buy_status == true
+          ? (this.ruleForm.limit_buy_status = "1")
+          : (this.ruleForm.limit_buy_status = "0");
+        this.ruleForm.freight_status == true
+          ? (this.ruleForm.freight_status = "1")
+          : (this.ruleForm.freight_status = "0");
+        this.ruleForm.vip_buy_status == true
+          ? (this.ruleForm.vip_buy_status = "1")
+          : (this.ruleForm.vip_buy_status = "0");
+        this.ruleForm.evaluate_status == true
+          ? (this.ruleForm.evaluate_status = "1")
+          : (this.ruleForm.evaluate_status = "0");
+        /(http|https):\/\/([\w.]+\/?)\S*/.test(this.fileList[0])
+          ? (this.ruleForm.img = this.fileList[0].split(
+              this.fileList[0].split("/upload")[0]
+            )[1])
+          : this.fileList[0],
+          (this.ruleForm.imgs = []);
+        this.fileList.forEach(val => {
+          if (/(http|https):\/\/([\w.]+\/?)\S*/.test(val)) {
+            this.ruleForm.imgs.push(val.split(val.split("/upload")[0])[1]);
           } else {
-            this.ruleForm.goods_attribute = this.tableData;
+            this.ruleForm.imgs.push(val);
           }
-          http.post("admin/goods/goods_manage", this.ruleForm).then(res => {
-            this.loading=false
-            if (res.code == 200) {
-              this.$message.success(res.msg);
-              this.$nextTick(() => {
-                this.resetForm();
-                if (this.$route.query.id) {
-                  this.$router.go(-1);
-                } else {
-                  this.active = 1;
-                }
-              });
-            } else {
-              this.$message.error(res.msg);
-            }
-          });
+        }),
+          (this.ruleForm.detail = this.data);
+        this.tableData.forEach(val => {
+          val.selected == true ? (val.selected = "1") : (val.selected = "0"),
+            (val.img = /(http|https):\/\/([\w.]+\/?)\S*/.test(val.img)
+              ? val.img.split(val.img.split("/upload")[0])[1]
+              : val.img);
         });
-     
+        if (this.$route.query.id) {
+          sessionStorage.getItem("del")
+            ? (this.tableData2 = JSON.parse(sessionStorage.getItem("del")))
+            : (this.tableData2 = []);
+          if (this.tableData2.length > 0) {
+            this.tableData2.forEach(val => {
+              val.img = /(http|https):\/\/([\w.]+\/?)\S*/.test(val.img)
+                ? val.img.split(val.img.split("/upload")[0])[1]
+                : val.img;
+              val.selected == "true"
+                ? (val.selected = "1")
+                : (val.selected = "0");
+            });
+          }
+          this.ruleForm.goods_attribute = this.tableData.concat(
+            this.tableData2
+          );
+        } else {
+          this.ruleForm.goods_attribute = this.tableData;
+        }
+        http.post("admin/goods/goods_manage", this.ruleForm).then(res => {
+          this.loading = false;
+          if (res.code == 200) {
+            this.$message.success(res.msg);
+            this.$nextTick(() => {
+              this.resetForm();
+              if (this.$route.query.id) {
+                this.$router.go(-1);
+              } else {
+                this.active = 1;
+              }
+            });
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
+      });
     },
     // 设为主图
     setImg(item, index) {
@@ -1018,8 +1073,7 @@ export default {
         this.checkedColors = [];
       }
     },
-   
-   
+
     next2() {
       if (this.fileList.length <= 0) {
         return this.$message.error("请上传商品图");

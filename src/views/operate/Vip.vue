@@ -277,7 +277,7 @@ export default {
         package_one({ id: e.id }).then(res => {
           if (res.code == 200) {
             this.title = "编辑";
-            debugger
+           
            this.$store.commit("set_selectGood", res.data.goods_id);
             this.$nextTick(() => {
               this.form = {

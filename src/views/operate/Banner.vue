@@ -35,7 +35,20 @@
             </template>
           </template>
         </el-table-column>
-        <el-table-column prop="url" label="跳转链接" width="180"></el-table-column>
+        <el-table-column prop="type" label="链接类型" width="180">
+ <template slot-scope="scope">
+
+  
+            <template v-if="scope.row.type=='1'">
+            商品
+            </template>
+             <template v-else>
+          专题
+            </template>
+          </template>
+        </el-table-column>
+
+        </el-table-column>
 
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
@@ -64,7 +77,28 @@
           <el-form-item label="名称" prop="name">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
-          <el-form-item label="位置" prop="position">
+<el-row>
+  <el-col :span="12">
+
+           <el-form-item label="位置" prop="position">
+            <el-select v-model="form.position" placeholder="请选择">
+              <el-option  label="首页推荐"  value="2"></el-option>
+    
+
+
+                      <el-option
+                v-for="item in position"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+
+
+
+            </el-select>
+          </el-form-item>
+
+          <!-- <el-form-item label="位置" prop="position">
             <el-select v-model="form.position" placeholder="请选择">
               <el-option
                 v-for="item in position"
@@ -73,10 +107,18 @@
                 :value="item.id"
               ></el-option>
             </el-select>
+          </el-form-item> -->
+          </el-col>
+   <el-col :span="12">
+               <el-form-item label="链接类型" prop="position">
+            <el-select v-model="form.type" placeholder="请选择">
+              <el-option   label="专题页" value="2"></el-option>
+                  <el-option   label="商品"  value="1"></el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="跳转链接" prop="url">
-            <el-input v-model="form.url"></el-input>
-          </el-form-item>
+  
+         </el-col>
+</el-row>
           <el-form-item label="图片" :label-width="formLabelWidth">
             <el-upload
               class="avatar-uploader"
@@ -89,7 +131,10 @@
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
+ 
         </el-form>
+               <AddGoods  v-if="form.type=='1'"  :status="'Vip'"   :spGood='spGood'    ref="headerChild" :goodcounts2="goodcounts2"  ></AddGoods>
+      <Addspecial   v-if="form.type=='2'" ref="Addspecial" :spGood='spGood' ></Addspecial>
         <div slot="footer" class="dialog-footer">
           <el-button @click="cel">取 消</el-button>
           <el-button type="primary" @click="save">确 定</el-button>
@@ -101,17 +146,24 @@
 
 <script>
 import http from "@/utils/request";
+import AddGoods from "./../commodity/AddGoods";
+import Addspecial from "./Addspecial";
 import {
   banner_more,
   banner_manage,
   banner_one,
-  banner_del
+  banner_del,classify
 } from "@/api/index";
 import { POSITION } from "@/utils/enums";
 import axios from "axios";
 export default {
+   components: {
+    AddGoods,Addspecial
+  },
   data() {
     return {
+      spGood:[],
+       goodcounts2:[],
       isDisable: true,
       serchTitle: "",
       tableData: [],
@@ -127,8 +179,10 @@ export default {
       form: {
         name: "",
         img: "",
-        url: "",
-        position: ""
+      url_id:"",
+        position: "",
+    
+        type:"1",//链接类型
       },
       position: [],
       selectId: "",
@@ -145,6 +199,9 @@ export default {
   created() {
     this.getList(1, this.serchTitle);
     this.position = POSITION;
+    classify({}).then(res=>{
+this.position=res.data
+    })
   },
   methods: {
     add() {
@@ -228,8 +285,18 @@ export default {
 
                 name: res.data.name,
                 position: res.data.position,
-                url: res.data.url
+            type:res.data.type.toString(),
+            url_id:res.data.url_id
               };
+            debugger
+              if(this.form.type=='1'){
+     this.spGood[0]= res.data.info
+               
+              }
+               if(this.form.type=='2'){
+    
+                this.spGood[0]= res.data.info
+              }
             });
           } else {
             this.$message.error(res.msg);
@@ -247,7 +314,16 @@ export default {
           )
             ? this.form.logo.split(this.form.logo.split("/upload")[0])[1]
             : this.form.logo;
-
+            debugger
+            // 商品
+            if(this.form.type=='1'){
+ this.form.url_id = this.$refs.headerChild.goods.map(val=>val.id).toString();
+            }
+             // 专题
+            if(this.form.type=='2'){
+  this.form.url_id = this.$refs.Addspecial.goods.map(val=>val.id).toString();
+            }
+ 
           banner_manage(this.form).then(res => {
             debugger;
             if (res.data.code == 200) {

@@ -91,15 +91,19 @@ goods:[],
       page: 0
     };
   },
-  props: ["Id", "status", "isintegral"],
+  props: ["Id", "status", "isintegral",'spGood'],
   created() {
     this.getClsss();
-
+ 
     // 新商品
     this.getGoods1(1, this.classify_id, this.classify_id_two, this.serchTitle);
-
-     
-    this.goods = this.$store.state.selectGood; 
+ 
+     if(this.spGood){
+    this.goods =  this.spGood
+     }else{
+   this.$store.state.selectGood.length>0? this.goods =   this.$store.state.selectGood:this.goods=[]; 
+ 
+     }
   },
   methods: {
     delGood(e) {
@@ -152,7 +156,7 @@ goods:[],
       add() {
       if (this.status == "Vip") {
         if (this.checkList.length > 1) {
-          this.$message.error("Vip最多添加一个商品");
+          this.$message.error("最多添加一个商品");
           this.checkList = [];
         } else {
           this.goods = this.checkList;
@@ -160,7 +164,8 @@ goods:[],
         }
       } else {
         let a = this.goods;
-        this.checkList = this.checkList.filter(e => {
+        if(a.length>0){
+ this.checkList = this.checkList.filter(e => {
           if (a.some(val => val.id == e.id)) {
             this.$message.error(e.title + "已添加");
             return;
@@ -180,6 +185,11 @@ goods:[],
             this.checkList = [];
           });
         }
+        }else{
+          this.goods=this.checkList
+          this.checkList=[]
+        }
+       
       }
     },
     getGoods1(page, classify_id, classify_id_two, serchTitle) {
