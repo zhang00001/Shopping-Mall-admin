@@ -15,23 +15,19 @@
           <div class="top"  >
             <i :class="icon" @click="changeSidebar"></i>
             <el-breadcrumb separator="/">
-              <el-breadcrumb-item
-                v-for="(item,index)  in levelList"
+            <template   v-for="item  in levelList">
+               <el-breadcrumb-item
+              
                 :key="item.path"
                 v-if="item.meta.title"
                 :to="item.redirect||item.path"
               >{{item.meta.title}}</el-breadcrumb-item>
+            </template>
+             
             </el-breadcrumb>
           </div>
           <app-main   ></app-main>
-              <!-- <i class='el-icon-arrow-up' @click="backTop" style="      position: absolute;
-    bottom: 20vh;
-    right: 100px;
-    font-size: 24px;
-    color: rgb(48, 194, 166);
-    border: 1px solid;
-    border-radius: 50%;
-    padding: 5px;"></i> -->
+
         </el-main>
       
       </el-container>

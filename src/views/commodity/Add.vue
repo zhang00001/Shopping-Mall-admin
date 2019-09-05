@@ -204,9 +204,9 @@
                       <el-col :span="2">尺码：</el-col>
                       <el-col :span="12">
                         <el-checkbox-group v-model="checkedSizes">
-                          <template v-for="(item,index) in sizes">
+                          <template v-for="(item,index) in sizes"   >
                             <el-checkbox :label="item" :key="item" style="margin-bottom:15px;"></el-checkbox>
-                            <br v-if="index==8||index==20" />
+                            <br v-if="index==8||index==20"    :key="item.id" />
                           </template>
                         </el-checkbox-group>
                       </el-col>
@@ -343,8 +343,8 @@
             <el-col :span="2">商品图片</el-col>
             <el-col :span="22" style="display:flex;">
               <div class="block" style="display:flex;" v-if="showFile">
-                <template v-for="(item,index) in fileList">
-                  <div style="height:250px; margin-right:20px; " v-if="index<=5">
+                <template v-for="(item,index) in fileList" >
+                  <div style="height:250px; margin-right:20px; " v-if="index<=5"    :key="item.id">
                     <div>
                       <el-image
                         :src="item"
@@ -379,21 +379,7 @@
           <el-row :gutter="24" style="margin-top:20px;">
             <el-col :span="2">商品详情</el-col>
             <el-col :span="22">
-              <quill-editor
-                v-model="data"
-                ref="myQuillEditor"
-                :options="editorOption"
-                @blur="onEditorBlur($event)"
-                @focus="onEditorFocus($event)"
-                @change="onEditorChange($event)"
-              ></quill-editor>
-              <input
-                type="file"
-                multiple="multiple"
-                @change="afterRead"
-                id="avatar-uploader"
-                style="display:none"
-              />
+              <Editor ref='editor' :content='data'></Editor>
             </el-col>
           </el-row>
         </div>
@@ -410,8 +396,7 @@
       </template>
 
       <el-form-item>
-        <!-- <el-button type="primary" v-if="active==1" @click="resetForm">下一步,填写规格并上传图片</el-button> -->
-        <el-button type="primary" v-if="active==1" @click="next">下一步,填写规格并上传图片</el-button>
+      <el-button type="primary" v-if="active==1" @click="next">下一步,填写规格并上传图片</el-button>
         <template v-if="active==2">
           <el-button type="primary" @click="active=1">上一步,填写商品信息</el-button>
           <el-button type="primary" @click="next2">下一步,选择关联商品</el-button>
@@ -427,62 +412,19 @@
 
  
 <script>
-const toolbarOptions = [
-  ["bold", "italic", "underline", "strike"], // toggled buttons
-  ["blockquote", "code-block"],
-  [{ header: 1 }, { header: 2 }], // custom button values
-  [{ list: "ordered" }, { list: "bullet" }],
-  [{ script: "sub" }, { script: "super" }], // superscript/subscript
-  [{ indent: "-1" }, { indent: "+1" }], // outdent/indent
-  [{ direction: "rtl" }], // text direction
-  [
-    {
-      size: [
-        "medium",
-        "small",
-        "large",
-        "huge",
-        "10px",
-        "12px",
-        "14px",
-        "16px",
-        "18px",
-        "20px",
-        "22px",
-        "24px",
-        "26px",
-        "32px",
-        "48px"
-      ]
-    }
-  ], // custom dropdown
-  [{ header: [1, 2, 3, 4, 5, 6, false] }],
-  [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-  [{ font: [] }],
-  [{ align: [] }],
-  ["link", "image", "video"],
-  ["clean"] // remove formatting button
-];
+ 
 import { enumSizes, enumColors } from "@/utils/enums";
-import AddGoods from "./AddGoods";
+import {goods_one,goods_manage,goods_class_more,brand_more,supplier_more,warehouse_more} from "@/api/index"
+import AddGoods from "@/components/AddGoods";
+import Editor from "@/components/Editor";
 import http from "@/utils/request";
 import axios from "axios";
 
 export default {
   components: {
-    AddGoods
+    AddGoods,Editor
   },
-  props: {
-    plugins: {
-      type: [String, Array],
-      default: " image media table wordcount"
-    },
-    toolbar: {
-      type: [String, Array],
-      default:
-        "undo redo |  formatselect | bold italic forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | lists image media table | removeformat"
-    }
-  },
+ 
   data() {
     return {
       buyPrice: "",
@@ -499,24 +441,8 @@ export default {
       classify_id: "", //第三步分类
       brand_id: "", //第三步品牌
       fileLists: [],
-      fileList2s: [],
-      editorOption: {
-        modules: {
-          toolbar: {
-            container: toolbarOptions, // 工具栏
-            handlers: {
-              image: function(value) {
-                if (value) {
-                  document.querySelector("#avatar-uploader").click();
-                } else {
-                  this.quill.format("image", false);
-                }
-              }
-            }
-          }
-        }
-      },
-
+  
+ 
       tableData: [], //前端显示table表格
       tableData2: [], //
       search: "",
@@ -556,7 +482,7 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       disabled: false,
-      active: 1,
+      active:1,
       value: false,
       classOnes: [], //一级分类数组
       classTwos: [], //二级分类数组
@@ -652,11 +578,7 @@ export default {
       }
     }
   },
-  computed: {
-    editor() {
-      return this.$refs.myQuillEditor.quill;
-    }
-  },
+
   created() {
     this.getSeleData();
     this.getUpdate(this.$route.query.id);
@@ -703,68 +625,12 @@ export default {
       }
     },
 
-    onEditorReady(editor) {
-      // 准备编辑器
-    },
-    onEditorBlur() {}, // 失去焦点事件
-    onEditorFocus() {}, // 获得焦点事件
-    onEditorChange() {}, // 内容改变事件
-    saveHtml: function(event) {
-      alert(this.content);
-    },
-    change(status) {
-      // this.$Message.info("开关状态：" + status);
-      if (status == false) {
-        this.banstatus = 2;
-      }
-      if (status == true) {
-        this.banstatus = 1;
-      }
-    },
-    upload(url) {
-      let quill = this.$refs.myQuillEditor.quill;
-      // 获取光标所在位置
-      let length = quill.getSelection().index;
-      // 插入图片  res.info为服务器返回的图片地址
-      quill.insertEmbed(length, "image", url);
-      // 调整光标到最后
-      quill.setSelection(length + 1);
-    },
-    afterRead() {
-      let files = event.target.files;
-
-      if (files.length > 0) {
-        Array.prototype.forEach.call(files, file => {
-          var that = this;
-          var form = new FormData();
-          form.append("upload_img", file);
-          form.append("type", 2);
-          //   form.append("token", this.$common._getCookie("ht_token"));
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", process.env.BASE_API + "index/base/upload", true);
-          xhr.onreadystatechange = callback;
-          xhr.send(form);
-          function callback(res) {
-            if (xhr.readyState == 4) {
-              if (xhr.status == 200) {
-                let url = JSON.parse(res.currentTarget.response).data;
-                console.log(url);
-                that.upload(url.http_image);
-              } else return false;
-            }
-          }
-        });
-      }
-      //   let file = event.target.files;
-      //   // 此时可以自行将文件上传至服务器
-      //   console.log(file);
-    },
+ 
    
     getUpdate(e) {
       if (e) {
         this.isEdit = true;
-        http
-          .post("admin/goods/goods_one", { id: this.$route.query.id })
+      goods_one({ id: this.$route.query.id })
           .then(res => {
             if (res.code == 200) {
               this.loadClassTwo(res.detail.classify_id);
@@ -888,10 +754,7 @@ export default {
       this.loadProduct(this.classify_id, this.brand_id, this.title);
     },
     check(e) {},
-    checkChange(e) {},
-    handleChange(value, direction, movedKeys) {
-      this.rightData = movedKeys;
-    },
+  
    
     // 提交商品
     next3() {
@@ -963,7 +826,7 @@ export default {
         } else {
           this.ruleForm.goods_attribute = this.tableData;
         }
-        http.post("admin/goods/goods_manage", this.ruleForm).then(res => {
+      goods_manage(this.ruleForm).then(res => {
           this.loading = false;
           if (res.code == 200) {
             this.$message.success(res.msg);
@@ -1075,6 +938,8 @@ export default {
     },
 
     next2() {
+this.data=this.$refs.editor.content
+
       if (this.fileList.length <= 0) {
         return this.$message.error("请上传商品图");
       } else {
@@ -1136,8 +1001,7 @@ export default {
     },
     // 获取下拉数据
     getSeleData() {
-      http
-        .post("admin/goods/goods_class_more", { page: 1, limit: 10000, pid: 0 })
+    goods_class_more({ page: 1, limit: 10000, pid: 0 })
         .then(res => {
           if (res.code == 200) {
             this.classOnes = res.data.data;
@@ -1145,8 +1009,7 @@ export default {
             this.$message.error(res.msg);
           }
         }),
-        http
-          .post("admin/goods/brand_more", { page: 1, limit: 10000 })
+       brand_more( { page: 1, limit: 10000 })
           .then(res => {
             if (res.code == 200) {
               this.brands = res.data.data;
@@ -1154,8 +1017,7 @@ export default {
               this.$message.error(res.msg);
             }
           });
-      http
-        .post("admin/goods/supplier_more", { page: 1, limit: 10000 })
+    supplier_more( { page: 1, limit: 10000 })
         .then(res => {
           if (res.code == 200) {
             this.suppliers = res.data.data;
@@ -1163,8 +1025,7 @@ export default {
             this.$message.error(res.msg);
           }
         });
-      http
-        .post("admin/goods/warehouse_more", { page: 1, limit: 10000 })
+    warehouse_more( { page: 1, limit: 10000 })
         .then(res => {
           if (res.code == 200) {
             this.warehouses = res.data.data;
@@ -1179,8 +1040,7 @@ export default {
       if (e == "") {
         this.classify_id2 = "";
       } else {
-        http
-          .post("admin/goods/goods_class_more", {
+       goods_class_more( {
             page: 1,
             limit: 10000,
             pid: e
@@ -1196,8 +1056,7 @@ export default {
     },
     loadClassTwo(e) {
       this.ruleForm.classify_id_two = "";
-      http
-        .post("admin/goods/goods_class_more", { page: 1, limit: 10000, pid: e })
+     goods_class_more({ page: 1, limit: 10000, pid: e })
         .then(res => {
           if (res.code == 200) {
             this.classTwos = res.data.data;

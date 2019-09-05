@@ -78,7 +78,7 @@
 
 <script>
 import http from "@/utils/request";
-import SelectGoods from "./SelectGoods";
+import SelectGoods from "@/components/SelectGoods";
 import {
   package_manage,
   package_more,

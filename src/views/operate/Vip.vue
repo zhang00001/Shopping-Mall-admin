@@ -91,7 +91,7 @@
 
 <script>
 import http from "@/utils/request";
-import AddGoods from "./../commodity/AddGoods";
+import AddGoods from "@/components/AddGoods";
 import {
   package_manage,
   package_more,

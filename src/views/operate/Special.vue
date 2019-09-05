@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import SelectGoods from "./SelectGoods";
+import SelectGoods from "@/components/SelectGoods";
 import http from "@/utils/request";
 import { POSITION } from "@/utils/enums";
 import {

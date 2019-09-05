@@ -19,7 +19,7 @@ const OPERATE_ROUTERS = [{
     }, {
         path: 'class',
         component: () =>
-            import ('@/views/operate/Women'),
+            import ('@/views/operate/Classification'),
 
         meta: { title: '首页-分类', icon: 'el-icon-trans', hidden: false },
         children: [
@@ -49,28 +49,7 @@ const OPERATE_ROUTERS = [{
         ]
 
     },
-    // {
-    //     path: 'men',
-    //     component: () =>
-    //         import ('@/views/operate/Men'),
 
-    //     meta: { title: '首页-男装', icon: 'el-icon-trans', hidden: false },
-    //     children: [
-
-    //     ]
-
-    // },
-    // {
-    //     path: 'children',
-    //     component: () =>
-    //         import ('@/views/operate/Children'),
-
-    //     meta: { title: '首页-童装', icon: 'el-icon-trans', hidden: false },
-    //     children: [
-
-    //     ]
-
-    // },
     {
         path: 'advertisement',
         component: () =>

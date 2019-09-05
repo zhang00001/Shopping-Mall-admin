@@ -48,7 +48,7 @@
           </template>
         </el-table-column>
 
-        </el-table-column>
+     
 
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
@@ -146,8 +146,8 @@
 
 <script>
 import http from "@/utils/request";
-import AddGoods from "./../commodity/AddGoods";
-import Addspecial from "./Addspecial";
+import AddGoods from "@/components//AddGoods";
+import Addspecial from "@/components/Addspecial";
 import {
   banner_more,
   banner_manage,

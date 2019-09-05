@@ -1,20 +1,16 @@
 <template>
-  <div>
+  <div class="main">
+   
     <quill-editor
-      v-model="describeChild"
+      v-model="content"
       ref="myQuillEditor"
       :options="editorOption"
       @blur="onEditorBlur($event)"
       @focus="onEditorFocus($event)"
       @change="onEditorChange($event)"
     ></quill-editor>
-    <input
-      type="file"
-      multiple="multiple"
-      @change="afterRead"
-      id="avatar-uploader2"
-      style="display:none"
-    />
+    <input type="file"   multiple="multiple"  id="avatar-uploader"  @change="afterRead" style="display:none" />
+    
   </div>
 </template>
 <script>
@@ -58,9 +54,20 @@ const toolbarOptions = [
   ["clean"] // remove formatting button
 ];
 
+import axios from "axios";
 export default {
   data() {
     return {
+   
+     
+    
+      url: "",
+  
+       
+     
+ 
+     
+     
       editorOption: {
         modules: {
           toolbar: {
@@ -68,7 +75,7 @@ export default {
             handlers: {
               image: function(value) {
                 if (value) {
-                  document.querySelector("#avatar-uploader2").click();
+                   document.querySelector("#avatar-uploader").click();
                 } else {
                   this.quill.format("image", false);
                 }
@@ -76,14 +83,13 @@ export default {
             }
           }
         }
-      },
-      describeChild: ""
+      }
     };
   },
-  props: ["describe"],
-  created() {
-    this.describeChild = describe;
+  mounted() {
+    
   },
+  props:["content"],
   computed: {
     editor() {
       return this.$refs.myQuillEditor.quill;
@@ -93,15 +99,14 @@ export default {
     onEditorReady(editor) {
       // 准备编辑器
     },
-    onEditorBlur(e) {
-      console.log(this.describe);
-    }, // 失去焦点事件
+    onEditorBlur() {}, // 失去焦点事件
     onEditorFocus() {}, // 获得焦点事件
-    onEditorChange(e) {
-      console.log(this.describe);
-    }, // 内容改变事件
+    onEditorChange() {}, // 内容改变事件
+    saveHtml: function(event) {
+      alert(this.content);
+    },
+ 
     upload(url) {
-        debugger
       let quill = this.$refs.myQuillEditor.quill;
       // 获取光标所在位置
       let length = quill.getSelection().index;
@@ -111,7 +116,7 @@ export default {
       quill.setSelection(length + 1);
     },
     afterRead() {
-      let files = event.target.files;
+       let files = event.target.files;
 
       if (files.length > 0) {
         Array.prototype.forEach.call(files, file => {
@@ -124,7 +129,6 @@ export default {
           xhr.open("POST", process.env.BASE_API + "index/base/upload", true);
           xhr.onreadystatechange = callback;
           xhr.send(form);
-
           function callback(res) {
             if (xhr.readyState == 4) {
               if (xhr.status == 200) {
@@ -136,7 +140,14 @@ export default {
           }
         });
       }
-    }
+    },
+   
+  
+   
+  
+   
+  
   }
 };
 </script>
+ 

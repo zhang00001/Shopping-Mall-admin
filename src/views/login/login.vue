@@ -54,9 +54,9 @@
 <script>
 import { isvalidUsername } from "@/utils/validate";
  
-import { debuglog } from "util";
+ 
 
-import SIdentify from "@/components/Identify/identify";
+ 
 import http from "@/utils/request";
 import { mapGetters } from "vuex";
 export default {

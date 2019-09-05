@@ -12,10 +12,10 @@ import 'babel-polyfill'
 import App from './App'
 import router from './router'
 import store from './store'
-import SIdentify from './components/Identify/identify';
+
 import '@/icons' // icon
 
-Vue.component("SIdentify", SIdentify);
+
 Vue.use(ElementUI, { locale })
 
 import ECharts from 'vue-echarts/components/ECharts'

@@ -116,7 +116,7 @@ import {
   advertisement_del,advertisement_log
 } from "@/api/index";
 import axios from "axios";
-import  SelectGoods  from "./SelectGoods";
+import SelectGoods from "@/components/SelectGoods";
 export default {
   components: {
     SelectGoods
