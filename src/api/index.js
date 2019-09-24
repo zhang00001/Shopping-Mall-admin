@@ -53,6 +53,26 @@ export const back_finish = data => http.post('admin/order/back_finish', data); /
 export const order_produce = data => http.post('/admin/order/order_produce', data); //订单(品牌订单生产中)
 export const order_cancel = data => http.post('/admin/order/order_cancel', data); //订单(未支付订单取消)
 export const order_back = data => http.post('/admin/order/order_back', data); //订单(退货列表)
+export const order_vip_more = data => http.post('/admin/order/order_vip_more', data); //订单(vip列表)
+
+export const order_vip_one = data => http.post('/admin/order/order_vip_one', data); //订单(vip详情)
+export const order_vip_logistics = data => http.post('/admin/order/order_vip_logistics', data); //订单(vip发货)
+
+export const order_back_logistics = data => http.post('/admin/order/order_back_logistics', data); //试衣间订单(填写退货物流)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // 用户会员
 export const user_integral = data => http.post('/admin/user/user_integral', data); //会员(等级变更明细)
@@ -64,7 +84,22 @@ export const user_manage = data => http.post('/admin/user/user_manage', data); /
 export const user_more = data => http.post('/admin/user/user_more', data); //会员(列表)
 export const user_integral_give = data => http.post('/admin/user/user_integral_give', data); //会员(积分赠送)
 export const user_grade = data => http.post('/admin/user/user_grade', data); //会员(等级变更明细)
+
+export const vip_grade_more = data => http.post('/admin/user/manage', data); //会员等级(列表)
+export const manage_confirm = data => http.post('/admin/user/manage_confirm', data); //会员店长超店(升级审核）
+
+export const user_money_right = data => http.post('/admin/user/user_money_right', data); //会员(财务信息)
+export const user_address = data => http.post('/admin/user/user_address', data); //会员(地址数据)
+export const user_order = data => http.post('/admin/user/user_order', data); //会员(订单列表)
+
+
+
+
+
+
+
 // 运营
+export const ad_list = data => http.post('/admin/operate/ad_list', data); //广告位的列表数据
 export const withdraw_status = data => http.post('/admin/operate/withdraw_status', data); //提现管理(打款)
 export const withdraw_more = data => http.post('/admin/operate/withdraw_more', data); //提现管理(列表)
 export const package_one = data => http.post('/admin/operate/package_one', data); //vip礼包(单条)
@@ -110,3 +145,4 @@ export const reset = data => http.post('/admin/base/reset', data); //后台改�
 
 // 第三方数据
 export const logistics = data => http.post('/index/base/logistics', data); //查看物流
+export const wuliu = data => http.post('index/base/wuliu', data); //物流公司

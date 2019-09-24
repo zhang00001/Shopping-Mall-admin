@@ -12,39 +12,30 @@
     </div>
     <div class="top">
       <div class="demo-input-suffix searchInput">
-        <span>名称：</span>
+        <span>商品搜索：</span>
 
         <el-input
           placeholder="请输入内容"
           prefix-icon="el-icon-search"
-          v-model="supplier"
+          v-model="title"
           style="width:200px;"
         ></el-input>
       </div>
       <el-button type="primary" @click="search">查询</el-button>
-      <el-button type="primary" @click="add">导入商品</el-button>
-      <!-- <el-button type="primary" @click="toggleSelection">{{allTitle}}</el-button> -->
-      <!-- <el-button type="primary" @click="delAll" :disabled="isDisable">批量删除</el-button> -->
+      <el-button type="primary" @click="add">新增商品</el-button>
+       <el-button type="primary" :disabled="isDisable" @click="delAll">批量删除</el-button>
     </div>
 
     <template>
-      <el-table :data="tableData" border ref="recordTable">
+      <el-table :data="tableData" border ref="recordTable" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="id" label="Id"></el-table-column>
-        <el-table-column prop="id" label="货号"></el-table-column>
+        <el-table-column prop="id" label="Id" width="55"></el-table-column>
+
         <el-table-column prop="title" label="名称"></el-table-column>
-        <el-table-column prop="img" label="图片">
+      
+        <el-table-column label="操作" width="155">
           <template slot-scope="scope">
-            <img :src="scope.row.img" alt style="width:100px;height:100px" />
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="order" label="排序"></el-table-column>
-
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <!-- <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button> -->
-            <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
+           <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -56,8 +47,9 @@
         ></el-pagination>
       </div>
 
-      <el-dialog title="管理商品" :visible.sync="dialogFormVisible">
-        <SelectGoods :Id="selectId" :status="'ad'" ref="headerChild" v-if="dialogFormVisible" :isintegral="'true'"></SelectGoods>
+      <el-dialog title="管理商品" :visible.sync="dialogFormVisible" width="80%'">
+
+        <SelectGoods :Id="selectId" :status="'ad'" :adId='selectStatus' ref="headerChild" v-if="dialogFormVisible" :Ishome="true"  :Ishome2="isSpecial" ></SelectGoods>
 
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="saveGood">确 定</el-button>
@@ -78,7 +70,7 @@ import {
   package_one,
   goods_class_more,
   brand_more,
-  advertisement_more,advertisement_log,advertisement_del_data,
+  advertisement_more,advertisement_log,advertisement_del_data,special_goods_del,
   advertisement_log_data
 } from "@/api/index";
 import axios from "axios";
@@ -88,11 +80,12 @@ export default {
   },
   data() {
     return {
-      selectId: "",
+      isAll:true,
+      selectId: "",isSpecial:true,
       selectStatus: "",
       serchTitle: "",
-      imageUrl: "",
-     
+      imageUrl: "",title:"",
+     multipleSelection:[],
       adverts: [], //广告位
       isDisable: true,
     
@@ -114,7 +107,34 @@ export default {
   
     this.getAdv();
   },
+   
   methods: {
+    delAll(){
+  this.$confirm("确认删除选中商品?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+       advertisement_del_data( {
+            id: this.multipleSelection.map(val => val.id).toString(),
+          })
+          .then(res => {
+            if (res.code == 200) {
+              this.getList(1);
+            } else {
+              this.$message.error(res.msg);
+            }
+          })
+          .catch(() => {});
+      });
+    },
+     handleSelectionChange(val) {
+      this.multipleSelection = val;
+      if (this.multipleSelection.length > 0) {
+        this.isDisable = false;
+      } else {
+        this.isDisable = true;
+      }},
       add(){
 this.dialogFormVisible = true
     this.selectId=this.selectStatus
@@ -139,6 +159,13 @@ this.dialogFormVisible = true
       }
     },
     changeSelect() {
+   
+     if(this.selectStatus=='13'){
+       this.isSpecial=false
+     }else{
+         this.isSpecial=true
+     }
+     console.log(this.isSpecial)
       this.getList(1);
     },
     getAdv() {
@@ -185,11 +212,11 @@ this.dialogFormVisible = true
         page: page,
         limit: 10,
 classif_id:0,
-        advertisement_id: this.selectStatus
+        advertisement_id: this.selectStatus,title:this.title
       }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data;
-          this.total = res.data.count;
+          this.total = res.count;
         } else {
           this.$message.error(res.msg);
         }

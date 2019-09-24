@@ -48,7 +48,10 @@
         <el-table-column fixed="right" label="设置" width="100">
           <template slot-scope="scope">
             <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
-            <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
+            <template v-if="scope.row.id!=27">
+               <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
+            </template>
+            
           </template>
         </el-table-column>
       </el-table>
@@ -62,7 +65,7 @@
 
       <el-dialog :title="title" :visible.sync="dialogFormVisible">
         <el-form :model="form" ref="form" :rules="rules">
-          <el-form-item label="分类名称" :label-width="formLabelWidth" prop="title">
+          <el-form-item label="名称" :label-width="formLabelWidth" prop="title">
             <el-input v-model="form.title" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="排序" :label-width="formLabelWidth" prop="order">
@@ -90,10 +93,10 @@
                
               action
               :show-file-list="false"
-  
+    :before-upload="beforeAvatarUpload2"
             
             >
-              <img v-if="imageUrl2" :src="imageUrl2" class="avatar" />
+              <img v-if="imageUrl2" :src="imageUrl2" class="avatar"  style="width:710px;height:272px;"/>
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               <div class="el-upload__tip" slot="tip">图片尺寸为710*272比例，大小不能超过200kB,图片只能为jpg,png,gif格式</div>
             </el-upload>
@@ -193,7 +196,7 @@ export default {
     },
     add(){
      this.dialogFormVisible = true
-     this.title='新增分类'
+     this.title='新增'
      this.form.id=''
     },
       handleCurrentChange(e){
@@ -298,7 +301,13 @@ getList(page, title) {
       .then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;
+          if(this.tableData.length>0){
+    
+   this.tableData= this.tableData.filter(val=>val.title!="其他")
+
           this.total = res.data.count;
+          }
+      
         } else {
           this.$message.error(res.msg);
         }
@@ -404,20 +413,77 @@ getList(page, title) {
         .catch(err => {});
     },
     beforeAvatarUpload(file) {
-       
-        const isJPG = file.type === 'image/jpeg';
-         const isPNG = file.type === 'image/png';
-            const isGIF = file.type === 'image/gif';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (!isJPG||isGIF||isPNG) {
-          this.$message.error('上传头像图片只能是 jpg,png,gif 格式!');
+   // 上传图片前处理函数
+    const isJPG =
+        file.type === "image/jpeg" ||
+        file.type === "image/png" ||
+        file.type === "image/gif";
+    const isLt2M = file.size / 1024 / 1024  < 0.195; // 限制小于200KB
+    let that = this;
+    let isAllow = false;
+    if (!isJPG) {
+        this.$message.error("上传头像图片只能是 jpg、png、gif 格式!");
+    }
+    if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 200KB!");
+    }
+    const isSize = new Promise(function(resolve, reject) {
+        let width =90;
+        let height = 90;
+        let _URL = window.URL || window.webkitURL;
+        let image = new Image();
+        image.onload = function() {
+          let valid = image.width == width && image.height == height;
+          valid ? resolve() : reject();
+        };
+        image.src = _URL.createObjectURL(file);
+    }).then(
+        () => {
+          return file;
+        },
+        () => {
+          this.$message.error("上传头像图片尺寸不符合,只能是90*90!");
+          return Promise.reject();
         }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 200kB!');
+      );
+    return isJPG && isLt2M && isSize;
+    },
+     beforeAvatarUpload2(file) {
+   // 上传图片前处理函数
+    const isJPG =
+        file.type === "image/jpeg" ||
+        file.type === "image/png" ||
+        file.type === "image/gif";
+    const isLt2M = file.size / 1024 / 1024  < 0.195; // 限制小于200KB
+    let that = this;
+    let isAllow = false;
+    if (!isJPG) {
+        this.$message.error("上传头像图片只能是 jpg、png、gif 格式!");
+    }
+    if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 200KB!");
+    }
+    const isSize = new Promise(function(resolve, reject) {
+        let width =710;
+        let height = 272;
+        let _URL = window.URL || window.webkitURL;
+        let image = new Image();
+        image.onload = function() {
+          let valid = image.width == width && image.height == height;
+          valid ? resolve() : reject();
+        };
+        image.src = _URL.createObjectURL(file);
+    }).then(
+        () => {
+          return file;
+        },
+        () => {
+          this.$message.error("上传头像图片尺寸不符合,只能是712*272!");
+          return Promise.reject();
         }
-        return isJPG && isLt2M;
-      }
+      );
+    return isJPG && isLt2M && isSize;
+    }
   }
 };
 </script>

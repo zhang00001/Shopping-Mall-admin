@@ -23,7 +23,7 @@ const MEMBER_ROUTERS = [{
         component: () =>
             import ('@/views/member/Grade'),
 
-        meta: { title: '会员等级', icon: 'el-icon-trans', hidden: true },
+        meta: { title: '等级审核', icon: 'el-icon-trans', hidden: false },
         children: [
 
         ]

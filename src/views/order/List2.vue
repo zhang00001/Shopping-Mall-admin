@@ -34,7 +34,7 @@
             <el-date-picker v-model="searchTitle" type="date" placeholder="选择日期"></el-date-picker>
           </el-col>
 
-          <el-col :span="6">
+          <!-- <el-col :span="6">
             <span>订单分类</span>
 
             <el-select v-model="type" placeholder="请选择" clearable>
@@ -44,7 +44,7 @@
               <el-option label="积分商品" value="3"></el-option>
               <el-option label="特价商品" value="4"></el-option>
             </el-select>
-          </el-col>
+          </el-col> -->
         </el-row>
         <el-row>
           <el-col :span="6">
@@ -75,12 +75,33 @@
         </el-table-column>
         <el-table-column prop="mobile" label="用户账户"></el-table-column>
         <el-table-column prop="money" label="订单金额"></el-table-column>
-        <el-table-column prop="pay_type" label="支付方式"></el-table-column>
-  <el-table-column prop="money_status" label="支付状态"></el-table-column>
- 
-        <el-table-column prop="msg" label="订单状态">
-           
+        <el-table-column prop="pay_type_name" label="支付方式"></el-table-column>
+         <el-table-column prop="total_status" label="状态">
+          <template slot-scope="scope">
+            <template v-if="scope.row.total_status==-3">未知</template>
+            <template v-if="scope.row.total_status==-2">待审核</template>
+            <template v-if="scope.row.total_status==-1">已拒绝</template>
+            <template v-if="scope.row.total_status==0">待生产</template>
+            <template v-if="scope.row.total_status==1">生产中</template>
+            <template v-if="scope.row.total_status==2">待支付</template>
+            <template v-if="scope.row.total_status==3">待发货</template>
+            <template v-if="scope.row.total_status==4">已发货</template>
+            <template v-if="scope.row.total_status==5">已完成</template>
+            <template v-if="scope.row.total_status==6">退货申请中</template>
+            <template v-if="scope.row.total_status==7">退货中</template>
+            <template v-if="scope.row.total_status==8">退货完成</template>
+            <template v-if="scope.row.total_status==9">已评价</template>
+            <template v-if="scope.row.total_status==10">待评价</template>
+            <template v-if="scope.row.total_status==11">买家取消</template>
+            <template v-if="scope.row.total_status==12">卖家取消</template>
+            <template v-if="scope.row.total_status==13">退货申请被驳回</template>
+          </template>
         </el-table-column>
+  <!-- <el-table-column prop="money_status_name" label="支付状态"></el-table-column> -->
+ 
+        <!-- <el-table-column prop="msg" label="订单状态"> -->
+           
+        <!-- </el-table-column> -->
 
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -236,39 +257,39 @@ export default {
       this.map=routerMsg.map
     } else {
       this.radio1 = "0";
-      this.map = JSON.stringify({ goods_type: 1, show: 1 });
+      
     }
-    this.getList(1, this.searchTitle, this.map);
+      this.getList(1, this.searchTitle, this.radio1);
   },
   methods: {
         changeRadio(){
-      
-switch (this.radio1) {
-        case 0:
-        this.map = JSON.stringify({goods_type:2,show:1} );
-          break;
-        case "1":
-         this.map = JSON.stringify({goods_type:2,status:0,confirm:2,money_status:0,show:1});
-          break;
-        case "2":
-           this.map = JSON.stringify({goods_type:2,status:0,confirm:2,money_status:1,show:1});
-          break;
-        case "3":
-       this.map = JSON.stringify({goods_type:2,status:2,confirm:2,money_status:1,show:1});
-          break;
-        case "4":
-            this.map = JSON.stringify({goods_typ:2,status:3,confirm:2,money_status:1,evaluate_status:0,show:1});
-          break;
-        case "5":
-           this.map = JSON.stringify({goods_type:2,status:1,confirm:2,money_status:1,show:1});
-          break;
-           case "6":
-           this.map = JSON.stringify({goods_type:2,status:4,confirm:2,money_status:1,show:1});
-          break;
-        default:
-        this.map = JSON.stringify({goods_type:1,show:1} );
-     } 
-      this.getList(1, this.searchTitle, this.map);
+        this.getList(1, this.searchTitle, this.radio1);
+// switch (this.radio1) {
+//         case 0:
+//         this.map = JSON.stringify({goods_type:2,show:1} );
+//           break;
+//         case "1":
+//          this.map = JSON.stringify({goods_type:2,status:0,confirm:2,money_status:0,show:1});
+//           break;
+//         case "2":
+//            this.map = JSON.stringify({goods_type:2,status:0,confirm:2,money_status:1,show:1});
+//           break;
+//         case "3":
+//        this.map = JSON.stringify({goods_type:2,status:2,confirm:2,money_status:1,show:1});
+//           break;
+//         case "4":
+//             this.map = JSON.stringify({goods_type:2,status:3,confirm:2,money_status:1,evaluate_status:0,show:1});
+//           break;
+//         case "5":
+//            this.map = JSON.stringify({goods_type:2,status:1,confirm:2,money_status:1,show:1});
+//           break;
+//            case "6":
+//            this.map = JSON.stringify({goods_type:2,status:4,confirm:2,money_status:1,show:1});
+//           break;
+//         default:
+//         this.map = JSON.stringify({goods_type:1,show:1} );
+//      } 
+//       this.getList(1, this.searchTitle, this.map);
      },
     handleCurrentChange(e) {
       this.getList(e, this.searchTitle);
@@ -388,8 +409,8 @@ switch (this.radio1) {
     },
 
     // 加载列表
-    getList(page, title ,map) {
-      order_more({ page: page, limit: 10, title: title,type:2,map:map }).then(res => {
+    getList(page, title ,index) {
+      order_more({ page: page, limit: 10, title: title,type:2,index:index }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;
           this.total = res.data.count;

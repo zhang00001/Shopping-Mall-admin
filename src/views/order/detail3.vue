@@ -52,7 +52,7 @@
             <el-col :span="6">
               <div class="text item">
                 <p>推荐账户：</p>
-                <span>{{data.user_id}}</span>
+                <span></span>
               </div>
               <div class="text item">
                 <p>支付方式：</p>
@@ -61,7 +61,7 @@
 
               <div class="text item">
                 <p>订单金额：</p>
-                <span>{{data.address_id}}</span>
+                <span>{{data.money}}</span>
               </div>
             </el-col>
           </el-row>
@@ -88,64 +88,62 @@
       </el-col>
     </el-row>
     <div class="overview-layout">
-      <el-row :gutter="24" style="margin-top:20px;">
-        <el-col :span="24" v-if="showBack" style="margin-bottom:20px;">
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>回寄详情</span>
-            </div>
-            <el-table :data="tableData2" style="width: 100%">
-              <el-table-column prop="id" label="ID"></el-table-column>
-              <el-table-column prop="addtime" label="提交时间">
-             <template slot-scope="scope">
-            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
-            
-          </template>
-        </el-table-column>
-              <el-table-column prop="img" label="图片"></el-table-column>
-              <el-table-column prop="mobile" label="手机号"></el-table-column>
-              <el-table-column prop="logistics_company" label="物流公司"></el-table-column>
-              <el-table-column prop="logistics_num" label="物流单号"></el-table-column>
-              <el-table-column fixed="right" label="操作" width="100">
-                <template slot-scope="scope">
-                  <el-button
-                    @click="logistics(scope.row.logistics_num)"
-                    type="text"
-                    size="small"
-                  >查看物流</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-        </el-col>
-        <el-col :span="8">
+     <el-row :gutter="24" style="margin-top:20px;">
+        <el-col :span="16">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
               <span>商品信息</span>
             </div>
-            <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="attribute_id" label="商品图片"></el-table-column>
-              <el-table-column prop="attribute_id" label="商品名称"></el-table-column>
-              <el-table-column prop="attribute_id" label="价格"></el-table-column>
-              <el-table-column prop="attribute_id" label="属性规格"></el-table-column>
-              <el-table-column prop="buy_num" label="数量"></el-table-column>
-              <el-table-column prop="attribute_id" label="小计"></el-table-column>
-            </el-table>
+
+            <div style="padding:5px 0 20px 10px ">
+              <el-table :data="tableData" style="width: 100%">
+                <el-table-column prop="attribute_info.data.goods_id" label="商品Id"></el-table-column>
+
+                <el-table-column prop="attribute_info.data.title" label="商品名称" width="600px;"></el-table-column>
+                <el-table-column prop="attribute_info.data.img" label="商品图片">
+                  <template slot-scope="scope">
+                    <img
+                      :src="scope.row.attribute_info.data.img"
+                      style="width:50px;height:50px;"
+                      alt
+                    />
+                  </template>
+                </el-table-column>
+                <el-table-column prop="attribute_info.money" label="价格"></el-table-column>
+                <el-table-column prop="attribute_info.size" label="属性规格">
+                  <template
+                    slot-scope="scope"
+                  >{{scope.row.attribute_info.size}} {{scope.row.attribute_info.color}}</template>
+                </el-table-column>
+                <el-table-column prop="buy_num" label="数量"></el-table-column>
+                <!-- <el-table-column prop="attribute_id" label="小计"></el-table-column> -->
+              </el-table>
+            </div>
           </el-card>
         </el-col>
 
-        <el-col :span="16">
-          <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>费用信息</span>
-            </div>
-            <el-table :data="tableData" style="width: 100%">
-              <el-table-column prop="date" label="商品合计"></el-table-column>
-              <el-table-column prop="name" label="运费"></el-table-column>
-              <el-table-column prop="address" label="折扣金额"></el-table-column>
-              <el-table-column prop="address" label="实际付款金额"></el-table-column>
-            </el-table>
-          </el-card>
+        <el-col :span="8">
+          <div class="out-border">
+            <el-card class="box-card">
+              <div slot="header" class="clearfix">
+                <span>费用信息</span>
+              </div>
+               <div class="text item">
+                <p>运费</p>
+                <span>{{data.money_logistics}}</span>
+              </div>
+              <div class="text item">
+                <p>销售金额</p>
+                <span>{{data.money_theory}}</span>
+              </div>
+              <div class="text item">
+                <p>实际付款金额</p>
+                <span>{{data.money}}</span>
+              </div>
+            </el-card>
+
+          
+          </div>
         </el-col>
       </el-row>
     </div>
@@ -162,6 +160,16 @@
     </el-dialog>
     <el-dialog title="发货" :visible.sync="dialogFormVisible2">
       <el-form :model="form">
+             <el-form-item label="物流公司" :label-width="formLabelWidth">
+           <el-select v-model="form.card" placeholder="请选择">
+    <el-option
+      v-for="item in cards"
+      :key="item.card"
+      :label="item.name"
+      :value="item.card">
+    </el-option>
+  </el-select>
+        </el-form-item>
         <el-form-item label="物流编号" :label-width="formLabelWidth">
           <el-input v-model="form.logistics_number" autocomplete="off"></el-input>
         </el-form-item>
@@ -176,12 +184,13 @@
       </div>
     </el-dialog>
     <el-dialog title="物流状态" :visible.sync="dialogFormVisible3">
+      <p>当前状态{{state_name}}</p>
       <el-timeline :reverse="reverse">
-        <el-timeline-item
+      <el-timeline-item
           v-for="(activity, index) in activities"
           :key="index"
-          :timestamp="activity.timestamp"
-        >{{activity.content}}</el-timeline-item>
+          :timestamp="activity.AcceptTime"
+        >{{activity.AcceptStation}}</el-timeline-item>
       </el-timeline>
     </el-dialog>
     <el-dialog title="退货审核" :visible.sync="dialogFormVisible4">
@@ -214,37 +223,26 @@ import {
   logistics,
   back_confirm,
   back_finish,
-  order_produce
+  order_produce,wuliu
 } from "@/api/index";
 export default {
   data() {
     return {
       active: 0,
-      data: {},
+      data: {},cards:[],
       showBack: false,
       tableData2: [],
       activities: [
-        {
-          content: "活动按期开始",
-          timestamp: "2018-04-15"
-        },
-        {
-          content: "通过审核",
-          timestamp: "2018-04-13"
-        },
-        {
-          content: "创建成功",
-          timestamp: "2018-04-11"
-        }
+     
       ],
       dialogFormVisible: false,
       dialogFormVisible2: false,
       dialogFormVisible3: false,
       dialogFormVisible4: false,
-      dialogFormVisible5: false,
+      dialogFormVisible5: false,state_name:"",
       form: {
         remarks: "",
-        logistics_number: ""
+        logistics_number: "",card:""
       },
       formLabelWidth: "120px",
       confirm: 1,
@@ -261,6 +259,14 @@ export default {
     },
     send2() {
       this.dialogFormVisible2 = true;
+      wuliu({}).then(res=>{
+if(res){
+this.dialogFormVisible2 = true;
+this.cards=res
+}else{
+  this.$message.error(res.msg)
+}
+})
     },
     send4() {
       this.dialogFormVisible4 = true;
@@ -268,7 +274,16 @@ export default {
 
     logistics(e) {
       this.dialogFormVisible3 = true;
-      logistics({ code: e }).then(res => {});
+     logistics({ code:this.data.logistics_number,type:this.data.logistics_card,from:1,id:this.data.id  }).then(res => {
+
+if(res.code==200){
+  this.activities = res.data.data;
+           this.state_name = res.data.State_name;
+}else{
+  this.$message.error(res.msg)
+}
+
+      });
     },
     over() {
       this.$confirm("确认收到货了吗", "提示", {
@@ -319,7 +334,7 @@ export default {
         });
     },
     okSend4() {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+      this.$confirm("确定?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -345,7 +360,7 @@ export default {
         });
     },
     okSend() {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+      this.$confirm("确定?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -374,7 +389,8 @@ export default {
       order_logistics_status({
         order_id: this.$route.query.id,
         logistics_number: this.form.logistics_number,
-        remarks: this.form.remarks
+        remarks: this.form.remarks,
+          card :this.form.card
       }).then(res => {
         if (res.code == 200) {
           this.getData();
@@ -415,7 +431,7 @@ export default {
 .item p {
   width: 25%;
   width: 29%;
-  text-align: right;
+  /* text-align: right; */
 }
 .clearfix:before,
 .clearfix:after {

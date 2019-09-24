@@ -11,9 +11,9 @@
      
    
       <el-container>
-        <el-main  >
+        <el-main   style="width: 90vw;">
           <div class="top"  >
-            <i :class="icon" @click="changeSidebar"></i>
+            <!-- <i :class="icon" @click="changeSidebar"></i> -->
             <el-breadcrumb separator="/">
             <template   v-for="item  in levelList">
                <el-breadcrumb-item

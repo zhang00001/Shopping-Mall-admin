@@ -124,7 +124,7 @@
         </el-table-column>
         <el-table-column prop="number" label="货号"></el-table-column>
           <el-table-column prop="goods_id" label="商品ID"></el-table-column>
-        <!-- <el-table-column prop="supplier" label="库存"></el-table-column> -->
+        <el-table-column prop="integral" label="赠送积分"></el-table-column>
         <el-table-column prop="sales_volume" label="销量"></el-table-column>
         <!-- <el-table-column prop="supplier" label="排序"></el-table-column> -->
         <el-table-column prop="shelf" label="上架">
@@ -152,7 +152,7 @@
           <el-select v-model="value" :disabled='isDisable' placeholder="批量操作">
     <el-option
       v-for="item in options"
-      :key="item.value"
+      :key="item.id"
       :label="item.label"
       :value="item.value">
     </el-option>
@@ -197,6 +197,9 @@ export default {
         }, {
           value: '2',
           label: '批量删除'
+        }, {
+          value: '3',
+          label: '关闭积分赠送'
         }, ],
         value: '',
       isDisable: true,
@@ -320,6 +323,15 @@ data={
   
 }
       }
+        if(this.value==3){
+msg='是否批量关闭积分赠送'
+url='admin/goods/goods_integral_status'
+data={
+  id: this.multipleSelection.map(val => val.id).toString(),
+  status:0
+}
+      }
+      
       this.$confirm(msg, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",

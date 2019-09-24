@@ -16,7 +16,7 @@
       :rules="rules"
       ref="ruleForm"
       label-width="auto"
-      class="demo-ruleForm"
+      class="demo-ruleForm inputForm"
     >
       <template v-if="active==1">
         <div>
@@ -69,12 +69,12 @@
                   <el-radio v-model="ruleForm.type" label="1">试衣间商品</el-radio>
                   <el-radio v-model="ruleForm.type" label="2">品牌商品</el-radio>
                   <el-radio v-model="ruleForm.type" label="3">积分商品</el-radio>
-                  <el-radio v-model="ruleForm.type" label="4">特价商品</el-radio>
+                  <!-- <el-radio v-model="ruleForm.type" label="4">特价商品</el-radio> -->
                 </el-form-item>
               </el-col>
 
               <el-col :span="12">
-                <el-form-item label="供货上架" prop="supplier_id">
+                <el-form-item label="供货商家" prop="supplier_id">
                   <el-select v-model="ruleForm.supplier_id" placeholder="请选择供货商">
                     <el-option
                       :key="item.id"
@@ -92,7 +92,7 @@
               </el-col>
               <el-col :span="22">
                 <el-form-item label="商品简介" prop="synopsis">
-                  <el-input type="textarea" v-model="ruleForm.synopsis" :rows="2"></el-input>
+                  <el-input type="textarea" v-model="ruleForm.synopsis" :rows="2" style=" width: 98%;"></el-input>
                 </el-form-item>
               </el-col>
             </el-col>
@@ -205,7 +205,7 @@
                       <el-col :span="12">
                         <el-checkbox-group v-model="checkedSizes">
                           <template v-for="(item,index) in sizes"   >
-                            <el-checkbox :label="item" :key="item" style="margin-bottom:15px;"></el-checkbox>
+                            <el-checkbox :label="item"  :key="item.id"  style="margin-bottom:15px;"></el-checkbox>
                             <br v-if="index==8||index==20"    :key="item.id" />
                           </template>
                         </el-checkbox-group>
@@ -222,7 +222,7 @@
                           <el-checkbox
                             v-for="item in colors"
                             :label="item"
-                            :key="item"
+                            :key="item.id"
                             style="margin-bottom:15px;"
                           >{{item}}</el-checkbox>
                         </el-checkbox-group>
@@ -300,7 +300,7 @@
                       ></el-input>
                     </template>
                   </el-table-column>
-                  <el-table-column label="商品图片" prop="name">
+                  <el-table-column label="商品图片" prop="name" width="150px;">
                     <template slot-scope="scope">
                       <template v-if="scope.row.img==''">
                         <el-upload
@@ -320,11 +320,11 @@
                     </template>
                   </el-table-column>
 
-                  <el-table-column label="商品默认选择">
+                  <!-- <el-table-column label="商品默认选择"  width="180px;">
                     <template slot-scope="scope">
                       <el-checkbox v-model="scope.row.selected" @change="changeSelect(scope.row)">是</el-checkbox>
                     </template>
-                  </el-table-column>
+                  </el-table-column> -->
 
                   <el-table-column align="right" label="操作">
                     <template slot-scope="scope">
@@ -1130,6 +1130,9 @@ this.data=this.$refs.editor.content
 }
 .demo-ruleForm {
   margin-top: 20px;
+}
+.inputForm /deep/ .el-input{
+  width: 90%;
 }
 </style>
 <style>

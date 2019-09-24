@@ -4,21 +4,25 @@
       <span>
         <i class="el-icon-potato-strips" style="color:red"></i> 当前订单状态 ：
       </span>
-      <span>{{data.status_name}}</span>
-      <!-- <el-button size="mini" v-if="data.status==0&&data.confirm==0" type="primary" @click="send">审核</el-button> -->
-     
-      <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send2">发货</el-button>
-      <el-button size="mini" v-if="data.status==1" type="primary" @click="send2">发货</el-button>
-      <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send3">生产</el-button>
+
+      <span v-if="data.status==0">待支付</span>
+      <span v-if="data.status==1&&data.logistics_status==0">已支付</span>
+      <span v-if="data.status==1&&data.logistics_status==1">待收货</span>
+      <span v-if="data.status==1&&data.logistics_status==2">已完成</span>
+
       <el-button
         size="mini"
-        v-if="data.status==2"
+        v-if="data.status==1&&data.logistics_status==0"
         type="primary"
-        @click="logistics(data.logistics_number)"
+        @click="send2"
+      >发货</el-button>
+
+      <el-button
+        size="mini"
+        v-if="data.status==1&&data.logistics_status==1"
+        type="primary"
+        @click="logistics"
       >查看物流</el-button>
-      <el-button size="mini" v-if="data.status==4" type="primary" @click="send4">退货审核</el-button>
-      <!-- <el-button size="mini" v-if="data.status==5" type="primary" @click="dialogFormVisible5=true">查看退货物流信息</el-button> -->
-      <el-button size="mini" v-if="data.status==5" type="primary" @click="over">退货完成</el-button>
     </div>
     <el-row :gutter="24">
       <el-col :span="18">
@@ -34,7 +38,7 @@
               </div>
               <div class="text item">
                 <p>发货单流水号：</p>
-                <span>{{data.order_sn}}</span>
+                <span>{{data.logistics_order_sn}}</span>
               </div>
               <div class="text item">
                 <p>物流单号：</p>
@@ -48,27 +52,31 @@
               </div>
               <div class="text item">
                 <p>用户账户：</p>
-                <span>{{data.user_info.mobile}}</span>
+                <span>{{data.mobile}}</span>
               </div>
               <div class="text item">
                 <p>用户昵称：</p>
-                <span>{{data.user_info.nick}}</span>
+                <span>{{data.nick}}</span>
               </div>
             </el-col>
             <el-col :span="6">
-              <div class="text item">
-                <p>推荐账户：</p>
-                <span></span>
-              </div>
-              <div class="text item">
+              <!-- <div class="text item">
+                <p>礼包信息：</p>
+                <span>{{data.msg}}</span>
+              </div> -->
+              <!-- <div class="text item">
                 <p>支付方式：</p>
                 <span>{{data.pay_type}}</span>
-              </div>
+              </div>-->
 
-              <div class="text item">
-                <p>订单金额：</p>
-                <span>{{data.money}}</span>
+              <!-- <div class="text item">
+                <p>货款金额：</p>
+                <span>{{data.money_huokuan}}</span>
               </div>
+              <div class="text item">
+                <p>押金：</p>
+                <span>{{data.money_yajing}}</span>
+              </div> -->
             </el-col>
           </el-row>
         </el-card>
@@ -94,7 +102,7 @@
       </el-col>
     </el-row>
     <div class="overview-layout">
-     <el-row :gutter="24" style="margin-top:20px;">
+      <el-row :gutter="24" style="margin-top:20px;">
         <el-col :span="16">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
@@ -103,25 +111,29 @@
 
             <div style="padding:5px 0 20px 10px ">
               <el-table :data="tableData" style="width: 100%">
-                <el-table-column prop="attribute_info.data.goods_id" label="商品Id"></el-table-column>
+                <el-table-column prop="goods_id" label="商品Id"></el-table-column>
 
-                <el-table-column prop="attribute_info.data.title" label="商品名称" width="600px;"></el-table-column>
-                <el-table-column prop="attribute_info.data.img" label="商品图片">
+                <el-table-column prop="title" label="商品名称" width="600px;"></el-table-column>
+                <el-table-column prop="show" label="商品图片">
                   <template slot-scope="scope">
                     <img
-                      :src="scope.row.attribute_info.data.img"
-                      style="width:50px;height:50px;"
+                      :src="scope.row.show"
+                      style="width:50px;"
                       alt
                     />
                   </template>
                 </el-table-column>
-                <el-table-column prop="attribute_info.money" label="价格"></el-table-column>
-                <el-table-column prop="attribute_info.size" label="属性规格">
-                  <template
-                    slot-scope="scope"
-                  >{{scope.row.attribute_info.size}} {{scope.row.attribute_info.color}}</template>
+                <el-table-column prop="price" label="价格"></el-table-column>
+                
+                <el-table-column prop="buy_num" label="数量">
+
+                     <template slot-scope="scope" >
+                       <template v-if='false'>
+                         {{scope.row}}
+                       </template>
+                      1
+                     </template>
                 </el-table-column>
-                <el-table-column prop="buy_num" label="数量"></el-table-column>
                 <!-- <el-table-column prop="attribute_id" label="小计"></el-table-column> -->
               </el-table>
             </div>
@@ -136,19 +148,17 @@
               </div>
               <div class="text item">
                 <p>运费</p>
-                <span>{{data.money_logistics}}</span>
+                <span>0</span>
               </div>
               <div class="text item">
-                <p>销售金额</p>
-                <span>{{data.money_theory}}</span>
+                <p>折扣金额</p>
+                <span>{{data.money_huokuan}}</span>
               </div>
               <div class="text item">
                 <p>实际付款金额</p>
-                <span>{{data.money}}</span>
+                <span>{{data.money_huokuan}}</span>
               </div>
             </el-card>
-
-          
           </div>
         </el-col>
       </el-row>
@@ -166,15 +176,10 @@
     </el-dialog>
     <el-dialog title="发货" :visible.sync="dialogFormVisible2">
       <el-form :model="form">
-         <el-form-item label="物流公司" :label-width="formLabelWidth">
-           <el-select v-model="form.card" placeholder="请选择">
-    <el-option
-      v-for="item in cards"
-      :key="item.card"
-      :label="item.name"
-      :value="item.card">
-    </el-option>
-  </el-select>
+        <el-form-item label="物流公司" :label-width="formLabelWidth">
+          <el-select v-model="form.card" placeholder="请选择">
+            <el-option v-for="item in cards" :key="item.card" :label="item.name" :value="item.card"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="物流编号" :label-width="formLabelWidth">
           <el-input v-model="form.logistics_number" autocomplete="off"></el-input>
@@ -212,7 +217,8 @@
     </el-dialog>
     <el-dialog title="回退物流状态" :visible.sync="dialogFormVisible5">
       <el-timeline :reverse="reverse">
-        <el-timeline-item
+        <p>当前状态：{{state_name}}</p>
+       <el-timeline-item
           v-for="(activity, index) in activities"
           :key="index"
           :timestamp="activity.timestamp"
@@ -229,18 +235,20 @@ import {
   logistics,
   back_confirm,
   back_finish,
-  order_produce,wuliu
+  wuliu,
+  order_produce,
+  order_vip_one,
+  order_vip_logistics
 } from "@/api/index";
 export default {
   data() {
     return {
       active: 0,
       data: {},
-      showBack: false,cards:[],state_name:"",
-      tableData2: [],
-      activities: [
-     
-      ],
+      showBack: false,
+    state_name:"",
+      cards: [],
+      activities: [],
       dialogFormVisible: false,
       dialogFormVisible2: false,
       dialogFormVisible3: false,
@@ -248,7 +256,8 @@ export default {
       dialogFormVisible5: false,
       form: {
         remarks: "",
-        logistics_number: "",card:""
+        logistics_number: "",
+        card: ""
       },
       formLabelWidth: "120px",
       confirm: 1,
@@ -265,31 +274,30 @@ export default {
     },
     send2() {
       this.dialogFormVisible2 = true;
-      wuliu({}).then(res=>{
-if(res){
-this.dialogFormVisible2 = true;
-this.cards=res
-}else{
-  this.$message.error(res.msg)
-}
-})
+      wuliu({}).then(res => {
+        if (res) {
+          this.dialogFormVisible2 = true;
+          this.cards = res;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
     },
     send4() {
       this.dialogFormVisible4 = true;
     },
 
-    logistics() {
-      
+    logistics(e) {
       this.dialogFormVisible3 = true;
-      logistics({  code:this.data.logistics_number,type:this.data.logistics_card,from:1,id:this.data.id }).then(res => {
-
-if(res.code==200){
-this.activities=res.data.data
- this.state_name = res.data.State_name;
-}else{
-  this.$message.error(res.msg)
-}
-
+      logistics({
+        code:this.data.logistics_number,type:this.data.logistics_card,from:2,id:this.data.id 
+      }).then(res => {
+        if (res.code == 200) {
+          this.activities = res.data.data;
+           this.state_name = res.data.State_name;
+        } else {
+          this.$message.error(res.msg);
+        }
       });
     },
     over() {
@@ -341,7 +349,7 @@ this.activities=res.data.data
         });
     },
     okSend4() {
-      this.$confirm("确定?", "提示", {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -367,7 +375,7 @@ this.activities=res.data.data
         });
     },
     okSend() {
-      this.$confirm("确定?", "提示", {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -393,12 +401,11 @@ this.activities=res.data.data
         });
     },
     okSend2() {
-      debugger
-      order_logistics_status({
-        order_id: this.$route.query.id,
+      order_vip_logistics({
+        id: this.$route.query.id,
         logistics_number: this.form.logistics_number,
         remarks: this.form.remarks,
-        card :this.form.card
+        card: this.form.card
       }).then(res => {
         if (res.code == 200) {
           this.getData();
@@ -409,15 +416,13 @@ this.activities=res.data.data
       });
     },
     getData() {
-      order_look({ id: this.$route.query.id }).then(res => {
+      order_vip_one({ id: this.$route.query.id }).then(res => {
         if (res) {
-          // this.active = res.status;
-          this.data = res;
-          this.tableData = res.goods_info;
-          this.tableData2[0] = res.back_info;
-          if (res.back_info) {
-            this.showBack = true;
-          }
+     
+          this.data = res.data;
+    this.tableData=[]
+            this.tableData[0] = res.data.package_info
+
         } else {
           this.$message.error(res.msg);
         }

@@ -53,13 +53,18 @@
     <template>
       <el-table :data="tableData" border>
         <el-table-column prop="id" label="编号" ></el-table-column>
-        <el-table-column prop="supplier" label="用户账户" ></el-table-column>
-        <el-table-column prop="name" label="商品名称" ></el-table-column>
-        <el-table-column prop="mobile" label="评价内容" ></el-table-column>
-        <el-table-column prop="title" label="评论时间" ></el-table-column>
+        <el-table-column prop="mobile" label="用户账户" ></el-table-column>
+        <el-table-column prop="title" label="商品名称" ></el-table-column>
+        <el-table-column prop="msg" label="评价内容" ></el-table-column>
+        <el-table-column prop="addtime" label="评论时间" >
+            <template slot-scope="scope">
+            <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
+            
+          </template>
+        </el-table-column>
         <el-table-column label="操作"  >
           <template slot-scope="scope">
-               <el-button @click="edit(scope.row)" type="text" size="small">查看订单</el-button>
+               <el-button @click="see(scope.row)" type="text" size="small">查看订单</el-button>
             <el-button @click="edit(scope.row)" type="text" size="small">隐藏</el-button>
             <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
           </template>
@@ -175,21 +180,20 @@ http.post("admin/goods/goods_class_more",{page:1,limit:10000}).then(res=>{
           }
         });
     },
+    see(e){
+     
+this.$router.push({ path: '/order/index2/detail2',query:{id:e.order_id }})
+    },
     // 编辑回显
     edit(e) {
-      (this.dialogFormVisible = true),
-        http.post("admin/goods/supplier_one", { id: e.id }).then(res => {
-          if (res.code == 200) {
-            this.title = "编辑";
 
-            this.$nextTick(() => {
-              this.form = {
-                id: e.id,
-                mobile: res.data.mobile,
-                name: res.data.name,
-                supplier: res.data.supplier
-              };
-            });
+
+     
+        http.post("/admin/goods/evaluate_show", { id: e.id }).then(res => {
+          if (res.code == 200) {
+           
+ this.$message.success(res.msg);
+            
           } else {
             this.$message.error(res.msg);
           }

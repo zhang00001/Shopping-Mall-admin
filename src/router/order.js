@@ -63,6 +63,22 @@ const ORDER_ROUTERS = [{
     //     children: []
     // },
     {
+        path: 'vip',
+        component: () =>
+            import ('@/views/order/Vip'),
+
+        meta: { title: 'vip订单', icon: 'el-icon-trans', hidden: false },
+        children: []
+    },
+    {
+        path: 'vip/detail',
+        component: () =>
+            import ('@/views/order/detail_vip'),
+
+        meta: { title: 'vip订单详情', icon: 'el-icon-trans', hidden: true },
+        children: []
+    },
+    {
         path: 'refund',
         component: () =>
             import ('@/views/order/Refund'),

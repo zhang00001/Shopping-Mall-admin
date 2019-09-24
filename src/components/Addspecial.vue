@@ -13,7 +13,7 @@
           v-model="checkList"
          
         >
-          <el-checkbox v-for="item in goodcounts" :key="item.id" :label="item">{{item.name}}</el-checkbox>
+          <el-checkbox v-for="(item,index) in goodcounts" :key="index" :label="item">{{item.name}}</el-checkbox>
         </el-checkbox-group>
 
         <p v-if="noMore">没有更多了</p>
@@ -78,7 +78,7 @@ goods:[],
     // 新商品
     this.getGoods1(1,);
 
-     
+     debugger
     this.goods =  this.spGood
   },
   methods: {

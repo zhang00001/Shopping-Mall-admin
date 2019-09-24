@@ -9,18 +9,18 @@
     :collapse="isCollapse"
     :unique-opened="true"
   >
-    <template v-for="items in routers">
+    <template v-for="(items,key) in routers" >
       <template v-if="items.meta.hidden==false">
         <template v-if="items.children.length>0">
-          <el-submenu :index="items.path" :key="items">
+          <el-submenu :index="items.path" :key="key">
             <template slot="title">
               <i :class="items.meta.icon"></i>
               <span>{{items.meta.title }}</span>
             </template>
             <el-menu-item-group>
-              <template v-for="item in items.children">
+              <template v-for="(item,key2) in items.children">
                 <template v-if="item.meta.hidden==false">
-                  <router-link :to="items.path+'/'+item.path" :key="item">
+                  <router-link :to="items.path+'/'+item.path" :key="key2">
                     <el-menu-item :index="items.path+'/'+item.path">
                       <i :class="item.meta.icon"></i>
                       <span slot="title">{{ item.meta.title }}</span>
@@ -32,7 +32,7 @@
           </el-submenu>
         </template>
         <template v-else>
-          <router-link :to="items.path" :key="items">
+          <router-link :to="items.path" :key="key">
             <el-menu-item :index="items.path">
               <i :class="items.meta.icon"></i>
               <span slot="title">{{ items.meta.title }}</span>

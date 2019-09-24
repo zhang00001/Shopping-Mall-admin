@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="top">
-      <div class="demo-input-suffix searchInput">
+      <!-- <div class="demo-input-suffix searchInput">
         <span>专题标题：</span>
 
         <el-input
@@ -12,10 +12,9 @@
         ></el-input>
       </div>
 
-      <el-button type="primary" @click="search">查询</el-button>
+      <el-button type="primary" @click="search">查询</el-button> -->
       <el-button type="primary" @click="add">添加</el-button>
-      <!-- <el-button type="primary" @click="toggleSelection">{{allTitle}}</el-button>
-      <el-button type="primary" @click="delAll" :disabled="isDisable">批量删除</el-button>-->
+
     </div>
 
     <template>
@@ -25,13 +24,13 @@
         border
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55"></el-table-column>
+        <!-- <el-table-column type="selection" width="55"></el-table-column> -->
         <el-table-column prop="id" label="编号"></el-table-column>
         <el-table-column prop="name" label="标题"></el-table-column>
         <el-table-column prop="classify_id" label="分类"></el-table-column>
         <el-table-column prop="img" label="图片">
           <template slot-scope="scope">
-            <img :src="scope.row.img" alt style="width:100px;height:100px;" />
+            <img :src="scope.row.img" alt style="width:150px;" />
           </template>
         </el-table-column>
 
@@ -112,7 +111,7 @@
       </div>
       </el-dialog>
       <el-dialog title="添加商品" :visible.sync="dialogFormVisible2" >
-        <SelectGoods :Id="selectId" :status="'sp'" ref="headerChild" v-if="dialogFormVisible2"  ></SelectGoods>
+        <SelectGoods :Id="selectId" :status="'sp'" ref="headerChild" :Ishome2='true' v-if="dialogFormVisible2"  :Ishome="true" ></SelectGoods>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="saveGood">确 定</el-button>
         </div>
@@ -227,6 +226,7 @@ multipleSelection2:{},
     add() {
       this.title = "添加专题";
       this.dialogFormVisible = true;
+      this.imageUrl=''
       this.$nextTick(() => {
         this.form.id = "";
       });
@@ -339,7 +339,8 @@ special_goods_del({id: this.multipleSelection2.map(val=>val.id).toString()}).the
     getList(page) {
       special_more({
         page: page,
-        limit: 10
+        limit: 10,
+       
       }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;

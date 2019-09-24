@@ -4,12 +4,23 @@
       <p style="margin-right:20px;">选择商品</p>
       <el-select v-model="classify_id" placeholder="一级分类" clearable @change="loadClassTwo2">
         <el-option label="一级分类" value></el-option>
-        <el-option :key="item.id" :label="item.name" :value="item.id" v-for="item in classOnes"></el-option>
+        <el-option :key="index" :label="item.name" :value="item.id" v-for="(item,index) in classOnes"></el-option>
       </el-select>
       <el-select v-model="classify_id2" placeholder="二级分类" clearable>
         <el-option label="二级分类" value></el-option>
-        <el-option :key="item.id" :label="item.name" :value="item.id" v-for="item in classTwos"></el-option>
+        <el-option :key="index" :label="item.name" :value="item.id" v-for="(item,index) in classTwos"></el-option>
       </el-select>
+        <el-select v-model="brand_id" placeholder="全部品牌" clearable>
+        <el-option label="品牌" value></el-option>
+        <el-option :key="item.id" :label="item.title" :value="item.id" v-for="item in bands"></el-option>
+      </el-select>
+       <el-select v-model="type" placeholder="商品类型" clearable>
+               <!-- <el-option label="全部" value="" ></el-option> -->
+              <el-option label="试衣间商品" value="1"></el-option>
+              <!-- <el-option label="品牌商品" value="2"></el-option>
+              <el-option label="积分特价商品" value="3"></el-option> -->
+           
+            </el-select>
       <el-input v-model="serchTitle" placeholder="关键词" style="width:200px;"></el-input>
       <el-button type="primary" @click="searchRelation">搜索</el-button>
     </div>
@@ -28,7 +39,7 @@
           element-loading-text="拼命加载中"
           element-loading-spinner="el-icon-loading"
         >
-          <el-checkbox v-for="item in goodcounts" :key="item.id" :label="item">{{item.title}}</el-checkbox>
+          <el-checkbox v-for="(item,index) in goodcounts" :key="index" :label="item">{{item.title}}</el-checkbox>
         </el-checkbox-group>
 
         <p v-if="noMore">没有更多了</p>
@@ -85,8 +96,8 @@ export default {
       classify_id2: "",
       serchTitle: "",
       classOnes: [],
-      classTwos: [],
-goods:[],
+      classTwos: [],type:"1",
+goods:[],brand_id:"",bands:[],
       checkList2: [],
       page: 0
     };
@@ -96,7 +107,7 @@ goods:[],
     this.getClsss();
  
     // 新商品
-    this.getGoods1(1, this.classify_id, this.classify_id_two, this.serchTitle);
+    this.getGoods1(1, this.classify_id, this.classify_id_two,this.brand_id, this.serchTitle);
  
      if(this.spGood){
     this.goods =  this.spGood
@@ -117,21 +128,24 @@ goods:[],
       this.getGoods1(
         this.page,
         this.classify_id,
-        this.classify_id_two,
+        this.classify_id2,this.brand_id,
         this.serchTitle
       );
     },
     searchRelation() {
+      debugger
       this.getGoods1(
         1,
         this.classify_id,
-        this.classify_id_two,
+        this.classify_id2,this.brand_id,
         this.serchTitle
       );
     },
     getClsss() {
       goods_class_more({ page: 1, limit: 10000, pid: 0 }).then(res => {
         this.classOnes = res.data.data;
+      }); brand_more({ page: 1, limit: 10000 }).then(res => {
+        this.bands = res.data.data;
       });
     },
     loadClassTwo2(e) {
@@ -192,12 +206,13 @@ goods:[],
        
       }
     },
-    getGoods1(page, classify_id, classify_id_two, serchTitle) {
+    getGoods1(page, classify_id, classify_id_two,brand_id, serchTitle) {
+ 
       let parmas = {
         page: page,
         limit: 10,
         classify_id: classify_id,
-        classify_id_two: classify_id_two,
+        classify_id_two: classify_id_two,brand_id:brand_id, type:this.type,
         title: serchTitle
       };
 

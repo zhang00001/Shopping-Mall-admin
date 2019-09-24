@@ -5,6 +5,8 @@
     </div>
 
     <template>
+
+
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column prop="id" label="编号" width="180"></el-table-column>
         <el-table-column prop="name" label="分类名称" width="180"></el-table-column>
@@ -32,13 +34,22 @@
           <template slot-scope="scope">
             <el-button @click="subordinates(scope.row)" type="text" size="small">查看下级</el-button>
             <el-button type="text" size="small" @click="addClass(scope.row)">新增下级</el-button>
-            <!-- <el-button type="text" size="small">转移商品</el-button> -->
+  
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="设置" width="100">
           <template slot-scope="scope">
-            <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
-            <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
+
+
+
+               <template  v-if='scope.row.id!=id1&&scope.row.id!=id2&&scope.row.id!=id3' >
+                   <el-button    @click="edit(scope.row)" type="text" size="small">编辑</el-button>
+            <el-button    type="text" size="small" @click="delect(scope.row)">删除</el-button>
+              </template>
+
+
+
+          
           </template>
         </el-table-column>
       </el-table>
@@ -109,7 +120,8 @@
 
           <el-table-column fixed="right" label="设置" width="100">
             <template slot-scope="scope">
-              <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
+           
+           <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
               <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -126,6 +138,7 @@
 <script>
 import http from "@/utils/request";
 import axios from "axios";
+import {classify} from "@/api/index"
 export default {
   data() {
     return {
@@ -135,7 +148,7 @@ export default {
       total2: 0,
       title: "新增",
       fileLists: [],
-      imageUrl: "",
+      imageUrl: "",class_more:null,id1:"",id2:"",id3:"",
       showClass2: false,
       form: {
         name: "",
@@ -157,8 +170,17 @@ export default {
   },
   created() {
     this.getList(1, 0);
+    this.getClass()
   },
   methods: {
+    getClass(){
+ classify({}).then(res => {
+     
+ this.id1= res.data.map(val=>val.id)[0];
+      this.id2= res.data.map(val=>val.id)[1];   
+        this.id3= res.data.map(val=>val.id)[2]; 
+        })
+    },
     handleCurrentChange(e) {
       this.getList(e, 0);
     },

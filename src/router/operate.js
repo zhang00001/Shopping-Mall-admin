@@ -32,7 +32,7 @@ const OPERATE_ROUTERS = [{
         component: () =>
             import ('@/views/operate/Vip'),
 
-        meta: { title: 'Vip礼包', icon: 'el-icon-trans', hidden: false },
+        meta: { title: 'Vip礼包', icon: 'el-icon-trans', hidden: true },
         children: [
 
         ]
