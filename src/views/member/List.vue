@@ -55,7 +55,7 @@
 
         <el-table-column prop="order_num" label="订单数量"></el-table-column>
         <el-table-column prop="money" label="可用余额"></el-table-column>
-        <el-table-column prop="money_huokuan_use" label="可用贷款"></el-table-column>
+        <el-table-column prop="money_huokuan_use" label="可用货款"></el-table-column>
 
         <el-table-column prop="shelf" label="账户状态">
           <template slot-scope="scope">

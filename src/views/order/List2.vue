@@ -14,7 +14,7 @@
             <el-input
               placeholder="订单编号/商品货号"
               prefix-icon="el-icon-search"
-              v-model="searchTitle"
+              v-model="searchname"
               style="width:200px;"
             ></el-input>
           </el-col>
@@ -24,7 +24,7 @@
             <el-input
               placeholder="姓名/手机号"
               prefix-icon="el-icon-search"
-              v-model="searchTitle"
+                v-model="time"
               style="width:200px;"
             ></el-input>
           </el-col>
@@ -159,7 +159,7 @@ import { order_more } from "@/api/index";
 import axios from "axios";
 export default {
   data() {
-    return {
+    return {time:"",searchname:"",mobile:"",
       options: [
         {
           value: "0",
@@ -259,11 +259,11 @@ export default {
       this.radio1 = "0";
       
     }
-      this.getList(1, this.searchTitle, this.radio1);
+      this.getList(1);
   },
   methods: {
         changeRadio(){
-        this.getList(1, this.searchTitle, this.radio1);
+        this.getList(1);
 // switch (this.radio1) {
 //         case 0:
 //         this.map = JSON.stringify({goods_type:2,show:1} );
@@ -292,7 +292,7 @@ export default {
 //       this.getList(1, this.searchTitle, this.map);
      },
     handleCurrentChange(e) {
-      this.getList(e, this.searchTitle);
+      this.getList(e,  );
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -307,7 +307,7 @@ export default {
       this.dialogFormVisible = false;
     },
     search() {
-      this.getList(1, this.searchTitle);
+      this.getList(1, );
     },
 
     toggleSelection() {
@@ -364,13 +364,7 @@ export default {
             if (res.code == 200) {
               this.getList(
                 1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
+                
               );
             } else {
               this.$message.error(res.msg);
@@ -392,13 +386,7 @@ export default {
               this.$message.success(res.msg);
               this.getList(
                 1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
+                
               );
             } else {
               this.$message.error(res.msg);
@@ -409,8 +397,16 @@ export default {
     },
 
     // 加载列表
-    getList(page, title ,index) {
-      order_more({ page: page, limit: 10, title: title,type:2,index:index }).then(res => {
+    getList(page ,index) {
+        let time1
+      if(this.time==''||this.time==null){
+    time1=""
+      }else{
+            time1=new Date(this.time).toISOString().split("T")[0]
+      }
+      order_more({ page: page, limit: 10,  search: this.searchname,
+        mobile:this.mobile,
+        time:this.time1,type:2,index:this.radio1 }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;
           this.total = res.data.count;
@@ -443,13 +439,7 @@ export default {
               this.dialogFormVisible = false;
               this.getList(
                 1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
+                
               );
 
               this.$refs["form"].resetFields();

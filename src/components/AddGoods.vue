@@ -15,10 +15,10 @@
         <el-option :key="item.id" :label="item.title" :value="item.id" v-for="item in bands"></el-option>
       </el-select>
        <el-select v-model="type" placeholder="商品类型" clearable>
-               <!-- <el-option label="全部" value="" ></el-option> -->
+               <el-option label="全部" value="" ></el-option>
               <el-option label="试衣间商品" value="1"></el-option>
-              <!-- <el-option label="品牌商品" value="2"></el-option>
-              <el-option label="积分特价商品" value="3"></el-option> -->
+              <el-option label="品牌商品" value="2"></el-option>
+              <el-option label="积分特价商品" value="3"></el-option>
            
             </el-select>
       <el-input v-model="serchTitle" placeholder="关键词" style="width:200px;"></el-input>

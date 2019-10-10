@@ -2,7 +2,11 @@
   <div>
     <div>
       <el-radio-group v-model="radio1" style="margin-top:20px;" @change="changeRadio">
-        <el-radio-button v-for="(item,index) in orderType" :key="index" :label="item.value">{{item.label}}</el-radio-button>
+        <el-radio-button
+          v-for="(item,index) in orderType"
+          :key="index"
+          :label="item.value"
+        >{{item.label}}</el-radio-button>
       </el-radio-group>
     </div>
     <div class="top">
@@ -14,7 +18,7 @@
             <el-input
               placeholder="订单编号/商品货号"
               prefix-icon="el-icon-search"
-              v-model="searchTitle"
+              v-model="searchname"
               style="width:200px;"
             ></el-input>
           </el-col>
@@ -24,14 +28,14 @@
             <el-input
               placeholder="姓名/手机号"
               prefix-icon="el-icon-search"
-              v-model="searchTitle"
+              v-model="mobile"
               style="width:200px;"
             ></el-input>
           </el-col>
           <el-col :span="6">
             <span>提交时间</span>
 
-            <el-date-picker v-model="searchTitle" type="date" placeholder="选择日期"></el-date-picker>
+            <el-date-picker v-model="time" type="date" placeholder="选择日期"></el-date-picker>
           </el-col>
 
           <!-- <el-col :span="6">
@@ -44,7 +48,7 @@
               <el-option label="积分商品" value="3"></el-option>
               <el-option label="特价商品" value="4"></el-option>
             </el-select>
-          </el-col> -->
+          </el-col>-->
         </el-row>
         <el-row>
           <el-col :span="6">
@@ -65,18 +69,17 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="id" label="ID"></el-table-column>
-          <el-table-column prop="order_sn" label="订单编号"></el-table-column>
+        <el-table-column prop="id" label="ID"></el-table-column>
+        <el-table-column prop="order_sn" label="订单编号"></el-table-column>
         <el-table-column prop="addtime" label="提交时间">
-             <template slot-scope="scope">
+          <template slot-scope="scope">
             <template v-if="scope.row.addtime">{{scope.row.addtime|formatDate}}</template>
-            
           </template>
         </el-table-column>
         <el-table-column prop="mobile" label="用户账户"></el-table-column>
         <!-- <el-table-column prop="money" label="订单金额"></el-table-column> -->
         <el-table-column prop="pay_type_name" label="支付方式"></el-table-column>
-   <el-table-column prop="total_status" label="状态">
+        <el-table-column prop="total_status" label="状态">
           <template slot-scope="scope">
             <template v-if="scope.row.total_status==-3">未知</template>
             <template v-if="scope.row.total_status==-2">待审核</template>
@@ -97,7 +100,7 @@
             <template v-if="scope.row.total_status==13">退货申请被驳回</template>
           </template>
         </el-table-column>
-           <!-- <el-table-column prop="msg" label="订单状态"></el-table-column> -->
+        <!-- <el-table-column prop="msg" label="订单状态"></el-table-column> -->
 
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -156,6 +159,9 @@ import axios from "axios";
 export default {
   data() {
     return {
+      time: "",
+      searchname: "",
+      mobile: "",
       options: [
         {
           value: "0",
@@ -176,8 +182,7 @@ export default {
         { value: "1", label: "待付款" },
         { value: "2", label: "待发货" },
         { value: "3", label: "待收货" },
-        { value: "4", label: "退货" },
-   
+        { value: "4", label: "退货" }
       ],
       isDisable: true,
       multipleSelection: [],
@@ -198,7 +203,7 @@ export default {
       warehouses: [],
       suppliers: [],
       total: 0,
-map:{},
+      map: {},
       title: "新增",
       fileLists: [],
 
@@ -219,8 +224,7 @@ map:{},
     };
   },
   created() {
-   if (this.$route.query.map) {
-     
+    if (this.$route.query.map) {
       let routerMsg = JSON.parse(this.$route.query.map);
       switch (routerMsg.msg) {
         case "全部":
@@ -238,24 +242,21 @@ map:{},
         case "退货":
           this.radio1 = 4;
           break;
-         
-         
+
         default:
           this.radio1 = 0;
       }
-    
-      this.map=routerMsg.map
+
+      this.map = routerMsg.map;
     } else {
       this.radio1 = "0";
-  
     }
-      this.getList(1, this.searchTitle, this.radio1);
+    this.getList(1);
   },
   methods: {
-        changeRadio(){
- 
-       this.getList(1, this.searchTitle, this.radio1);
-     },
+    changeRadio() {
+      this.getList(1);
+    },
     handleCurrentChange(e) {
       this.getList(e, this.searchTitle);
     },
@@ -272,7 +273,7 @@ map:{},
       this.dialogFormVisible = false;
     },
     search() {
-      this.getList(1, this.searchTitle);
+      this.getList(1);
     },
 
     toggleSelection() {
@@ -327,16 +328,7 @@ map:{},
           .post(url, data)
           .then(res => {
             if (res.code == 200) {
-              this.getList(
-                1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
-              );
+              this.getList(1);
             } else {
               this.$message.error(res.msg);
             }
@@ -355,16 +347,7 @@ map:{},
           http.post("admin/goods/goods_del", { id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.getList(
-                1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
-              );
+              this.getList(1);
             } else {
               this.$message.error(res.msg);
             }
@@ -374,8 +357,22 @@ map:{},
     },
 
     // 加载列表
-    getList(page, title,index) {
-      order_more({ page: page, limit: 10, title: title,type:3,index:index }).then(res => {
+    getList(page) {
+      let time1
+      if(this.time==''||this.time==null){
+    time1=""
+      }else{
+            time1=new Date(this.time).toISOString().split("T")[0]
+      }
+      order_more({
+        page: page,
+        limit: 10,
+        search: this.searchname,
+        mobile: this.mobile,
+        time: time1,
+        type: 3,
+        index: this.radio1
+      }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;
           this.total = res.data.count;
@@ -386,7 +383,7 @@ map:{},
     },
     // 编辑回显
     edit(e) {
-         this.$router.push({ path: "index3/detail3", query: { id: e.id } });
+      this.$router.push({ path: "index3/detail3", query: { id: e.id } });
       // http.post("admin/goods/goods_one", { id: e.id }).then(res => {
       //   if (res.code == 200) {
       //    sessionStorage.setItem("edit",JSON.stringify(res.detail))
@@ -407,13 +404,7 @@ map:{},
               this.dialogFormVisible = false;
               this.getList(
                 1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
+              
               );
 
               this.$refs["form"].resetFields();

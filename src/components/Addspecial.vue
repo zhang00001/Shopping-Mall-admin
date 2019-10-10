@@ -78,7 +78,7 @@ goods:[],
     // 新商品
     this.getGoods1(1,);
 
-     debugger
+ 
     this.goods =  this.spGood
   },
   methods: {

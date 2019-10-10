@@ -58,17 +58,8 @@ import axios from "axios";
 export default {
   data() {
     return {
-   
-     
-    
-      url: "",
-  
-       
-     
- 
-     
-     
-      editorOption: {
+url: "",
+   editorOption: {
         modules: {
           toolbar: {
             container: toolbarOptions, // 工具栏

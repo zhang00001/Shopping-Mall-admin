@@ -17,9 +17,10 @@
       
        <el-select v-model="type" placeholder="商品类型" clearable>
                <!-- <el-option label="全部" value="" ></el-option> -->
-              <el-option label="试衣间商品" value="1" :disabled="!Ishome&&Ishome2"  v-if='!isintegral'></el-option>
-              <el-option label="品牌商品" value="2" :disabled="!Ishome||!Ishome2"   v-if='!isintegral' ></el-option>
+              <el-option label="试衣间商品" value="1"  :disabled="!Ishome||!Ishome2"   v-if='!isintegral'></el-option>
+              <el-option label="品牌商品" value="2" :disabled="!Ishome&&Ishome2"  v-if='!isintegral' ></el-option>
               <el-option label="积分商品" value="3" :disabled="Ishome"  v-if='isintegral'></el-option>
+                 <el-option label="积分商品" value="3"    v-if="status=='sp'"></el-option>
             <!-- <el-option label="特价商品" value="4" :disabled="!Ishome"></el-option> -->
             </el-select>
       <el-input v-model="serchTitle" placeholder="关键词" style="width:200px;"></el-input>
@@ -106,7 +107,20 @@ classify_id_two:"",type:"",
     selectClass(){
       this.classTwos=[]
         this.classify_id_two=''
-   this.getGoods1(1, this.classify_id,this.classify_id_two, this.brand_id, this.serchTitle);
+        
+        goods_class_more({
+          page: 1,
+          limit: 10000,
+          pid: this.classify_id
+        }).then(res => {
+          if (res.code == 200) {
+            this.classTwos = res.data.data;  
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
+      
+
    
     },
     add() {
@@ -148,7 +162,7 @@ classify_id_two:"",type:"",
       if (this.isintegral) {
         parmas.type = 3;
       }else{
-parmas.type = -3;
+parmas.type = 0;
       }
       this.loading = true;
       goods_more(parmas).then(res => {

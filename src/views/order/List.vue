@@ -18,7 +18,7 @@
             <el-input
               placeholder="订单编号/商品货号"
               prefix-icon="el-icon-search"
-              v-model="searchTitle"
+              v-model="searchname"
               style="width:200px;"
             ></el-input>
           </el-col>
@@ -28,14 +28,14 @@
             <el-input
               placeholder="姓名/手机号"
               prefix-icon="el-icon-search"
-              v-model="searchTitle"
+              v-model="mobile"
               style="width:200px;"
             ></el-input>
           </el-col>
           <el-col :span="6">
             <span>提交时间</span>
 
-            <el-date-picker v-model="searchTitle" type="date" placeholder="选择日期"></el-date-picker>
+            <el-date-picker v-model="time" type="date" placeholder="选择日期"></el-date-picker>
           </el-col>
 
           <!-- <el-col :span="6">
@@ -159,7 +159,7 @@ import { order_more } from "@/api/index";
 import axios from "axios";
 export default {
   data() {
-    return {
+    return {time:"",searchname:"",mobile:"",
       options: [
         {
           value: "0",
@@ -260,37 +260,14 @@ export default {
       this.radio1 = "0";
      
     }
-    this.getList(1, this.searchTitle, this.radio1);
+    this.getList(1);
   },
   methods: {
     changeRadio() {
-      this.getList(1, this.searchTitle, this.radio1);
-      // switch (this.radio1) {
-      //         case 0:
-      //         this.map = JSON.stringify({goods_type:1,show:1} );
-      //           break;
-      //         case "1":
-      //          this.map = JSON.stringify({goods_type:1,confirm:0,status:0,money_status:0,show:1});
-      //           break;
-      //         case "2":
-      //            this.map = JSON.stringify({goods_type:1,confirm:2,status:0,money_status:0,show:1});
-      //           break;
-      //         case "3":
-      //        this.map = JSON.stringify({goods_type:1,confirm:2,status:2,money_status:0,show:1});
-      //           break;
-      //         case "4":
-      //             this.map = JSON.stringify({goods_type:1,money_status:0,show:1});
-      //           break;
-      //         case "5":
-      //            this.map = JSON.stringify({goods_type:1,confirm:2,status:4,money_status:0,show:1});
-      //           break;
-      //         default:
-      //         this.map = JSON.stringify({goods_type:1,show:1} );
-      //      }
-      // this.getList(1, this.searchTitle, this.map);
+      this.getList(1)
     },
     handleCurrentChange(e) {
-      this.getList(e, this.searchTitle);
+      this.getList(e);
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -305,7 +282,7 @@ export default {
       this.dialogFormVisible = false;
     },
     search() {
-      this.getList(1, this.searchTitle);
+      this.getList(1);
     },
 
     toggleSelection() {
@@ -360,16 +337,7 @@ export default {
           .post(url, data)
           .then(res => {
             if (res.code == 200) {
-              this.getList(
-                1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
-              );
+              this.getList(  1,  );
             } else {
               this.$message.error(res.msg);
             }
@@ -388,16 +356,7 @@ export default {
           http.post("admin/goods/goods_del", { id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.getList(
-                1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
-              );
+              this.getList(1,);
             } else {
               this.$message.error(res.msg);
             }
@@ -407,13 +366,23 @@ export default {
     },
 
     // 加载列表
-    getList(page, title, index) {
+    getList(page) {
+      
+      let time1
+      if(this.time==''||this.time==null){
+    time1=""
+      }else{
+            time1=new Date(this.time).toISOString().split("T")[0]
+      }
+    
       order_more({
         page: page,
         limit: 10,
-        title: title,
+        search: this.searchname,
+        mobile:this.mobile,
+        time:time1,
         type: 1,
-        index: index
+        index:this.radio1
       }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;
@@ -445,16 +414,7 @@ export default {
               this.$message.success(res.msg);
 
               this.dialogFormVisible = false;
-              this.getList(
-                1,
-                this.searchTitle,
-                this.classify_id,
-                this.type,
-                this.brand_id,
-                this.shelf,
-                this.warehouse_id,
-                this.supplier_id
-              );
+              this.getList(1);
 
               this.$refs["form"].resetFields();
             } else {

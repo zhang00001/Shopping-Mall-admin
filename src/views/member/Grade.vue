@@ -221,9 +221,9 @@ export default {
     confirm(e, status) {
       let num =0
       if (e.vip_grade == "超级店长") {
-      num=110000
+      num='11万'
       } else {
-          num=5000
+          num=5500
       }
 
         this.$confirm(`是否打款${num}?`, "提示", {
@@ -232,14 +232,16 @@ export default {
           type: "warning"
         })
           .then(() => {
-            this.getmanage_confirm(e.id, status);
+            this.getmanage_confirm(e.id, status,1);
           })
-          .catch(() => {});
+          .catch(() => {
+                this.getmanage_confirm(e.id, status,0);
+          });
 
 
     },
-    getmanage_confirm(id, status) {
-      manage_confirm({ id: id, status: status }).then(res => {
+    getmanage_confirm(id, status,type) {
+      manage_confirm({ id: id, status: status ,type:type}).then(res => {
         if (res.code == 200) {
           this.getList(1);
         } else {
