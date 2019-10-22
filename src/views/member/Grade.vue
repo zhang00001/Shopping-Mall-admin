@@ -53,7 +53,7 @@
         <!-- <el-table-column prop="weixin" label="微信号"></el-table-column> -->
         <el-table-column prop="pay_type" label="支付方式"></el-table-column>
 
-        <el-table-column prop="vip_grade" label="VIP等级"></el-table-column>
+        <el-table-column prop="vip_grade" label="待升等级"></el-table-column>
         <el-table-column prop="status" label="状态"></el-table-column>
 
         <el-table-column prop="img" label="审核图片(点击预览)">
@@ -73,6 +73,12 @@
               <el-button @click="confirm(scope.row,2)" type="text" size="small">审核通过</el-button>
               <el-button @click="confirm(scope.row,1)" type="text" size="small">不通过</el-button>
             </template>
+            <template
+              v-if="scope.row.status=='待审核'&&scope.row.vip_grade=='超级店长'&&scope.row.other.vip_grade_now==2"
+            >
+              <el-button @click="confirm(scope.row,2)" type="text" size="small">审核通过</el-button>
+              <el-button @click="confirm(scope.row,1)" type="text" size="small">不通过</el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -83,6 +89,29 @@
           @current-change="handleCurrentChange"
         ></el-pagination>
       </div>
+      <el-dialog title="审核通过" :visible.sync="dialogFormVisible">
+        <span>普通用户升级店长</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="save(1)">确认打款 5000元货款+500保证金</el-button>
+        </span>
+      </el-dialog>
+      <el-dialog title="审核通过" :visible.sync="dialogFormVisible1">
+        <span>vip升级店长</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible1 = false">取消</el-button>
+          <el-button type="primary" @click="save(1)">5000元货款+500保证金</el-button>
+          <el-button type="primary" @click="save(0)">推荐10个vip+500元保证金</el-button>
+        </span>
+      </el-dialog>
+      <el-dialog title="审核通过" :visible.sync="dialogFormVisible2">
+        <span>vip升级店长</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible2 = false">取消</el-button>
+          <el-button type="primary" @click="save(1)">直推10个店长，100000元货款+10000元保证金</el-button>
+          <el-button type="primary" @click="save(0)">直推20店长+30位团队店长共计50位店长+10000元保证金</el-button>
+        </span>
+      </el-dialog>
     </template>
   </div>
 </template>
@@ -108,9 +137,13 @@ export default {
           label: "批量删除"
         }
       ],
+      SelectIndex: 1,
       value: "",
       vip_grade: "",
       isDisable: true,
+      dialogFormVisible: false,
+      dialogFormVisible1: false,
+      dialogFormVisible2: false,
       multipleSelection: [],
       allTitle: "全选",
       selAll: false,
@@ -130,7 +163,7 @@ export default {
       warehouses: [],
       suppliers: [],
       total: 0,
-
+      selectId: "",
       title: "新增",
       fileLists: [],
 
@@ -165,6 +198,7 @@ export default {
     },
 
     handleCurrentChange(e) {
+      this.SelectIndex = e;
       this.getList(e, this.vip_grade, this.searchTitle, this.searchTime);
     },
     handleSelectionChange(val) {
@@ -219,31 +253,54 @@ export default {
     },
 
     confirm(e, status) {
-      let num =0
-      if (e.vip_grade == "超级店长") {
-      num='11万'
-      } else {
-          num=5500
-      }
+      // let num = 0;
+      // 普通用户
 
-        this.$confirm(`是否打款${num}?`, "提示", {
+      // status 0 不通过  1 通过
+      if (status == 1) {
+        this.$confirm(`是否不通过`, "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         })
           .then(() => {
-            this.getmanage_confirm(e.id, status,1);
+            this.getmanage_confirm(e.id, status, 0);
           })
-          .catch(() => {
-                this.getmanage_confirm(e.id, status,0);
-          });
-
-
+          .catch(() => {});
+      } else {
+        this.selectId = e.id;
+        if (e.other.vip_grade_now == 0) {
+          this.dialogFormVisible = true;
+        }
+        // vip
+        if (e.other.vip_grade_now == 1) {
+          this.dialogFormVisible1 = true;
+        }
+        if (e.other.vip_grade_now == 2 && e.vip_grade == "超级店长") {
+          this.dialogFormVisible2 = true;
+        }
+      }
     },
-    getmanage_confirm(id, status,type) {
-      manage_confirm({ id: id, status: status ,type:type}).then(res => {
+    save(e) {
+      this.$confirm(`是否确认?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          //  1 普用户升级店长  2  vip升级店长 5000元货款+500保证金 3推荐10个vip+500元保证金
+
+          this.getmanage_confirm(this.selectId, 2, e);
+        })
+        .catch(() => {});
+    },
+    getmanage_confirm(id, status, type) {
+      manage_confirm({ id: id, status: status, type: type }).then(res => {
         if (res.code == 200) {
           this.getList(1);
+          this.dialogFormVisible2 = false;
+          this.dialogFormVisible1 = false;
+          this.dialogFormVisible = false;
         } else {
           this.$message.error(res.msg);
         }

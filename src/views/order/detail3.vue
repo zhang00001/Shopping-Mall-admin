@@ -1,6 +1,8 @@
 <template>
   <div style="margin-top:20px">
     <div style="margin:20px 0;">
+      <el-page-header @back="goBack" content style="display:inline-block"></el-page-header>
+
       <span>
         <i class="el-icon-potato-strips" style="color:red"></i> 当前订单状态 ：
       </span>
@@ -9,7 +11,12 @@
       <!-- <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send2">发货</el-button> -->
       <el-button size="mini" v-if="data.status==0" type="primary" @click="send2">发货</el-button>
       <!-- <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send3">生产</el-button> -->
-      <el-button size="mini" v-if="data.status==2" type="primary"  @click="logistics(data.logistics_number)">查看物流</el-button>
+      <el-button
+        size="mini"
+        v-if="data.status==2"
+        type="primary"
+        @click="logistics(data.logistics_number)"
+      >查看物流</el-button>
       <el-button size="mini" v-if="data.status==4" type="primary" @click="send4">退货审核</el-button>
       <!-- <el-button size="mini" v-if="data.status==5" type="primary" @click="dialogFormVisible5=true">查看退货物流信息</el-button> -->
       <el-button size="mini" v-if="data.status==5" type="primary" @click="over">退货完成</el-button>
@@ -88,7 +95,7 @@
       </el-col>
     </el-row>
     <div class="overview-layout">
-     <el-row :gutter="24" style="margin-top:20px;">
+      <el-row :gutter="24" style="margin-top:20px;">
         <el-col :span="16">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
@@ -128,7 +135,7 @@
               <div slot="header" class="clearfix">
                 <span>费用信息</span>
               </div>
-               <div class="text item">
+              <div class="text item">
                 <p>运费</p>
                 <span>{{data.money_logistics}}</span>
               </div>
@@ -141,8 +148,6 @@
                 <span>{{data.money}}</span>
               </div>
             </el-card>
-
-          
           </div>
         </el-col>
       </el-row>
@@ -160,15 +165,10 @@
     </el-dialog>
     <el-dialog title="发货" :visible.sync="dialogFormVisible2">
       <el-form :model="form">
-             <el-form-item label="物流公司" :label-width="formLabelWidth">
-           <el-select v-model="form.card" placeholder="请选择">
-    <el-option
-      v-for="item in cards"
-      :key="item.card"
-      :label="item.name"
-      :value="item.card">
-    </el-option>
-  </el-select>
+        <el-form-item label="物流公司" :label-width="formLabelWidth">
+          <el-select v-model="form.card" placeholder="请选择">
+            <el-option v-for="item in cards" :key="item.card" :label="item.name" :value="item.card"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="物流编号" :label-width="formLabelWidth">
           <el-input v-model="form.logistics_number" autocomplete="off"></el-input>
@@ -186,7 +186,7 @@
     <el-dialog title="物流状态" :visible.sync="dialogFormVisible3">
       <p>当前状态{{state_name}}</p>
       <el-timeline :reverse="reverse">
-      <el-timeline-item
+        <el-timeline-item
           v-for="(activity, index) in activities"
           :key="index"
           :timestamp="activity.AcceptTime"
@@ -223,26 +223,28 @@ import {
   logistics,
   back_confirm,
   back_finish,
-  order_produce,wuliu
+  order_produce,
+  wuliu
 } from "@/api/index";
 export default {
   data() {
     return {
       active: 0,
-      data: {},cards:[],
+      data: {},
+      cards: [],
       showBack: false,
       tableData2: [],
-      activities: [
-     
-      ],
+      activities: [],
       dialogFormVisible: false,
       dialogFormVisible2: false,
       dialogFormVisible3: false,
       dialogFormVisible4: false,
-      dialogFormVisible5: false,state_name:"",
+      dialogFormVisible5: false,
+      state_name: "",
       form: {
         remarks: "",
-        logistics_number: "",card:""
+        logistics_number: "",
+        card: ""
       },
       formLabelWidth: "120px",
       confirm: 1,
@@ -253,20 +255,23 @@ export default {
     this.getData();
   },
   methods: {
+    goBack() {
+      this.$router.go(-1);
+    },
     // 发货
     send() {
       this.dialogFormVisible = true;
     },
     send2() {
       this.dialogFormVisible2 = true;
-      wuliu({}).then(res=>{
-if(res){
-this.dialogFormVisible2 = true;
-this.cards=res
-}else{
-  this.$message.error(res.msg)
-}
-})
+      wuliu({}).then(res => {
+        if (res) {
+          this.dialogFormVisible2 = true;
+          this.cards = res;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
     },
     send4() {
       this.dialogFormVisible4 = true;
@@ -274,15 +279,18 @@ this.cards=res
 
     logistics(e) {
       this.dialogFormVisible3 = true;
-     logistics({ code:this.data.logistics_number,type:this.data.logistics_card,from:1,id:this.data.id  }).then(res => {
-
-if(res.code==200){
-  this.activities = res.data.data;
-           this.state_name = res.data.State_name;
-}else{
-  this.$message.error(res.msg)
-}
-
+      logistics({
+        code: this.data.logistics_number,
+        type: this.data.logistics_card,
+        from: 1,
+        id: this.data.id
+      }).then(res => {
+        if (res.code == 200) {
+          this.activities = res.data.data;
+          this.state_name = res.data.State_name;
+        } else {
+          this.$message.error(res.msg);
+        }
       });
     },
     over() {
@@ -390,7 +398,7 @@ if(res.code==200){
         order_id: this.$route.query.id,
         logistics_number: this.form.logistics_number,
         remarks: this.form.remarks,
-          card :this.form.card
+        card: this.form.card
       }).then(res => {
         if (res.code == 200) {
           this.getData();

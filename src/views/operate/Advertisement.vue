@@ -10,7 +10,7 @@
           v-model="serchTitle"
           style="width:200px;"
         ></el-input>
-      </div> -->
+      </div>-->
       <!-- <el-button type="primary" @click="add">添加</el-button> -->
       <!-- <el-button type="primary" :disabled="isDisable" @click="delAll">批量删除</el-button>
       <el-button type="primary" :disabled="isDisable" @click="closeAll(0)">批量关闭</el-button>
@@ -42,7 +42,7 @@
             <template v-if="scope.row.show==1">正常</template>
             <template v-else>否</template>
           </template>
-        </el-table-column> -->
+        </el-table-column>-->
 
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
@@ -58,14 +58,14 @@
           :total="total"
           @current-change="handleCurrentChange"
         ></el-pagination>
-      </div> -->
+      </div>-->
 
       <el-dialog :title="title" :visible.sync="dialogFormVisible">
         <el-form :model="form" ref="form" :rules="rules" label-width="auto">
-          <el-form-item label="广告名称" prop="name" >
+          <el-form-item label="广告名称" prop="name">
             <el-input v-model="form.name" disabled></el-input>
           </el-form-item>
-          <el-form-item label="广告位置" prop="position" >
+          <el-form-item label="广告位置" prop="position">
             <el-select v-model="form.position" placeholder="请选择" disabled>
               <el-option
                 v-for="item in position"
@@ -76,8 +76,8 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="排序" prop="order" >
-            <el-input v-model="form.order" disabled></el-input >
+          <el-form-item label="排序" prop="order">
+            <el-input v-model="form.order" disabled></el-input>
           </el-form-item>
           <el-form-item label="广告图标">
             <el-upload
@@ -97,7 +97,7 @@
         </div>
       </el-dialog>
       <el-dialog title="管理商品" :visible.sync="dialogFormVisible2">
-        <SelectGoods :Id='selectId'   :status="'ad'"  ref="headerChild" v-if="dialogFormVisible2"></SelectGoods>
+        <SelectGoods :Id="selectId" :status="'ad'" ref="headerChild" v-if="dialogFormVisible2"></SelectGoods>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="saveGood">确 定</el-button>
         </div>
@@ -113,7 +113,9 @@ import {
   advertisement_more,
   advertisement_manage,
   advertisement_one,
-  advertisement_del,advertisement_log,ad_list
+  advertisement_del,
+  advertisement_log,
+  ad_list
 } from "@/api/index";
 import axios from "axios";
 import SelectGoods from "@/components/SelectGoods";
@@ -123,9 +125,10 @@ export default {
   },
   data() {
     return {
+      SelectIndex: 1,
       isDisable: true,
-selectId:"",
-serchTitle:"",
+      selectId: "",
+      serchTitle: "",
       tableData: [],
       tableData2: [],
       position: [],
@@ -144,7 +147,7 @@ serchTitle:"",
         icon: "",
         position: ""
       },
-     
+
       rules: {
         name: [{ required: true, message: "必填字段", trigger: "blur" }],
 
@@ -160,29 +163,33 @@ serchTitle:"",
   },
   methods: {
     editGood(e) {
-       this.selectId=e.id
-  this.dialogFormVisible2=true
+      this.selectId = e.id;
+      this.dialogFormVisible2 = true;
     },
     add() {
       this.dialogFormVisible = true;
       this.title = "新增广告";
       this.form.id = "";
     },
-    saveGood(){
-let goods= this.$refs.headerChild.defulGood
- 
-if(goods.length>0){
-  advertisement_log({advertisement_id:this.selectId,goods_id:goods.toString()}).then(res=>{
-   if(res.code==200){
-     this.dialogFormVisible=false
-   this.$message.success(res.msg)
-   }else{
-     this.$message.error(res.msg)
-   }
-  })
-}
+    saveGood() {
+      let goods = this.$refs.headerChild.defulGood;
+
+      if (goods.length > 0) {
+        advertisement_log({
+          advertisement_id: this.selectId,
+          goods_id: goods.toString()
+        }).then(res => {
+          if (res.code == 200) {
+            this.dialogFormVisible = false;
+            this.$message.success(res.msg);
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
+      }
     },
     handleCurrentChange(e) {
+      this.SelectIndex = e;
       this.getList(e, this.serchTitle);
     },
     handleSelectionChange(val) {
@@ -207,7 +214,7 @@ if(goods.length>0){
           })
           .then(res => {
             if (res.code == 200) {
-              this.getList(1, this.serchTitle);
+              this.getList(SelectIndex, this.serchTitle);
             } else {
               this.$message.error(res.msg);
             }

@@ -165,6 +165,7 @@ export default {
   },
   data() {
     return {
+      SelectIndex: 1,
       spGood: [],
       goodcounts2: [],
       isDisable: true,
@@ -232,6 +233,7 @@ export default {
       this.dialogFormVisible = true;
     },
     handleCurrentChange(e) {
+      this.SelectIndex = e;
       this.getList(e, this.serchTitle);
     },
     handleSelectionChange(val) {
@@ -264,7 +266,7 @@ export default {
             if (res.data.code == 200) {
               this.$message.success(res.data.msg);
 
-              this.getList(1);
+              this.getList(this.SelectIndex);
             } else {
               this.$message.error(res.msg);
             }

@@ -11,13 +11,13 @@
         <el-input v-model="ruleForm.username"></el-input>
       </el-form-item>
       <el-form-item label="旧密码" prop="password_old">
-        <el-input v-model="ruleForm.password_old"></el-input>
+        <el-input v-model="ruleForm.password_old" type="password"></el-input>
       </el-form-item>
       <el-form-item label="新密码" prop="password_new">
-        <el-input v-model="ruleForm.password_new"></el-input>
+        <el-input v-model="ruleForm.password_new" type="password"></el-input>
       </el-form-item>
       <el-form-item label="确认密码" prop="password_new_re">
-        <el-input v-model="ruleForm.password_new_re"></el-input>
+        <el-input v-model="ruleForm.password_new_re" type="password"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm">提交</el-button>

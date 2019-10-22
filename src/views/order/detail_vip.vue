@@ -1,6 +1,8 @@
 <template>
   <div style="margin-top:20px">
     <div style="margin:20px 0;">
+      <el-page-header @back="goBack" content style="display:inline-block"></el-page-header>
+
       <span>
         <i class="el-icon-potato-strips" style="color:red"></i> 当前订单状态 ：
       </span>
@@ -63,7 +65,7 @@
               <!-- <div class="text item">
                 <p>礼包信息：</p>
                 <span>{{data.msg}}</span>
-              </div> -->
+              </div>-->
               <!-- <div class="text item">
                 <p>支付方式：</p>
                 <span>{{data.pay_type}}</span>
@@ -76,7 +78,7 @@
               <div class="text item">
                 <p>押金：</p>
                 <span>{{data.money_yajing}}</span>
-              </div> -->
+              </div>-->
             </el-col>
           </el-row>
         </el-card>
@@ -116,23 +118,16 @@
                 <el-table-column prop="title" label="商品名称" width="600px;"></el-table-column>
                 <el-table-column prop="show" label="商品图片">
                   <template slot-scope="scope">
-                    <img
-                      :src="scope.row.show"
-                      style="width:50px;"
-                      alt
-                    />
+                    <img :src="scope.row.show" style="width:50px;" alt />
                   </template>
                 </el-table-column>
                 <el-table-column prop="price" label="价格"></el-table-column>
-                
-                <el-table-column prop="buy_num" label="数量">
 
-                     <template slot-scope="scope" >
-                       <template v-if='false'>
-                         {{scope.row}}
-                       </template>
-                      1
-                     </template>
+                <el-table-column prop="buy_num" label="数量">
+                  <template slot-scope="scope">
+                    <template v-if="false">{{scope.row}}</template>
+                    1
+                  </template>
                 </el-table-column>
                 <!-- <el-table-column prop="attribute_id" label="小计"></el-table-column> -->
               </el-table>
@@ -218,7 +213,7 @@
     <el-dialog title="回退物流状态" :visible.sync="dialogFormVisible5">
       <el-timeline :reverse="reverse">
         <p>当前状态：{{state_name}}</p>
-       <el-timeline-item
+        <el-timeline-item
           v-for="(activity, index) in activities"
           :key="index"
           :timestamp="activity.timestamp"
@@ -246,7 +241,7 @@ export default {
       active: 0,
       data: {},
       showBack: false,
-    state_name:"",
+      state_name: "",
       cards: [],
       activities: [],
       dialogFormVisible: false,
@@ -268,6 +263,9 @@ export default {
     this.getData();
   },
   methods: {
+    goBack() {
+      this.$router.go(-1);
+    },
     // 发货
     send() {
       this.dialogFormVisible = true;
@@ -290,11 +288,14 @@ export default {
     logistics(e) {
       this.dialogFormVisible3 = true;
       logistics({
-        code:this.data.logistics_number,type:this.data.logistics_card,from:2,id:this.data.id 
+        code: this.data.logistics_number,
+        type: this.data.logistics_card,
+        from: 2,
+        id: this.data.id
       }).then(res => {
         if (res.code == 200) {
           this.activities = res.data.data;
-           this.state_name = res.data.State_name;
+          this.state_name = res.data.State_name;
         } else {
           this.$message.error(res.msg);
         }
@@ -418,11 +419,9 @@ export default {
     getData() {
       order_vip_one({ id: this.$route.query.id }).then(res => {
         if (res) {
-     
           this.data = res.data;
-    this.tableData=[]
-            this.tableData[0] = res.data.package_info
-
+          this.tableData = [];
+          this.tableData[0] = res.data.package_info;
         } else {
           this.$message.error(res.msg);
         }

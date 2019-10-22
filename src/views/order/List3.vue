@@ -98,6 +98,9 @@
             <template v-if="scope.row.total_status==11">买家取消</template>
             <template v-if="scope.row.total_status==12">卖家取消</template>
             <template v-if="scope.row.total_status==13">退货申请被驳回</template>
+            <template v-if="scope.row.total_status==15">
+              <span style="color: #f42525;">待支付</span>
+            </template>
           </template>
         </el-table-column>
         <!-- <el-table-column prop="msg" label="订单状态"></el-table-column> -->
@@ -111,7 +114,7 @@
         </el-table-column>
       </el-table>
       <div class="block">
-        <el-select v-model="value" :disabled="isDisable" placeholder="批量操作">
+        <!-- <el-select v-model="value" :disabled="isDisable" placeholder="批量操作">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -124,7 +127,7 @@
           type="primary"
           @click="delAll"
           :disabled="isDisable"
-        >确定</el-button>
+        >确定</el-button>-->
         <el-pagination
           layout="prev, pager, next"
           :total="total"
@@ -181,8 +184,8 @@ export default {
         { value: "0", label: "全部订单" },
         { value: "1", label: "待付款" },
         { value: "2", label: "待发货" },
-        { value: "3", label: "待收货" },
-        { value: "4", label: "退货" }
+        { value: "3", label: "已发货" },
+        { value: "4", label: "退货/售后" }
       ],
       isDisable: true,
       multipleSelection: [],
@@ -224,30 +227,8 @@ export default {
     };
   },
   created() {
-    if (this.$route.query.map) {
-      let routerMsg = JSON.parse(this.$route.query.map);
-      switch (routerMsg.msg) {
-        case "全部":
-          this.radio1 = 0;
-          break;
-        case "待付款":
-          this.radio1 = 1;
-          break;
-        case "待发货":
-          this.radio1 = 2;
-          break;
-        case "待收货":
-          this.radio1 = 3;
-          break;
-        case "退货":
-          this.radio1 = 4;
-          break;
-
-        default:
-          this.radio1 = 0;
-      }
-
-      this.map = routerMsg.map;
+    if (this.$route.query.status) {
+      this.radio1 = this.$route.query.status.toString();
     } else {
       this.radio1 = "0";
     }
@@ -358,11 +339,11 @@ export default {
 
     // 加载列表
     getList(page) {
-      let time1
-      if(this.time==''||this.time==null){
-    time1=""
-      }else{
-            time1=new Date(this.time).toISOString().split("T")[0]
+      let time1;
+      if (this.time == "" || this.time == null) {
+        time1 = "";
+      } else {
+        time1 = new Date(this.time).toISOString().split("T")[0];
       }
       order_more({
         page: page,
@@ -402,10 +383,7 @@ export default {
               this.$message.success(res.msg);
 
               this.dialogFormVisible = false;
-              this.getList(
-                1,
-              
-              );
+              this.getList(1);
 
               this.$refs["form"].resetFields();
             } else {

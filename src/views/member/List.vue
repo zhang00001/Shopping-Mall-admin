@@ -6,11 +6,11 @@
           <el-col :span="6">
             <span>用户类型</span>
             <el-select v-model="vip_grade" placeholder="请选择">
-                <el-option label="全部" value=""></el-option>
+              <el-option label="全部" value></el-option>
               <el-option label="普通用户" value="0"></el-option>
-                 <el-option label="Vip" value="1"></el-option>
-                    <el-option label="店长" value="2"></el-option>
-                      <el-option label="超级店长" value="3"></el-option>
+              <el-option label="Vip" value="1"></el-option>
+              <el-option label="店长" value="2"></el-option>
+              <el-option label="超级店长" value="3"></el-option>
             </el-select>
           </el-col>
           <el-col :span="6">
@@ -32,7 +32,6 @@
         <el-row>
           <el-col :span="6">
             <el-button type="primary" @click="search">查询</el-button>
-
           </el-col>
         </el-row>
       </div>
@@ -51,7 +50,8 @@
         <el-table-column prop="mobile" label="用户账户"></el-table-column>
         <el-table-column prop="nick" label="用户昵称"></el-table-column>
         <el-table-column prop="weixin" label="微信号"></el-table-column>
-        <!-- <el-table-column prop="id" label="消费金额"></el-table-column> -->
+        <el-table-column prop="vip_grade_name" label="Vip等级"></el-table-column>
+        <el-table-column prop="remarks" label="备注"></el-table-column>
 
         <el-table-column prop="order_num" label="订单数量"></el-table-column>
         <el-table-column prop="money" label="可用余额"></el-table-column>
@@ -72,12 +72,11 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button @click="edit(scope.row)" type="text" size="small">查看</el-button>
-           
+            <el-button @click="editRem(scope.row)" type="text" size="small">修改备注</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="block">
-       
         <el-pagination
           layout="prev, pager, next"
           :total="total"
@@ -85,12 +84,19 @@
         ></el-pagination>
       </div>
     </template>
+    <el-dialog title="修改备注" :visible.sync="dialogFormVisible" :before-close="handleClose">
+      <span>备注：</span>
+      <el-input v-model="remarks"></el-input>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="save">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import http from "@/utils/request";
-import { user_more, user_del } from "@/api/index";
+import { user_more, user_del, Updateremarks } from "@/api/index";
 import axios from "axios";
 export default {
   data() {
@@ -111,11 +117,14 @@ export default {
       ],
       value: "",
       isDisable: true,
+      dialogFormVisible: false,
       multipleSelection: [],
       allTitle: "全选",
       selAll: false,
       supplier: "",
       tableData: [],
+      remarks: "",
+      selectId: "",
       supplier_id: "",
       warehouse_id: "",
       shelf: "",
@@ -154,6 +163,20 @@ export default {
     this.getList(1, this.vip_grade, this.searchTitle, this.searchTime);
   },
   methods: {
+    save() {
+      Updateremarks({ id: this.selectId, remarks: this.remarks }).then(res => {
+        this.handleClose();
+        this.getList(1, this.vip_grade, this.searchTitle, this.searchTime);
+      });
+    },
+    handleClose() {
+      (this.dialogFormVisible = false),
+        (this.remarks = ""),
+        (this.selectId = "");
+    },
+    editRem(e) {
+      (this.dialogFormVisible = true), (this.selectId = e.id);
+    },
     changeOption(e) {
       this.$confirm("更改用户账户状态, 是否继续?", "提示", {
         confirmButtonText: "确定",
@@ -187,12 +210,8 @@ export default {
         this.isDisable = true;
       }
     },
-    handleClose() {
-      this.$refs["form"].resetFields();
-      this.dialogFormVisible = false;
-    },
+
     search() {
-      
       this.getList(1, this.vip_grade, this.searchTitle, this.searchTime);
     },
 
@@ -211,15 +230,13 @@ export default {
         this.selAll = true;
       }
     },
-    
 
     // 加载列表
     getList(page, vip_grade, search, time) {
-      
       user_more({
         page: page,
         limit: 10,
- 
+
         vip_grade: vip_grade,
         search: search,
         time: time

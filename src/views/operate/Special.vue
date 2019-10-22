@@ -12,9 +12,8 @@
         ></el-input>
       </div>
 
-      <el-button type="primary" @click="search">查询</el-button> -->
+      <el-button type="primary" @click="search">查询</el-button>-->
       <el-button type="primary" @click="add">添加</el-button>
-
     </div>
 
     <template>
@@ -91,27 +90,38 @@
         </div>
       </el-dialog>
       <el-dialog title="商品详情" :visible.sync="dialogFormVisible3">
-         <div  class="dialog-footer">
+        <div class="dialog-footer">
           <el-button type="primary" @click="deleteGood" :disabled="isdel">删除</el-button>
         </div>
-        <el-table :data="tableData2" border   v-loading="loading"
-    element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading"
-     @selection-change="handleSelectionChange2">
+        <el-table
+          :data="tableData2"
+          border
+          v-loading="loading"
+          element-loading-text="拼命加载中"
+          element-loading-spinner="el-icon-loading"
+          @selection-change="handleSelectionChange2"
+        >
           <el-table-column type="selection" width="55"></el-table-column>
           <el-table-column prop="id" label="编号" width="55"></el-table-column>
           <el-table-column prop="title" label="标题"></el-table-column>
         </el-table>
-          <div class="block">
-        <el-pagination
-          layout="prev, pager, next"
-          :total="total2"
-          @current-change="handleCurrentChange2"
-        ></el-pagination>
-      </div>
+        <div class="block">
+          <el-pagination
+            layout="prev, pager, next"
+            :total="total2"
+            @current-change="handleCurrentChange2"
+          ></el-pagination>
+        </div>
       </el-dialog>
-      <el-dialog title="添加商品" :visible.sync="dialogFormVisible2" >
-        <SelectGoods :Id="selectId" :status="'sp'" ref="headerChild" :Ishome2='true' v-if="dialogFormVisible2"  :Ishome="true" ></SelectGoods>
+      <el-dialog title="添加商品" :visible.sync="dialogFormVisible2">
+        <SelectGoods
+          :Id="selectId"
+          :status="'sp'"
+          ref="headerChild"
+          :Ishome2="true"
+          v-if="dialogFormVisible2"
+          :Ishome="true"
+        ></SelectGoods>
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="saveGood">确 定</el-button>
         </div>
@@ -131,7 +141,8 @@ import {
   special_manage,
   special_del,
   special_goods_join,
-  special_goods_data,special_goods_del
+  special_goods_data,
+  special_goods_del
 } from "@/api/index";
 import axios from "axios";
 export default {
@@ -140,23 +151,24 @@ export default {
   },
   data() {
     return {
+      SelectIndex: 1,
       imageUrl: "",
       moreClass: [],
       isDisable: true,
       searchTitle: "",
       multipleSelection: [],
-      isdel:true,
+      isdel: true,
       dialogFormVisible2: false,
       dialogFormVisible3: false,
       supplier: "",
       tableData: [],
       tableData2: [],
       total: 0,
-total2:0,
+      total2: 0,
       title: "新增",
       fileLists: [],
       value: [],
-loading:false,
+      loading: false,
       allTitle: "全选",
       selAll: false,
       form: {
@@ -164,7 +176,7 @@ loading:false,
         classify_id: "",
         img: ""
       },
-multipleSelection2:{},
+      multipleSelection2: {},
       rules: {
         name: [{ required: true, message: "必填字段", trigger: "blur" }],
 
@@ -175,7 +187,7 @@ multipleSelection2:{},
     };
   },
   created() {
-    this.getList(1);
+    this.getList(this.SelectIndex);
     this.getClass();
   },
   methods: {
@@ -190,15 +202,15 @@ multipleSelection2:{},
       this.dialogFormVisible2 = true;
     },
     getspecial_goods_data(page) {
-      this.loading=true
+      this.loading = true;
       special_goods_data({
         special_id: this.selectId,
         page: page,
         limit: 10
       }).then(res => {
-         this.loading=false
+        this.loading = false;
         this.tableData2 = res.data.data;
-        this.total2=res.data.count
+        this.total2 = res.data.count;
       });
     },
     saveGood() {
@@ -226,19 +238,20 @@ multipleSelection2:{},
     add() {
       this.title = "添加专题";
       this.dialogFormVisible = true;
-      this.imageUrl=''
+      this.imageUrl = "";
       this.$nextTick(() => {
         this.form.id = "";
       });
     },
     handleCurrentChange(e) {
+      this.SelectIndex = e;
       this.getList(e, this.searchTitle);
     },
-    handleCurrentChange2(e){
- this.getspecial_goods_data(e);
+    handleCurrentChange2(e) {
+      this.getspecial_goods_data(e);
     },
     search() {
-      this.getList(1, this.searchTitle);
+      this.getList(this.SelectIndex, this.searchTitle);
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -248,26 +261,26 @@ multipleSelection2:{},
         this.isDisable = true;
       }
     },
-    handleSelectionChange2(val){
-      
- this.multipleSelection2 = val;
-  
+    handleSelectionChange2(val) {
+      this.multipleSelection2 = val;
+
       if (this.multipleSelection2.length > 0) {
         this.isdel = false;
       } else {
         this.isdel = true;
       }
     },
-    deleteGood(){
-special_goods_del({id: this.multipleSelection2.map(val=>val.id).toString()}).then(res=>{
-  if(res.code==200){
-    this.$message.success(res.msg)
-     this.getspecial_goods_data(1);
-
-  }else{
-     this.$message.error(res.msg)
-  }
-})
+    deleteGood() {
+      special_goods_del({
+        id: this.multipleSelection2.map(val => val.id).toString()
+      }).then(res => {
+        if (res.code == 200) {
+          this.$message.success(res.msg);
+          this.getspecial_goods_data(1);
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
     },
     handleClose() {
       this.$refs["form"].resetFields();
@@ -302,7 +315,7 @@ special_goods_del({id: this.multipleSelection2.map(val=>val.id).toString()}).the
           })
           .then(res => {
             if (res.code == 200) {
-              this.getList(1, this.serchTitle);
+              this.getList(this.SelectIndex, this.serchTitle);
             } else {
               this.$message.error(res.msg);
             }
@@ -326,7 +339,7 @@ special_goods_del({id: this.multipleSelection2.map(val=>val.id).toString()}).the
           special_del({ id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.getList(1);
+              this.getList(this.SelectIndex);
             } else {
               this.$message.error(res.msg);
             }
@@ -339,8 +352,7 @@ special_goods_del({id: this.multipleSelection2.map(val=>val.id).toString()}).the
     getList(page) {
       special_more({
         page: page,
-        limit: 10,
-       
+        limit: 10
       }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;
@@ -380,7 +392,7 @@ special_goods_del({id: this.multipleSelection2.map(val=>val.id).toString()}).the
               this.$message.success(res.msg);
 
               this.dialogFormVisible = false;
-              this.getList(1);
+              this.getList(this.SelectIndex);
 
               this.$refs["form"].resetFields();
             } else {

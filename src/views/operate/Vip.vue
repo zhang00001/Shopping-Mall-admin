@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="top">
-      <div class="demo-input-suffix searchInput">
-        <span>名称：</span>
+      <!-- <div class="demo-input-suffix searchInput"> -->
+      <!-- <span>名称：</span>
 
         <el-input
           placeholder="请输入内容"
@@ -11,7 +11,7 @@
           style="width:200px;"
         ></el-input>
       </div>
-      <el-button type="primary" @click="search">查询</el-button>
+      <el-button type="primary" @click="search">查询</el-button>-->
       <el-button type="primary" @click="dialogFormVisible = true">添加</el-button>
       <!-- <el-button type="primary" @click="toggleSelection">{{allTitle}}</el-button> -->
       <!-- <el-button type="primary" @click="delAll" :disabled="isDisable">批量删除</el-button> -->
@@ -24,14 +24,14 @@
         ref="recordTable"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55"></el-table-column>
+        <!-- <el-table-column type="selection" width="55"></el-table-column> -->
         <el-table-column prop="id" label="编号"></el-table-column>
         <el-table-column prop="title" label="名称"></el-table-column>
-          <el-table-column prop="img" label="图片">
-               <template slot-scope="scope">
-                   <img :src="scope.row.img" alt="" style="width:100px;height:100px">
-               </template>
-          </el-table-column>
+        <el-table-column prop="show" label="图片">
+          <template slot-scope="scope">
+            <img :src="scope.row.show" alt style="width:100px;height:100px" />
+          </template>
+        </el-table-column>
         <el-table-column prop="price" label="价格"></el-table-column>
         <el-table-column prop="order" label="排序"></el-table-column>
 
@@ -50,8 +50,13 @@
         ></el-pagination>
       </div>
 
-      <el-dialog :title="title" :visible.sync="dialogFormVisible" :before-close="handleClose" >
-        <el-form :model="form" ref="form" :rules="rules"   label-width="auto">
+      <el-dialog
+        :title="title"
+        :visible.sync="dialogFormVisible"
+        :before-close="handleClose"
+        width="80%"
+      >
+        <el-form :model="form" ref="form" :rules="rules" label-width="auto">
           <el-form-item label="标题" prop="title">
             <el-input v-model="form.title" autocomplete="off"></el-input>
           </el-form-item>
@@ -62,27 +67,57 @@
           <el-form-item label="排序" prop="order">
             <el-input v-model="form.order" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="图片" prop="img">
-          <el-upload
+          <el-form-item label="封面" prop="show">
+            <el-upload
               class="avatar-uploader"
               :http-request="uploadFile"
-               
               action
               :show-file-list="false"
-          
-            
             >
               <img v-if="imageUrl" :src="imageUrl" class="avatar" />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="图片">
+            <div style="display: flex;">
+              <template v-for="(item,index) in fileList">
+                <div style="height:250px; margin-right:20px; " v-if="index<=5" :key="item.id">
+                  <div>
+                    <el-image
+                      :src="item"
+                      fit="cover"
+                      style="width:200px;height:200px;  border-radius:15px; "
+                    ></el-image>
+                  </div>
+
+                  <div style="margin-top:15px;">
+                    <el-button style="padding: 10px;" v-if="index==0">商品主图</el-button>
+                    <el-button style="padding: 10px;" v-else @click="setImg(item,index)">设为主图</el-button>
+                    <el-button style="padding: 10px;" @click="delProductImg(item,index)">删除图片</el-button>
+                  </div>
+                </div>
+              </template>
+
+              <template v-if="fileList.length<5">
+                <el-upload
+                  class="avatar-uploader"
+                  :http-request="uploadFile2"
+                  action
+                  multiple
+                  :show-file-list="false"
+                  :file-list="fileLists"
+                >
+                  <i class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+              </template>
+            </div>
           </el-form-item>
         </el-form>
-        <div >
-         
-           <AddGoods   :status="'Vip'" ref="headerChild" :goodcounts2="goodcounts2"  ></AddGoods>
-        <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="save">确 定</el-button>
-        </div>
+        <div>
+          <Editor ref="editor" :content="data"></Editor>
+          <div slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="save">确 定</el-button>
+          </div>
         </div>
       </el-dialog>
     </template>
@@ -102,16 +137,21 @@ import {
   brand_more
 } from "@/api/index";
 import axios from "axios";
+import Editor from "@/components/Editor";
 export default {
-   components: {
-    AddGoods
+  components: {
+    AddGoods,
+    Editor
   },
   data() {
     return {
+      data: "",
+      SelectIndex: 1,
       serchTitle: "",
-      imageUrl:"",
+      imageUrl: "",
       data: [],
-  goodcounts2:[],
+      fileList: [],
+      goodcounts2: [],
       isDisable: true,
       multipleSelection: [],
       multipleSelection2: [],
@@ -132,8 +172,9 @@ export default {
         title: "",
         price: "",
         order: "",
-        img:"",
-        goods_id: ""
+        show: "",
+        detail: "",
+        img: []
       },
 
       rules: {
@@ -147,11 +188,49 @@ export default {
     };
   },
   created() {
-    this.getList(1, this.supplier);
+    this.getList(this.SelectIndex, this.supplier);
 
     this.getClss();
   },
   methods: {
+    uploadFile2(item) {
+      const formdata = new FormData();
+      formdata.append("upload_img", item.file);
+      formdata.append("type", 1);
+      axios
+        .post(process.env.BASE_API + "index/base/upload", formdata)
+        .then(res => {
+          if (res.data.code == 200) {
+            console.log(this.fileList.length);
+            if (this.fileList.length < 5) {
+              this.fileList.push(res.data.data.http_image);
+            } else {
+            }
+          } else {
+            this.$message.warning(res.data.msg);
+          }
+        })
+        .catch(err => {});
+    },
+    // 设为主图
+    setImg(item, index) {
+      this.showFile = false;
+      let selectImg = this.fileList[0];
+      this.fileList[0] = item;
+      this.fileList[index] = selectImg;
+      this.showFile = true;
+    },
+    delProductImg(item, index) {
+      this.$confirm("是否删除, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.fileList.splice(index, 1);
+        })
+        .catch(() => {});
+    },
     searchRelation() {
       this.getGoods(this.classify_id, this.brand_id, this.serchTitle);
     },
@@ -182,6 +261,7 @@ export default {
       });
     },
     handleCurrentChange(e) {
+      this.SelectIndex = e;
       this.getList(e, this.supplier);
     },
     handleSelectionChange(val) {
@@ -198,45 +278,9 @@ export default {
       this.dialogFormVisible = false;
     },
     search() {
-      this.getList(1, this.supplier);
+      this.getList(this.SelectIndex, this.supplier);
     },
-    toggleSelection() {
-      if (this.selAll) {
-        this.selAll = false;
-        this.allTitle = "全选";
-        this.tableData.forEach(row => {
-          this.$refs.recordTable.toggleRowSelection(row, false);
-        });
-      } else {
-        this.allTitle = "取消全选";
-        this.tableData.forEach(row => {
-          this.$refs.recordTable.toggleRowSelection(row, true);
-        });
-        this.selAll = true;
-      }
-    },
-    //   批量删除
-    delAll() {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        http
-          .post("admin/goods/batch_del", {
-            id: this.multipleSelection.map(val => val.id).toString(),
-            type: 2
-          })
-          .then(res => {
-            if (res.code == 200) {
-              this.getList(1, this.supplier);
-            } else {
-              this.$message.error(res.msg);
-            }
-          })
-          .catch(() => {});
-      });
-    },
+
     //删除
     delect(e) {
       this.$confirm("此操作将永久删除, 是否继续?", "提示", {
@@ -248,7 +292,7 @@ export default {
           package_del({ id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.getList(1, this.supplier);
+              this.getList(this.SelectIndex, this.supplier);
             } else {
               this.$message.error(res.msg);
             }
@@ -277,34 +321,28 @@ export default {
         package_one({ id: e.id }).then(res => {
           if (res.code == 200) {
             this.title = "编辑";
-           
-           this.$store.commit("set_selectGood", res.data.goods_id);
+
+            this.$store.commit("set_selectGood", res.data.goods_id);
             this.$nextTick(() => {
               this.form = {
                 id: e.id,
                 title: res.data.title,
                 price: res.data.price,
                 order: res.data.order,
-                goods_id: res.data.goods_id
+                detail: res.data.detail,
+                show: res.data.show
               };
-              this.goodcounts2 = res.data.goods_id
+              this.data = res.data.detail;
+              this.fileList = res.data.imgs ? res.data.imgs : [];
+              this.fileList[0] = res.detail.img;
+              (this.imageUrl = res.data.show), (this.data = res.data.detail);
             });
           } else {
             this.$message.error(res.msg);
           }
         });
     },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
-    },
-     uploadFile(item) {
-      
+    uploadFile(item) {
       const formdata = new FormData();
       formdata.append("upload_img", item.file);
       formdata.append("type", 5);
@@ -315,7 +353,7 @@ export default {
             this.$message.success(res.data.msg);
             this.imageUrl = res.data.data.http_image;
             this.$nextTick(() => {
-              this.form.img = res.data.data.image;
+              this.form.show = res.data.data.image;
             });
           } else {
             this.$message.warning(res.data.msg);
@@ -328,15 +366,22 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.$nextTick(() => {
-            this.form.goods_id = this.$refs.headerChild.goods.map(val=>val.id).toString();
-
+            this.form.detail = this.$refs.editor.content;
+            let imgs = [];
+            this.fileList.forEach(val => {
+              if (/(http|https):\/\/([\w.]+\/?)\S*/.test(val)) {
+                imgs.push(val.split(val.split("/upload")[0])[1]);
+              } else {
+                imgs.push(val);
+              }
+            }),
+              (this.form.img = JSON.stringify(imgs));
             package_manage(this.form).then(res => {
               if (res.code == 200) {
                 this.$message.success(res.msg);
-              
-                this.dialogFormVisible = false;
-                this.getList(1, this.supplier);
-                this.$refs["form"].resetFields();
+
+                this.getList(this.SelectIndex, this.supplier);
+                this.clearData();
               } else {
                 this.$message.error(res.msg);
               }
@@ -344,7 +389,59 @@ export default {
           });
         }
       });
+    },
+    clearData() {
+      this.data = "";
+      this.$refs["form"].resetFields();
+      this.dialogFormVisible = false;
+      (this.fileList = []), (this.imageUrl = "");
     }
+    // toggleSelection() {
+    //   if (this.selAll) {
+    //     this.selAll = false;
+    //     this.allTitle = "全选";
+    //     this.tableData.forEach(row => {
+    //       this.$refs.recordTable.toggleRowSelection(row, false);
+    //     });
+    //   } else {
+    //     this.allTitle = "取消全选";
+    //     this.tableData.forEach(row => {
+    //       this.$refs.recordTable.toggleRowSelection(row, true);
+    //     });
+    //     this.selAll = true;
+    //   }
+    // },
+    //   批量删除
+    // delAll() {
+    //   this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+    //     confirmButtonText: "确定",
+    //     cancelButtonText: "取消",
+    //     type: "warning"
+    //   }).then(() => {
+    //     http
+    //       .post("admin/goods/batch_del", {
+    //         id: this.multipleSelection.map(val => val.id).toString(),
+    //         type: 2
+    //       })
+    //       .then(res => {
+    //         if (res.code == 200) {
+    //           this.getList(this.SelectIndex, this.supplier);
+    //         } else {
+    //           this.$message.error(res.msg);
+    //         }
+    //       })
+    //       .catch(() => {});
+    //   });
+    // },
+    // toggleSelection(rows) {
+    //   if (rows) {
+    //     rows.forEach(row => {
+    //       this.$refs.multipleTable.toggleRowSelection(row);
+    //     });
+    //   } else {
+    //     this.$refs.multipleTable.clearSelection();
+    //   }
+    // },
   }
 };
 </script>

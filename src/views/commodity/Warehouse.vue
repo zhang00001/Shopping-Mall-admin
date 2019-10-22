@@ -39,7 +39,11 @@
         </el-table-column>
       </el-table>
       <div class="block">
-        <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange"></el-pagination>
+        <el-pagination
+          layout="prev, pager, next"
+          :total="total"
+          @current-change="handleCurrentChange"
+        ></el-pagination>
       </div>
 
       <el-dialog :title="title" :visible.sync="dialogFormVisible" :before-close="handleClose">
@@ -106,7 +110,7 @@ export default {
       tableData: [],
 
       total: 0,
-
+      SelectIndex: 1,
       title: "新增",
       fileLists: [],
       value: [],
@@ -142,15 +146,16 @@ export default {
     this.getMap(0);
   },
   methods: {
-    add(){
-this.title='添加仓库';
-this.dialogFormVisible = true
-this.$nextTick(()=>{
-this.form.id=''
-})
+    add() {
+      this.title = "添加仓库";
+      this.dialogFormVisible = true;
+      this.$nextTick(() => {
+        this.form.id = "";
+      });
     },
-    handleCurrentChange(e){
-this.getList(e, this.searchTitle);
+    handleCurrentChange(e) {
+      this.SelectIndex = e;
+      this.getList(e, this.searchTitle);
     },
     search() {
       this.getList(1, this.searchTitle);
@@ -225,16 +230,15 @@ this.getList(e, this.searchTitle);
     },
     changeProvince() {
       this.getCitys(this.form.province, 1);
-      this.$nextTick(()=>{
-        this.form.city='',
-        this.form.area=''
-      })
+      this.$nextTick(() => {
+        (this.form.city = ""), (this.form.area = "");
+      });
     },
     changeProvince2() {
       this.getCitys(this.form.city, 2);
-      this.$nextTick(()=>{
-           this.form.area=''
-      })
+      this.$nextTick(() => {
+        this.form.area = "";
+      });
     },
 
     handleChange(value) {
@@ -313,7 +317,7 @@ this.getList(e, this.searchTitle);
               this.$message.success(res.msg);
 
               this.dialogFormVisible = false;
-              this.getList(1, this.supplier);
+              this.getList(this.SelectIndex, this.supplier);
               this.form.city = "";
               this.form.area = "";
               this.$refs["form"].resetFields();

@@ -9,7 +9,7 @@
     :collapse="isCollapse"
     :unique-opened="true"
   >
-    <template v-for="(items,key) in routers" >
+    <template v-for="(items,key) in routers">
       <template v-if="items.meta.hidden==false">
         <template v-if="items.children.length>0">
           <el-submenu :index="items.path" :key="key">
@@ -56,16 +56,42 @@ export default {
   },
   beforeCreate: function() {},
   created: function() {
-    this.routers = this.$router.options.routes;
+    // this.routers = this.$router.options.routes;
+
+    let power = sessionStorage.getItem("power");
+
+    switch (power) {
+      case "0":
+        this.routers = this.$router.options.routes;
+        break;
+      case "1":
+        this.routers = this.$router.options.routes.filter(
+          val => val.path == "/commodity" || val.path == "/home"
+        );
+        break;
+      case "2":
+        this.routers = this.$router.options.routes.filter(
+          val => val.path == "/order" || val.path == "/home"
+        );
+        break;
+      case "3":
+        this.routers = this.$router.options.routes.filter(
+          val => val.path == "/member" || val.path == "/home"
+        );
+        break;
+      case "4":
+        this.routers = this.$router.options.routes.filter(
+          val => val.path == "/operate" || val.path == "/home"
+        );
+        break;
+      default:
+        this.routers = this.$router.options.routes.filter(
+          val => val.path == "/home"
+        );
+    }
   },
   props: ["isCollapse"],
-  methods: {
-    // handleOpen(key, keyPath) {
-    //   if (keyPath.length < 2) {
-    //   }
-    //   console.log(key, keyPath);
-    // }
-  }
+  methods: {}
 };
 </script>
 <style rel="stylesheet/scss" lang="scss" >

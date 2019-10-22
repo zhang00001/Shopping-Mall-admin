@@ -23,14 +23,19 @@
       </div>
       <el-button type="primary" @click="search">查询</el-button>
       <el-button type="primary" @click="add">新增商品</el-button>
-           <el-button type="primary" :disabled="isDisable" @click="delAll">批量删除</el-button>
-   
+      <el-button type="primary" :disabled="isDisable" @click="delAll">批量删除</el-button>
+
       <!-- <el-button type="primary" @click="toggleSelection">{{allTitle}}</el-button> -->
       <!-- <el-button type="primary" @click="delAll" :disabled="isDisable">批量删除</el-button> -->
     </div>
 
     <template>
-      <el-table :data="tableData" border ref="recordTable" @selection-change="handleSelectionChange">
+      <el-table
+        :data="tableData"
+        border
+        ref="recordTable"
+        @selection-change="handleSelectionChange"
+      >
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="id" label="Id" width="55"></el-table-column>
         <!-- <el-table-column prop="id" label="货号" width="55"></el-table-column> -->
@@ -41,7 +46,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="order" label="排序"></el-table-column> -->
+        <el-table-column prop="order" label="排序"></el-table-column>-->
 
         <el-table-column label="操作" width="150">
           <template slot-scope="scope">
@@ -59,7 +64,15 @@
       </div>
 
       <el-dialog title="管理商品" :visible.sync="dialogFormVisible">
-        <SelectGoods :Id="selectId" :status="'ad'"  :adId='selectStatus' ref="headerChild" v-if="dialogFormVisible"   :Ishome="false" :isintegral="isintegral"></SelectGoods>
+        <SelectGoods
+          :Id="selectId"
+          :status="'ad'"
+          :adId="selectStatus"
+          ref="headerChild"
+          v-if="dialogFormVisible"
+          :Ishome="false"
+          :isintegral="isintegral"
+        ></SelectGoods>
 
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="saveGood">确 定</el-button>
@@ -80,8 +93,11 @@ import {
   package_one,
   goods_class_more,
   brand_more,
-  advertisement_more,advertisement_log,advertisement_del_data,
-  advertisement_log_data,special_goods_del
+  advertisement_more,
+  advertisement_log,
+  advertisement_del_data,
+  advertisement_log_data,
+  special_goods_del
 } from "@/api/index";
 import axios from "axios";
 export default {
@@ -89,44 +105,41 @@ export default {
     SelectGoods
   },
   data() {
-    return {isintegral:true,
+    return {
+      isintegral: true,
       selectId: "",
+      SelectIndex: 1,
       selectStatus: "",
       serchTitle: "",
-      imageUrl: "",title:"",
-       multipleSelection:[],
+      imageUrl: "",
+      title: "",
+      multipleSelection: [],
       adverts: [], //广告位
-   
-     isDisable: true,
+
+      isDisable: true,
       allTitle: "全选",
-     
+
       supplier: "",
       tableData: [],
-    
-      total: 0,
- 
 
-   
-     
- 
+      total: 0,
+
       dialogFormVisible: false
     };
   },
   created() {
-  
     this.getAdv();
   },
   methods: {
-
-  delAll(){
-  this.$confirm("确认删除选中商品?", "提示", {
+    delAll() {
+      this.$confirm("确认删除选中商品?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-       advertisement_del_data( {
-            id: this.multipleSelection.map(val => val.id).toString(),
-          })
+        advertisement_del_data({
+          id: this.multipleSelection.map(val => val.id).toString()
+        })
           .then(res => {
             if (res.code == 200) {
               this.getList(1);
@@ -137,26 +150,27 @@ export default {
           .catch(() => {});
       });
     },
-     handleSelectionChange(val) {
+    handleSelectionChange(val) {
       this.multipleSelection = val;
       if (this.multipleSelection.length > 0) {
         this.isDisable = false;
       } else {
         this.isDisable = true;
-      }},
+      }
+    },
 
-      add(){
-this.dialogFormVisible = true
-    this.selectId=this.selectStatus
-      },
+    add() {
+      this.dialogFormVisible = true;
+      this.selectId = this.selectStatus;
+    },
     saveGood() {
-      let goods = this.$refs.headerChild.checkList.map(val=>val.id);
- 
+      let goods = this.$refs.headerChild.checkList.map(val => val.id);
+
       if (goods.length > 0) {
         advertisement_log({
           advertisement_id: this.selectStatus,
           goods_id: goods.toString(),
-          classif_id:'-3',
+          classif_id: "-3"
         }).then(res => {
           if (res.code == 200) {
             this.dialogFormVisible = false;
@@ -198,7 +212,7 @@ this.dialogFormVisible = true
           advertisement_del_data({ id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.getList(1, this.supplier);
+              this.getList(this.SelectIndex, this.supplier);
             } else {
               this.$message.error(res.msg);
             }
@@ -207,6 +221,7 @@ this.dialogFormVisible = true
         .catch(() => {});
     },
     handleCurrentChange(e) {
+      this.SelectIndex = e;
       this.getList(e);
     },
     // 加载列表
@@ -214,8 +229,9 @@ this.dialogFormVisible = true
       advertisement_log_data({
         page: page,
         limit: 10,
-classif_id:'-3',
-        advertisement_id: this.selectStatus,title:this.title
+        classif_id: "-3",
+        advertisement_id: this.selectStatus,
+        title: this.title
       }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data;

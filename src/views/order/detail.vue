@@ -1,14 +1,26 @@
 <template>
   <div style="margin-top:20px">
     <div style="margin:20px 0;">
+      <el-page-header @back="goBack" content style="display:inline-block"></el-page-header>
+
       <span>
         <i class="el-icon-potato-strips" style="color:red"></i> 当前订单状态 ：
       </span>
       <span>{{data.status_name}}</span>
       <el-button size="mini" v-if="data.status_name=='待审核'" type="primary" @click="send">审核</el-button>
       <!-- <el-button size="mini" type="primary"   @click=" this.dialogFormVisible5 = true">取消订单</el-button> -->
-        <el-button size="mini"  type="primary" v-if="data.total_status==4" @click="send2(1)">设置退单物流</el-button>
-      <el-button size="mini" v-if="data.status==0&&data.confirm==2" type="primary" @click="send2(0)">发货</el-button>
+      <el-button
+        size="mini"
+        type="primary"
+        v-if="data.total_status==7&&data.yes==0"
+        @click="send2(1)"
+      >设置退单物流</el-button>
+      <el-button
+        size="mini"
+        v-if="data.status==0&&data.confirm==2"
+        type="primary"
+        @click="send2(0)"
+      >发货</el-button>
       <el-button size="mini" v-if="data.status==2" type="primary" @click="logistics">查看物流</el-button>
       <el-button size="mini" v-if="data.status==4" type="primary" @click="send4">退货审核</el-button>
       <el-button size="mini" v-if="data.status==5" type="primary" @click="over">退货完成</el-button>
@@ -35,7 +47,7 @@
               </div>
             </el-col>
             <el-col :span="6">
-            <div class="text item">
+              <div class="text item">
                 <p>用户账户</p>
                 <span>{{data.user_info.mobile}}</span>
               </div>
@@ -136,8 +148,6 @@
                 <span>{{data.money}}</span>
               </div>
             </el-card>
-
-          
           </div>
         </el-col>
       </el-row>
@@ -156,14 +166,9 @@
     <el-dialog title="发货" :visible.sync="dialogFormVisible2">
       <el-form :model="form">
         <el-form-item label="物流公司" :label-width="formLabelWidth">
-           <el-select v-model="form.card" placeholder="请选择">
-    <el-option
-      v-for="item in cards"
-      :key="item.card"
-      :label="item.name"
-      :value="item.card">
-    </el-option>
-  </el-select>
+          <el-select v-model="form.card" placeholder="请选择">
+            <el-option v-for="item in cards" :key="item.card" :label="item.name" :value="item.card"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="物流编号" :label-width="formLabelWidth">
           <el-input v-model="form.logistics_number" autocomplete="off"></el-input>
@@ -179,7 +184,7 @@
       </div>
     </el-dialog>
     <el-dialog title="物流状态" :visible.sync="dialogFormVisible3">
-       <p>当前状态：{{state_name}}</p>
+      <p>当前状态：{{state_name}}</p>
       <el-timeline :reverse="reverse">
         <el-timeline-item
           v-for="(activity, index) in activities"
@@ -217,22 +222,28 @@ import {
   logistics,
   back_confirm,
   back_finish,
-  order_cancel,wuliu,order_back_logistics
+  order_cancel,
+  wuliu,
+  order_back_logistics
 } from "@/api/index";
 export default {
   data() {
     return {
       active: 0,
-      data: {},cards:[],
-      activities: [],logisticsType:0,//oo默认发货，1 退单发货
+      data: {},
+      cards: [],
+      activities: [],
+      logisticsType: 0, //oo默认发货，1 退单发货
       dialogFormVisible: false,
       dialogFormVisible2: false,
       dialogFormVisible3: false,
       dialogFormVisible4: false,
-      dialogFormVisible5: false,    state_name:"",
+      dialogFormVisible5: false,
+      state_name: "",
       form: {
         remarks: "",
-        logistics_number: "",card:""
+        logistics_number: "",
+        card: ""
       },
       remarks: "",
       formLabelWidth: "120px",
@@ -246,6 +257,9 @@ export default {
     this.getData();
   },
   methods: {
+    goBack() {
+      this.$router.go(-1);
+    },
     // 取消订单
     cancel() {
       this.$confirm("确认取消吗", "提示", {
@@ -279,33 +293,33 @@ export default {
       this.dialogFormVisible = true;
     },
     send2(e) {
-      this.logisticsType=e
-wuliu({}).then(res=>{
-if(res){
-this.dialogFormVisible2 = true;
-this.cards=res
-}else{
-  this.$message.error(res.msg)
-}
-})
-
-
+      this.logisticsType = e;
+      wuliu({}).then(res => {
+        if (res) {
+          this.dialogFormVisible2 = true;
+          this.cards = res;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
     },
     send4() {
       this.dialogFormVisible4 = true;
     },
     logistics() {
-      
       this.dialogFormVisible3 = true;
-      logistics({ code:this.data.logistics_number,type:this.data.logistics_card,from:1,id:this.data.id }).then(res => {
-
-if(res.code==200){
-this.activities=res.data.data
- this.state_name = res.data.State_name;
-}else{
-  this.$message.error(res.msg)
-}
-
+      logistics({
+        code: this.data.logistics_number,
+        type: this.data.logistics_card,
+        from: 1,
+        id: this.data.id
+      }).then(res => {
+        if (res.code == 200) {
+          this.activities = res.data.data;
+          this.state_name = res.data.State_name;
+        } else {
+          this.$message.error(res.msg);
+        }
       });
     },
     over() {
@@ -333,7 +347,7 @@ this.activities=res.data.data
         });
     },
     okSend4() {
-      this.$confirm("确认?", "提示", {
+      this.$confirm("确认以上信息?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -385,36 +399,43 @@ this.activities=res.data.data
         });
     },
     okSend2() {
-       if(this.logisticsType==0){
- order_logistics_status({
-        order_id: this.$route.query.id,
-        logistics_number: this.form.logistics_number,
-        remarks: this.form.remarks,
-        card:this.form.card
-      }).then(res => {
-        if (res.code == 200) {
-          this.getData();
-          this.dialogFormVisible2 = false;
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
-       }else{
-          order_back_logistics({
-        order_id: this.$route.query.id,
-        logistics_number: this.form.logistics_number,
-        msg: this.form.remarks,
-        logistics_company:this.form.card
-      }).then(res => {
-        if (res.code == 200) {
-          this.getData();
-          this.dialogFormVisible2 = false;
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
-       }
-     
+      this.$confirm("确认?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          if (this.logisticsType == 0) {
+            order_logistics_status({
+              order_id: this.$route.query.id,
+              logistics_number: this.form.logistics_number,
+              remarks: this.form.remarks,
+              card: this.form.card
+            }).then(res => {
+              if (res.code == 200) {
+                this.getData();
+                this.dialogFormVisible2 = false;
+              } else {
+                this.$message.error(res.msg);
+              }
+            });
+          } else {
+            order_back_logistics({
+              order_id: this.$route.query.id,
+              logistics_number: this.form.logistics_number,
+              msg: this.form.remarks,
+              logistics_company: this.form.card
+            }).then(res => {
+              if (res.code == 200) {
+                this.getData();
+                this.dialogFormVisible2 = false;
+              } else {
+                this.$message.error(res.msg);
+              }
+            });
+          }
+        })
+        .catch(() => {});
     },
     getData() {
       order_look({ id: this.$route.query.id }).then(res => {

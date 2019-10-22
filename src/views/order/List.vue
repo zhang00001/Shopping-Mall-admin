@@ -102,17 +102,21 @@
             <template v-if="scope.row.total_status==11">买家取消</template>
             <template v-if="scope.row.total_status==12">卖家取消</template>
             <template v-if="scope.row.total_status==13">退货申请被驳回</template>
+            <template v-if="scope.row.total_status==15">
+              <span style="color: #f42525;">待支付</span>
+            </template>
           </template>
         </el-table-column>
         <!-- <el-table-column prop="msg" label="审核状态"></el-table-column> -->
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button @click="edit(scope.row)" type="text" size="small">查看</el-button>
+            <el-button v-if="radio1=='5'" @click="trans(scope.row)" type="text" size="small">预约</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="block">
-        <el-select v-model="value" :disabled="isDisable" placeholder="批量操作">
+        <!-- <el-select v-model="value" :disabled="isDisable" placeholder="批量操作">
           <el-option
             v-for="item in options"
             :key="item.value"
@@ -125,7 +129,7 @@
           type="primary"
           @click="delAll"
           :disabled="isDisable"
-        >确定</el-button>
+        >确定</el-button>-->
         <el-pagination
           layout="prev, pager, next"
           :total="total"
@@ -155,11 +159,20 @@
 
 <script>
 import http from "@/utils/request";
-import { order_more } from "@/api/index";
+import {
+  order_more,
+  subscribedata_start,
+  finish_order,
+  finished_order
+} from "@/api/index";
+
 import axios from "axios";
 export default {
   data() {
-    return {time:"",searchname:"",mobile:"",
+    return {
+      time: "",
+      searchname: "",
+      mobile: "",
       options: [
         {
           value: "0",
@@ -178,10 +191,14 @@ export default {
       orderType: [
         { value: "0", label: "全部订单" },
         { value: "1", label: "待审核" },
+
         { value: "2", label: "待发货" },
-        { value: "3", label: "待收货" },
+        { value: "3", label: "已发货" },
         { value: "4", label: "待支付" },
-        { value: "5", label: "退货" }
+
+        { value: "5", label: "退货/售后" },
+        { value: "6", label: "即将过期" },
+        { value: "7", label: "已过期" }
       ],
       isDisable: true,
       multipleSelection: [],
@@ -230,42 +247,32 @@ export default {
     }
   },
   created() {
-    if (this.$route.query.map) {
-      let routerMsg = JSON.parse(this.$route.query.map);
-      switch (routerMsg.msg) {
-        case "全部":
-          this.radio1 = 0;
-          break;
-        case "待审核":
-          this.radio1 = 1;
-          break;
-        case "待发货":
-          this.radio1 = 2;
-          break;
-        case "待收货":
-          this.radio1 = 3;
-          break;
-        case "待支付":
-          this.radio1 = 4;
-          break;
-        case "退货":
-          this.radio1 = 5;
-          break;
-        default:
-          this.radio1 = 0;
-      }
-
-      this.map = routerMsg.map;
+    if (this.$route.query.status) {
+      this.radio1 = this.$route.query.status.toString();
     } else {
       this.radio1 = "0";
-     
     }
     this.getList(1);
   },
   methods: {
-    changeRadio() {
-      this.getList(1)
+    trans(e) {
+      subscribedata_start({ id: e.id }).then(res => {
+        this.$message.success(res.msg);
+      });
     },
+    changeRadio() {
+      switch (this.radio1) {
+        case "6":
+          this.getList2(1);
+          break;
+        case "7":
+          this.getList3(1);
+          break;
+        default:
+          this.getList(1);
+      }
+    },
+
     handleCurrentChange(e) {
       this.getList(e);
     },
@@ -337,7 +344,7 @@ export default {
           .post(url, data)
           .then(res => {
             if (res.code == 200) {
-              this.getList(  1,  );
+              this.getList(1);
             } else {
               this.$message.error(res.msg);
             }
@@ -356,7 +363,7 @@ export default {
           http.post("admin/goods/goods_del", { id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.getList(1,);
+              this.getList(1);
             } else {
               this.$message.error(res.msg);
             }
@@ -366,23 +373,73 @@ export default {
     },
 
     // 加载列表
+
     getList(page) {
-      
-      let time1
-      if(this.time==''||this.time==null){
-    time1=""
-      }else{
-            time1=new Date(this.time).toISOString().split("T")[0]
+      let time1;
+      if (this.time == "" || this.time == null) {
+        time1 = "";
+      } else {
+        time1 = new Date(this.time).toISOString().split("T")[0];
       }
-    
+
       order_more({
         page: page,
         limit: 10,
         search: this.searchname,
-        mobile:this.mobile,
-        time:time1,
+        mobile: this.mobile,
+        time: time1,
         type: 1,
-        index:this.radio1
+        index: this.radio1
+      }).then(res => {
+        if (res.code == 200) {
+          this.tableData = res.data.data;
+
+          this.total = res.data.count;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    getList3(page) {
+      let time1;
+      if (this.time == "" || this.time == null) {
+        time1 = "";
+      } else {
+        time1 = new Date(this.time).toISOString().split("T")[0];
+      }
+
+      finished_order({
+        page: page,
+        limit: 10,
+        search: this.searchname,
+        mobile: this.mobile,
+        time: time1
+      }).then(res => {
+        if (res.code == 200) {
+          this.tableData = res.data.data;
+
+          this.total = res.data.count;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    getList2(page) {
+      let time1;
+      if (this.time == "" || this.time == null) {
+        time1 = "";
+      } else {
+        time1 = new Date(this.time).toISOString().split("T")[0];
+      }
+
+      finish_order({
+        page: page,
+        limit: 10,
+        search: this.searchname,
+        mobile: this.mobile,
+        time: time1,
+        type: 1,
+        index: this.radio1
       }).then(res => {
         if (res.code == 200) {
           this.tableData = res.data.data;

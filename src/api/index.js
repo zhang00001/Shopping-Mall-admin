@@ -45,6 +45,7 @@ export const batch_del = data => http.post('/admin/goods/batch_del', data); // �
 export const order_logistics_status = data => http.post('/admin/order/order_logistics_status', data); //订单(点击发货)
 export const order_set = data => http.post('/admin/order/order_set', data); //订单设置
 export const order_more = data => http.post('/admin/order/order_more', data); //订单(列表)
+export const finish_order = data => http.post('/admin/order/finish_order', data); //试衣间快过期订单
 export const order_look = data => http.post('/admin/order/order_look', data); //订单(查看订单)
 export const order_confim = data => http.post('/admin/order/order_confim', data); //订单(试衣间订单审核)
 export const back_confirm = data => http.post('admin/order/back_confirm', data); //订单(退货审核)
@@ -59,7 +60,11 @@ export const order_vip_one = data => http.post('/admin/order/order_vip_one', dat
 export const order_vip_logistics = data => http.post('/admin/order/order_vip_logistics', data); //订单(vip发货)
 
 export const order_back_logistics = data => http.post('/admin/order/order_back_logistics', data); //试衣间订单(填写退货物流)
+export const finished_order = data => http.post('/admin/order/finished_order', data); //已结束
 
+export const subscribedata_start = data => http.post('/admin/order/subscribedata_start', data); //试衣间退款预约
+
+export const order_look_list = data => http.post('/admin/order/order_look_list', data); //商品
 
 
 
@@ -92,6 +97,10 @@ export const user_money_right = data => http.post('/admin/user/user_money_right'
 export const user_address = data => http.post('/admin/user/user_address', data); //会员(地址数据)
 export const user_order = data => http.post('/admin/user/user_order', data); //会员(订单列表)
 
+export const friend_list = data => http.post('/admin/user/friend_list', data); //好友明细
+export const Updateremarks = data => http.post('/admin/user/remarks', data); //好友明细
+
+export const charge_money_huokuan_use = data => http.post('/admin/user/charge_money_huokuan_use', data); //充值
 
 
 

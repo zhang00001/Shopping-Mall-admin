@@ -1,7 +1,6 @@
 <template>
   <div class="bg">
     <div class="con">
-   
       <div class="card">
         <el-form
           autocomplete="on"
@@ -12,7 +11,7 @@
           label-width="80px"
         >
           <div style="text-align: center;    margin-bottom: 10%;">
-           <p>试衣盒子后台管理</p>
+            <p>试衣盒子后台管理</p>
           </div>
 
           <el-form-item prop="username" label="用户名">
@@ -35,7 +34,6 @@
             ></el-input>
           </el-form-item>
 
-       
           <el-form-item style="margin-bottom: 60px">
             <el-button
               type="primary"
@@ -47,16 +45,12 @@
         </el-form>
       </div>
     </div>
-     
   </div>
 </template>
 
 <script>
 import { isvalidUsername } from "@/utils/validate";
- 
- 
 
- 
 import http from "@/utils/request";
 import { mapGetters } from "vuex";
 export default {
@@ -76,39 +70,30 @@ export default {
         callback();
       }
     };
-  
+
     return {
       routers: [],
       name: "",
       btn: [],
- 
+
       loginForm: {
         username: "",
-        password: "",
-       
+        password: ""
       },
       loginRules: {
         username: [
           { required: true, trigger: "blur", validator: validateUsername }
         ],
-        password: [
-          { required: true, trigger: "blur", validator: validatePass }
-        ],
-       
+        password: [{ required: true, trigger: "blur", validator: validatePass }]
       },
       loading: false,
       pwdType: "password",
-     
 
       dialogVisible: false
     };
   },
-  mounted() {
-    
-  },
+  mounted() {},
   methods: {
-    
-     
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
@@ -120,15 +105,13 @@ export default {
               password: this.loginForm.password
             })
             .then(res => {
-              
               if (res.code == "200") {
-               
                 sessionStorage.token = res.data.token;
-                sessionStorage.username=this.loginForm.username
+                sessionStorage.username = this.loginForm.username;
+                sessionStorage.setItem("power", res.data.power);
                 this.loading = false;
-                 
-                  this.$router.push({ path: "/home" });
-                 
+
+                this.$router.push({ path: "/home" });
               } else {
                 this.loading = false;
                 this.$message.error(res.msg);
@@ -138,16 +121,12 @@ export default {
           return false;
         }
       });
-    },
-
-    
+    }
   }
 };
 </script>
 
 <style scoped  rel="stylesheet/scss" lang="scss" >
- 
-
 .card {
   /* padding: 240px; */
   width: 47vw;
@@ -162,7 +141,7 @@ export default {
 .login-title {
   text-align: center;
 }
- 
+
 .con {
   display: flex;
   justify-content: start;
@@ -171,7 +150,7 @@ export default {
 
   margin: 0;
 }
- 
+
 .bg {
   width: 100%;
   height: 100vh;
@@ -183,10 +162,10 @@ export default {
 }
 .login {
   width: 22vw;
-  
+
   background: $defulColor;
   font-size: 20px;
-   
+
   border: none;
 }
 </style>

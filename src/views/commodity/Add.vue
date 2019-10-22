@@ -1,420 +1,438 @@
 <template>
-  <div
-    class="con"
-    v-loading="loading"
-    element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading"
-  >
-    <el-steps :active="active" style="margin-buttom:20px">
-      <el-step v-if="isEdit" title="编辑商品信息" icon="el-icon-edit"></el-step>
-      <el-step v-else title="填写商品信息" icon="el-icon-edit"></el-step>
-      <el-step title="属性规格与图片" icon="el-icon-upload"></el-step>
-      <el-step title="选择关联商品" icon="el-icon-picture"></el-step>
-    </el-steps>
-    <el-form
-      :model="ruleForm"
-      :rules="rules"
-      ref="ruleForm"
-      label-width="auto"
-      class="demo-ruleForm inputForm"
+  <div>
+    <div
+      class="con"
+      v-loading="loading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
     >
-      <template v-if="active==1">
-        <div>
-          <el-row :gutter="24">
-            <el-col :span="2">基本信息</el-col>
-            <el-col :span="22">
-              <el-col :span="12">
-                <el-form-item label="商品分类" prop="classify_id">
-                  <el-col :span="8">
-                    <el-select
-                      v-model="ruleForm.classify_id"
-                      placeholder="一级分类"
-                      @change="loadClassTwo"
-                    >
+      <el-steps :active="active" style="margin-buttom:20px">
+        <el-step v-if="isEdit" title="编辑商品信息" icon="el-icon-edit"></el-step>
+        <el-step v-else title="填写商品信息" icon="el-icon-edit"></el-step>
+        <el-step title="属性规格与图片" icon="el-icon-upload"></el-step>
+        <el-step title="选择关联商品" icon="el-icon-picture"></el-step>
+      </el-steps>
+      <el-form
+        :model="ruleForm"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="auto"
+        class="demo-ruleForm inputForm"
+      >
+        <template v-if="active==1">
+          <div>
+            <el-row :gutter="24">
+              <el-col :span="2">基本信息</el-col>
+              <el-col :span="22">
+                <el-col :span="12">
+                  <el-form-item label="商品分类" prop="classify_id">
+                    <el-col :span="8">
+                      <el-select
+                        v-model="ruleForm.classify_id"
+                        placeholder="一级分类"
+                        @change="loadClassTwo"
+                      >
+                        <el-option
+                          :key="item.id"
+                          :label="item.name"
+                          :value="item.id"
+                          v-for="item in classOnes"
+                        ></el-option>
+                      </el-select>
+                    </el-col>
+                    <el-col class="line" :span="1">-</el-col>
+                    <el-col :span="8">
+                      <el-select v-model="ruleForm.classify_id_two" placeholder="二级分类">
+                        <el-option
+                          :key="item.id"
+                          :label="item.name"
+                          :value="item.id"
+                          v-for="item in classTwos"
+                        ></el-option>
+                      </el-select>
+                    </el-col>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="商品品牌" prop="brand_id">
+                    <el-select v-model="ruleForm.brand_id" placeholder="请选择品牌">
                       <el-option
                         :key="item.id"
-                        :label="item.name"
+                        :label="item.title"
                         :value="item.id"
-                        v-for="item in classOnes"
+                        v-for="item in brands"
                       ></el-option>
                     </el-select>
-                  </el-col>
-                  <el-col class="line" :span="1">-</el-col>
-                  <el-col :span="8">
-                    <el-select v-model="ruleForm.classify_id_two" placeholder="二级分类">
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item label="商品类型" prop="type">
+                    <el-radio v-model="ruleForm.type" label="1">试衣间商品</el-radio>
+                    <el-radio v-model="ruleForm.type" label="2">品牌商品</el-radio>
+                    <el-radio v-model="ruleForm.type" label="3">积分商品</el-radio>
+                    <!-- <el-radio v-model="ruleForm.type" label="4">特价商品</el-radio> -->
+                  </el-form-item>
+                </el-col>
+
+                <el-col :span="12">
+                  <el-form-item label="供货商家" prop="supplier_id">
+                    <el-select v-model="ruleForm.supplier_id" placeholder="请选择供货商">
                       <el-option
                         :key="item.id"
-                        :label="item.name"
+                        :label="item.supplier"
                         :value="item.id"
-                        v-for="item in classTwos"
+                        v-for="item in suppliers"
                       ></el-option>
                     </el-select>
-                  </el-col>
-                </el-form-item>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="商品名称" prop="title">
+                    <el-input v-model="ruleForm.title"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="22">
+                  <el-form-item label="商品简介" prop="synopsis">
+                    <el-input
+                      type="textarea"
+                      v-model="ruleForm.synopsis"
+                      :rows="2"
+                      style=" width: 98%;"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
               </el-col>
-              <el-col :span="12">
-                <el-form-item label="商品品牌" prop="brand_id">
-                  <el-select v-model="ruleForm.brand_id" placeholder="请选择品牌">
-                    <el-option
-                      :key="item.id"
-                      :label="item.title"
-                      :value="item.id"
-                      v-for="item in brands"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="24">
-                <el-form-item label="商品类型" prop="type">
-                  <el-radio v-model="ruleForm.type" label="1">试衣间商品</el-radio>
-                  <el-radio v-model="ruleForm.type" label="2">品牌商品</el-radio>
-                  <el-radio v-model="ruleForm.type" label="3">积分商品</el-radio>
-                  <!-- <el-radio v-model="ruleForm.type" label="4">特价商品</el-radio> -->
-                </el-form-item>
-              </el-col>
+            </el-row>
 
-              <el-col :span="12">
-                <el-form-item label="供货商家" prop="supplier_id">
-                  <el-select v-model="ruleForm.supplier_id" placeholder="请选择供货商">
-                    <el-option
-                      :key="item.id"
-                      :label="item.supplier"
-                      :value="item.id"
-                      v-for="item in suppliers"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="商品名称" prop="title">
-                  <el-input v-model="ruleForm.title"></el-input>
-                </el-form-item>
-              </el-col>
+            <el-row :gutter="24" style="margin-top:20px;">
+              <el-col :span="2">其他信息</el-col>
               <el-col :span="22">
-                <el-form-item label="商品简介" prop="synopsis">
-                  <el-input type="textarea" v-model="ruleForm.synopsis" :rows="2" style=" width: 98%;"></el-input>
-                </el-form-item>
+                <el-col :span="12">
+                  <el-form-item label="商品货号" prop="number">
+                    <el-input v-model="ruleForm.number"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="商品ID" prop="number">
+                    <el-input v-model="ruleForm.goods_id"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12"></el-col>
+                <el-col :span="12">
+                  <el-form-item label="初始销量" prop="sales_volume">
+                    <el-input v-model.number="ruleForm.sales_volume"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="仓库" prop="warehouse_id">
+                    <el-select v-model="ruleForm.warehouse_id" placeholder="选择仓库">
+                      <el-option
+                        :key="item.id"
+                        :label="item.title"
+                        :value="item.id"
+                        v-for="item in warehouses"
+                      ></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="赠送积分" prop="integral">
+                    <el-input v-model.number="ruleForm.integral"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="兑换积分" prop="exchange_integral">
+                    <el-input v-model.number="ruleForm.exchange_integral"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="22">
+                  <el-form-item label="生产周期（天）" prop="production_cycle">
+                    <el-col :span="11">
+                      <el-input v-model="ruleForm.production_cycle"></el-input>
+                    </el-col>
+                    <el-col :span="11">
+                      <el-checkbox v-model="ruleForm.production_cycle_status">启用</el-checkbox>
+                    </el-col>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="22">
+                  <el-form-item label="运费（元）" prop="freight">
+                    <el-col :span="11">
+                      <el-input v-model.number="ruleForm.freight"></el-input>
+                    </el-col>
+                    <el-col :span="11">
+                      <el-checkbox v-model="ruleForm.freight_status">启用</el-checkbox>
+                    </el-col>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="22">
+                  <el-form-item label="商品限购（件）" prop="limit_buy">
+                    <el-col :span="11">
+                      <el-input v-model.number="ruleForm.limit_buy"></el-input>
+                    </el-col>
+                    <el-col :span="11">
+                      <el-checkbox v-model="ruleForm.limit_buy_status">启用（同一用户同一订单限购数量）</el-checkbox>
+                      <p></p>
+                    </el-col>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="是否支持会员价" prop="vip_buy_status">
+                    <el-switch v-model="ruleForm.vip_buy_status"></el-switch>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="上架" prop="shelf">
+                    <el-switch v-model="ruleForm.shelf"></el-switch>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="启用商品评价" prop="evaluate_status">
+                    <el-switch v-model="ruleForm.evaluate_status"></el-switch>
+                  </el-form-item>
+                </el-col>
               </el-col>
-            </el-col>
-          </el-row>
+            </el-row>
+          </div>
+        </template>
+        <template v-if="active==2">
+          <div>
+            <el-row :gutter="24">
+              <el-col :span="2">属性规格</el-col>
+              <el-col :span="22">
+                <el-col :span="24">
+                  <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                      <span>商品规格</span>
+                    </div>
+                    <el-col :span="20">
+                      <el-row :gutter="24">
+                        <el-col :span="2">尺码：</el-col>
+                        <el-col :span="12">
+                          <el-checkbox-group v-model="checkedSizes">
+                            <template v-for="(item,index) in sizes">
+                              <el-checkbox :label="item" :key="item.id" style="margin-bottom:15px;"></el-checkbox>
+                              <br v-if="index==8||index==20" :key="item.id" />
+                            </template>
+                          </el-checkbox-group>
+                        </el-col>
+                        <el-col :span="10">
+                          <el-input v-model="sizeInput" placeholder="请输入尺码" style="width:150px"></el-input>
+                          <el-button type="primary" @click="addSize">添加</el-button>
+                        </el-col>
+                      </el-row>
+                      <el-row :gutter="24" style="margin-bottom:20px;">
+                        <el-col :span="2">颜色：</el-col>
+                        <el-col :span="12">
+                          <el-checkbox-group v-model="checkedColors">
+                            <el-checkbox
+                              v-for="item in colors"
+                              :label="item"
+                              :key="item.id"
+                              style="margin-bottom:15px;"
+                            >{{item}}</el-checkbox>
+                          </el-checkbox-group>
+                        </el-col>
+                        <el-col :span="10">
+                          <el-input v-model="colorInput" placeholder="请输入颜色" style="width:150px"></el-input>
+                          <el-button type="primary" @click="addColor">添加</el-button>
+                        </el-col>
+                      </el-row>
+                    </el-col>
+                    <el-col :span="1">
+                      <el-button type="primary" @click="add">添加商品</el-button>
+                    </el-col>
+                  </el-card>
+                </el-col>
+                <el-col :span="24" style="margin:20px 0;">
+                  <el-col :span="3" style="margin-top:10px;">批量输入价格：</el-col>
+                  <el-col :span="4">
+                    <el-input v-model="buyPrice" placeholder="进货价" min="0"></el-input>
+                  </el-col>
+                  <el-col :span="4">
+                    <el-input v-model="vipPrice" placeholder="Vip价" min="0"></el-input>
+                  </el-col>
+                  <el-col :span="4">
+                    <el-input v-model="salePrice" placeholder="销售价格" min="0"></el-input>
+                  </el-col>
+                  <el-col :span="4">
+                    <el-button type="primary" @click="okMoney">确认价格</el-button>
+                  </el-col>
+                </el-col>
 
-          <el-row :gutter="24" style="margin-top:20px;">
-            <el-col :span="2">其他信息</el-col>
-            <el-col :span="22">
-              <el-col :span="12">
-                <el-form-item label="商品货号" prop="number">
-                  <el-input v-model="ruleForm.number"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="商品ID" prop="number">
-                  <el-input v-model="ruleForm.goods_id"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12"></el-col>
-              <el-col :span="12">
-                <el-form-item label="初始销量" prop="sales_volume">
-                  <el-input v-model.number="ruleForm.sales_volume"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="仓库" prop="warehouse_id">
-                  <el-select v-model="ruleForm.warehouse_id" placeholder="选择仓库">
-                    <el-option
-                      :key="item.id"
-                      :label="item.title"
-                      :value="item.id"
-                      v-for="item in warehouses"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="赠送积分" prop="integral">
-                  <el-input v-model.number="ruleForm.integral"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
-                <el-form-item label="兑换积分" prop="exchange_integral">
-                  <el-input v-model.number="ruleForm.exchange_integral"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="22">
-                <el-form-item label="生产周期（天）" prop="production_cycle">
-                  <el-col :span="11">
-                    <el-input v-model="ruleForm.production_cycle"></el-input>
-                  </el-col>
-                  <el-col :span="11">
-                    <el-checkbox v-model="ruleForm.production_cycle_status">启用</el-checkbox>
-                  </el-col>
-                </el-form-item>
-              </el-col>
-              <el-col :span="22">
-                <el-form-item label="运费（元）" prop="freight">
-                  <el-col :span="11">
-                    <el-input v-model.number="ruleForm.freight"></el-input>
-                  </el-col>
-                  <el-col :span="11">
-                    <el-checkbox v-model="ruleForm.freight_status">启用</el-checkbox>
-                  </el-col>
-                </el-form-item>
-              </el-col>
-              <el-col :span="22">
-                <el-form-item label="商品限购（件）" prop="limit_buy">
-                  <el-col :span="11">
-                    <el-input v-model.number="ruleForm.limit_buy"></el-input>
-                  </el-col>
-                  <el-col :span="11">
-                    <el-checkbox v-model="ruleForm.limit_buy_status">启用（同一用户同一订单限购数量）</el-checkbox>
-                    <p></p>
-                  </el-col>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="是否支持会员价" prop="vip_buy_status">
-                  <el-switch v-model="ruleForm.vip_buy_status"></el-switch>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="上架" prop="shelf">
-                  <el-switch v-model="ruleForm.shelf"></el-switch>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="启用商品评价" prop="evaluate_status">
-                  <el-switch v-model="ruleForm.evaluate_status"></el-switch>
-                </el-form-item>
-              </el-col>
-            </el-col>
-          </el-row>
-        </div>
-      </template>
-      <template v-if="active==2">
-        <div>
-          <el-row :gutter="24">
-            <el-col :span="2">属性规格</el-col>
-            <el-col :span="22">
-              <el-col :span="24">
-                <el-card class="box-card">
-                  <div slot="header" class="clearfix">
-                    <span>商品规格</span>
-                  </div>
-                  <el-col :span="20">
-                    <el-row :gutter="24">
-                      <el-col :span="2">尺码：</el-col>
-                      <el-col :span="12">
-                        <el-checkbox-group v-model="checkedSizes">
-                          <template v-for="(item,index) in sizes"   >
-                            <el-checkbox :label="item"  :key="item.id"  style="margin-bottom:15px;"></el-checkbox>
-                            <br v-if="index==8||index==20"    :key="item.id" />
-                          </template>
-                        </el-checkbox-group>
-                      </el-col>
-                      <el-col :span="10">
-                        <el-input v-model="sizeInput" placeholder="请输入尺码" style="width:150px"></el-input>
-                        <el-button type="primary" @click="addSize">添加</el-button>
-                      </el-col>
-                    </el-row>
-                    <el-row :gutter="24" style="margin-bottom:20px;">
-                      <el-col :span="2">颜色：</el-col>
-                      <el-col :span="12">
-                        <el-checkbox-group v-model="checkedColors">
-                          <el-checkbox
-                            v-for="item in colors"
-                            :label="item"
-                            :key="item.id"
-                            style="margin-bottom:15px;"
-                          >{{item}}</el-checkbox>
-                        </el-checkbox-group>
-                      </el-col>
-                      <el-col :span="10">
-                        <el-input v-model="colorInput" placeholder="请输入颜色" style="width:150px"></el-input>
-                        <el-button type="primary" @click="addColor">添加</el-button>
-                      </el-col>
-                    </el-row>
-                  </el-col>
-                  <el-col :span="1">
-                    <el-button type="primary" @click="add">添加商品</el-button>
-                  </el-col>
-                </el-card>
-              </el-col>
-              <el-col :span="24" style="margin:20px 0;">
-                <el-col :span="3" style="margin-top:10px;">批量输入价格：</el-col>
-                <el-col :span="4">
-                  <el-input v-model="buyPrice" placeholder="进货价" min="0"></el-input>
-                </el-col>
-                <el-col :span="4">
-                  <el-input v-model="vipPrice" placeholder="Vip价" min="0"></el-input>
-                </el-col>
-                <el-col :span="4">
-                  <el-input v-model="salePrice" placeholder="销售价格" min="0"></el-input>
-                </el-col>
-                <el-col :span="4">
-                  <el-button type="primary" @click="okMoney">确认价格</el-button>
-                </el-col>
-              </el-col>
-
-              <el-col :span="24">
-                <el-table :data="tableData" style="width: 100%" border highlight-current-row>
+                <el-col :span="24">
+                  <el-table :data="tableData" style="width: 100%" border highlight-current-row>
                     <!-- <el-table-column label="id" prop="id" v-if='false'></el-table-column> -->
-                  <el-table-column label="尺码" prop="size"></el-table-column>
-                  <el-table-column label="颜色" prop="color"></el-table-column>
-                  <el-table-column label="进货价">
-                    <template slot-scope="scope">
-                      <el-input v-model="scope.row.join_money" placeholder="进货价" min="0"></el-input>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column label="vip价">
-                    <template slot-scope="scope">
-                      <el-input
-                        v-model="scope.row.vip_money"
-                        type="number"
-                        placeholder="vip价"
-                        min="0"
-                      ></el-input>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="销售价格" prop="money">
-                    <template slot-scope="scope">
-                      <el-input
-                        v-model="scope.row.money"
-                        type="number"
-                        placeholder="销售价格"
-                        min="0"
-                        @blur="checkMoney(scope.row,scope)"
-                      ></el-input>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="商品库存">
-                    <template slot-scope="scope">
-                      <el-input v-model="scope.row.stock" type="number" placeholder="商品库存" min="0"></el-input>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="SKU编号">
-                    <template slot-scope="scope">
-                      <el-input
-                        v-model="scope.row.sku"
-                        placeholder="SKU编号"
-                        @blur="changeCode(scope.row,scope)"
-                      ></el-input>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="商品图片" prop="name" width="150px;">
-                    <template slot-scope="scope">
-                      <template v-if="scope.row.img==''">
-                        <el-upload
-                          class="avatar-uploader"
-                          :http-request="uploadFile"
-                          action
-                          :show-file-list="false"
-                        >
-                          <el-button @click="test(scope.row)">点击上传</el-button>
-                        </el-upload>
+                    <el-table-column label="尺码" prop="size"></el-table-column>
+                    <el-table-column label="颜色" prop="color"></el-table-column>
+                    <el-table-column label="进货价">
+                      <template slot-scope="scope">
+                        <el-input v-model="scope.row.join_money" placeholder="进货价" min="0"></el-input>
                       </template>
+                    </el-table-column>
 
-                      <template v-else>
-                        <img :src="scope.row.img" alt style="width:30px;height:30px;" />
-                        <i class="el-icon-delete" @click="delImg(scope.row)"></i>
+                    <el-table-column label="vip价">
+                      <template slot-scope="scope">
+                        <el-input
+                          v-model="scope.row.vip_money"
+                          type="number"
+                          placeholder="vip价"
+                          min="0"
+                        ></el-input>
                       </template>
-                    </template>
-                  </el-table-column>
+                    </el-table-column>
+                    <el-table-column label="销售价格" prop="money">
+                      <template slot-scope="scope">
+                        <el-input
+                          v-model="scope.row.money"
+                          type="number"
+                          placeholder="销售价格"
+                          min="0"
+                          @blur="checkMoney(scope.row,scope)"
+                        ></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="商品库存">
+                      <template slot-scope="scope">
+                        <el-input
+                          v-model="scope.row.stock"
+                          type="number"
+                          placeholder="商品库存"
+                          min="0"
+                        ></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="SKU编号">
+                      <template slot-scope="scope">
+                        <el-input
+                          v-model="scope.row.sku"
+                          placeholder="SKU编号"
+                          @blur="changeCode(scope.row,scope)"
+                        ></el-input>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="商品图片" prop="name" width="150px;">
+                      <template slot-scope="scope">
+                        <template v-if="scope.row.img==''">
+                          <el-upload
+                            class="avatar-uploader"
+                            :http-request="uploadFile"
+                            action
+                            :show-file-list="false"
+                          >
+                            <el-button @click="test(scope.row)">点击上传</el-button>
+                          </el-upload>
+                        </template>
 
-                  <!-- <el-table-column label="商品默认选择"  width="180px;">
+                        <template v-else>
+                          <img :src="scope.row.img" alt style="width:30px;height:30px;" />
+                          <i class="el-icon-delete" @click="delImg(scope.row)"></i>
+                        </template>
+                      </template>
+                    </el-table-column>
+
+                    <!-- <el-table-column label="商品默认选择"  width="180px;">
                     <template slot-scope="scope">
                       <el-checkbox v-model="scope.row.selected" @change="changeSelect(scope.row)">是</el-checkbox>
                     </template>
-                  </el-table-column> -->
+                    </el-table-column>-->
 
-                  <el-table-column align="right" label="操作">
-                    <template slot-scope="scope">
-                      <el-button
-                        size="mini"
-                        type="danger"
-                        @click="delTableData(scope.$index, scope.row)"
-                      >删除</el-button>
-                    </template>
-                  </el-table-column>
-                </el-table>
+                    <el-table-column align="right" label="操作">
+                      <template slot-scope="scope">
+                        <el-button
+                          size="mini"
+                          type="danger"
+                          @click="delTableData(scope.$index, scope.row)"
+                        >删除</el-button>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </el-col>
               </el-col>
-            </el-col>
-          </el-row>
-          <el-row :gutter="24" style="margin-top:20px;">
-            <el-col :span="2">商品图片</el-col>
-            <el-col :span="22" style="display:flex;">
-              <div class="block" style="display:flex;" v-if="showFile">
-                <template v-for="(item,index) in fileList" >
-                  <div style="height:250px; margin-right:20px; " v-if="index<=5"    :key="item.id">
-                    <div>
-                      <el-image
-                        :src="item"
-                        fit="cover"
-                        style="width:200px;height:200px;  border-radius:15px; "
-                      ></el-image>
-                    </div>
+            </el-row>
+            <el-row :gutter="24" style="margin-top:20px;">
+              <el-col :span="2">商品图片</el-col>
+              <el-col :span="22" style="display:flex;">
+                <div class="block" style="display:flex;" v-if="showFile">
+                  <template v-for="(item,index) in fileList">
+                    <div style="height:250px; margin-right:20px; " v-if="index<=5" :key="item.id">
+                      <div>
+                        <el-image
+                          :src="item"
+                          fit="cover"
+                          style="width:200px;height:200px;  border-radius:15px; "
+                        ></el-image>
+                      </div>
 
-                    <div style="margin-top:15px;">
-                      <el-button style="padding: 10px;" v-if="index==0">商品主图</el-button>
-                      <el-button style="padding: 10px;" v-else @click="setImg(item,index)">设为主图</el-button>
-                      <el-button style="padding: 10px;" @click="delProductImg(item,index)">删除图片</el-button>
+                      <div style="margin-top:15px;">
+                        <el-button style="padding: 10px;" v-if="index==0">商品主图</el-button>
+                        <el-button style="padding: 10px;" v-else @click="setImg(item,index)">设为主图</el-button>
+                        <el-button style="padding: 10px;" @click="delProductImg(item,index)">删除图片</el-button>
+                      </div>
                     </div>
-                  </div>
+                  </template>
+                </div>
+                <template v-if="fileList.length<5">
+                  <el-upload
+                    class="avatar-uploader"
+                    :http-request="uploadFile2"
+                    action
+                    multiple
+                    :show-file-list="false"
+                    :file-list="fileLists"
+                  >
+                    <i class="el-icon-plus avatar-uploader-icon"></i>
+                  </el-upload>
                 </template>
-              </div>
-              <template v-if="fileList.length<5">
-                <el-upload
-                  class="avatar-uploader"
-                  :http-request="uploadFile2"
-                  action
-                  multiple
-                  :show-file-list="false"
-                  :file-list="fileLists"
-                >
-                  <i class="el-icon-plus avatar-uploader-icon"></i>
-                </el-upload>
-              </template>
-            </el-col>
-          </el-row>
+              </el-col>
+            </el-row>
 
-          <el-row :gutter="24" style="margin-top:20px;">
-            <el-col :span="2">商品详情</el-col>
-            <el-col :span="22">
-              <Editor ref='editor' :content='data'></Editor>
-            </el-col>
-          </el-row>
-        </div>
-      </template>
-      <template v-if="active==3">
-        <div>
-          <el-row :gutter="24">
-            <el-col :span="2">关联商品</el-col>
-            <el-col :span="22">
-              <AddGoods :Id="addId" :status="'Add'" ref="headerChild"></AddGoods>
-            </el-col>
-          </el-row>
-        </div>
-      </template>
-
-      <el-form-item>
-      <el-button type="primary" v-if="active==1" @click="next">下一步,填写规格并上传图片</el-button>
-        <template v-if="active==2">
-          <el-button type="primary" @click="active=1">上一步,填写商品信息</el-button>
-          <el-button type="primary" @click="next2">下一步,选择关联商品</el-button>
+            <el-row :gutter="24" style="margin-top:20px;">
+              <el-col :span="2">商品详情</el-col>
+              <el-col :span="22">
+                <Editor ref="editor" :content="data"></Editor>
+              </el-col>
+            </el-row>
+          </div>
         </template>
         <template v-if="active==3">
-          <el-button type="primary" @click="active=2">上一步,填写规格并上传图片</el-button>
-          <el-button type="primary" @click="next3">完成提交商品</el-button>
+          <div>
+            <el-row :gutter="24">
+              <el-col :span="2">关联商品</el-col>
+              <el-col :span="22">
+                <AddGoods :Id="addId" :status="'Add'" ref="headerChild"></AddGoods>
+              </el-col>
+            </el-row>
+          </div>
         </template>
-      </el-form-item>
-    </el-form>
+
+        <el-form-item>
+          <el-button type="primary" v-if="active==1" @click="next">下一步,填写规格并上传图片</el-button>
+          <template v-if="active==2">
+            <el-button type="primary" @click="active=1">上一步,填写商品信息</el-button>
+            <el-button type="primary" @click="next2">下一步,选择关联商品</el-button>
+          </template>
+          <template v-if="active==3">
+            <el-button type="primary" @click="active=2">上一步,填写规格并上传图片</el-button>
+            <el-button type="primary" @click="next3">完成提交商品</el-button>
+          </template>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
  
 <script>
- 
 import { enumSizes, enumColors } from "@/utils/enums";
-import {goods_one,goods_manage,goods_class_more,brand_more,supplier_more,warehouse_more} from "@/api/index"
+import {
+  goods_one,
+  goods_manage,
+  goods_class_more,
+  brand_more,
+  supplier_more,
+  warehouse_more
+} from "@/api/index";
 import AddGoods from "@/components/AddGoods";
 import Editor from "@/components/Editor";
 import http from "@/utils/request";
@@ -422,9 +440,10 @@ import axios from "axios";
 
 export default {
   components: {
-    AddGoods,Editor
+    AddGoods,
+    Editor
   },
- 
+
   data() {
     return {
       buyPrice: "",
@@ -441,8 +460,7 @@ export default {
       classify_id: "", //第三步分类
       brand_id: "", //第三步品牌
       fileLists: [],
-  
- 
+
       tableData: [], //前端显示table表格
       tableData2: [], //
       search: "",
@@ -482,7 +500,7 @@ export default {
       dialogImageUrl: "",
       dialogVisible: false,
       disabled: false,
-      active:1,
+      active: 1,
       value: false,
       classOnes: [], //一级分类数组
       classTwos: [], //二级分类数组
@@ -584,6 +602,9 @@ export default {
     this.getUpdate(this.$route.query.id);
   },
   methods: {
+    goBack() {
+      this.$router.go(-1);
+    },
     // 批量添加价格
     okMoney() {
       if (this.tableData.length > 0) {
@@ -601,20 +622,14 @@ export default {
       } else {
         this.$message.error("暂无商品规格");
       }
- 
     },
     // 积分商品价格检查
     checkMoney(e) {
       if (this.ruleForm.type == "3") {
-        
         if (this.tableData.length > 0) {
           if (this.tableData.some(val => val.money != "")) {
             this.tableData.forEach(val => {
-              if (
-               
-                Number(e.money) != Number(val.money) &&
-                val.money != ""
-              ) {
+              if (Number(e.money) != Number(val.money) && val.money != "") {
                 this.$message.error("积分商品的销售价格请保持一致");
                 e.money = "";
               }
@@ -625,60 +640,55 @@ export default {
       }
     },
 
- 
-   
     getUpdate(e) {
       if (e) {
         this.isEdit = true;
-      goods_one({ id: this.$route.query.id })
-          .then(res => {
-            if (res.code == 200) {
-              this.loadClassTwo(res.detail.classify_id);
-              this.$nextTick(() => {
-                (this.addId = res.detail.id),
-                  this.$store.commit("set_selectGood", res.detail.realtion);
+        goods_one({ id: this.$route.query.id }).then(res => {
+          if (res.code == 200) {
+            this.loadClassTwo(res.detail.classify_id);
+            this.$nextTick(() => {
+              (this.addId = res.detail.id),
+                this.$store.commit("set_selectGood", res.detail.realtion);
 
-                this.ruleForm = {
-                  id: res.detail.id,
-                  classify_id: res.detail.classify_id,
-                  classify_id_two: res.detail.classify_id_two,
-                  type: res.detail.type.toString(),
-                  title: res.detail.title,
-                  brand_id: res.detail.brand_id,
-                  supplier_id: res.detail.supplier_id,
-                  synopsis: res.detail.synopsis,
-                  number: res.detail.number,
-                  goods_id: res.detail.goods_id,
-                  sales_volume: res.detail.sales_volume,
-                  warehouse_id: res.detail.warehouse_id,
-                  integral: res.detail.integral,
-                  exchange_integral: res.detail.exchange_integral,
-                  production_cycle: res.detail.production_cycle,
-                  production_cycle_status:
-                    res.detail.production_cycle_status == "1" ? true : false,
-                  limit_buy: res.detail.limit_buy,
-                  limit_buy_status:
-                    res.detail.limit_buy_status == "1" ? true : false,
-                  freight: res.detail.freight,
-                  freight_status:
-                    res.detail.freight_status == "1" ? true : false,
-                  vip_buy_status:
-                    res.detail.vip_buy_status == "1" ? true : false,
-                  shelf: res.detail.shelf == "1" ? true : false,
-                  evaluate_status:
-                    res.detail.evaluate_status == "1" ? true : false
-                };
+              this.ruleForm = {
+                id: res.detail.id,
+                classify_id: res.detail.classify_id,
+                classify_id_two: res.detail.classify_id_two,
+                type: res.detail.type.toString(),
+                title: res.detail.title,
+                brand_id: res.detail.brand_id,
+                supplier_id: res.detail.supplier_id,
+                synopsis: res.detail.synopsis,
+                number: res.detail.number,
+                goods_id: res.detail.goods_id,
+                sales_volume: res.detail.sales_volume,
+                warehouse_id: res.detail.warehouse_id,
+                integral: res.detail.integral,
+                exchange_integral: res.detail.exchange_integral,
+                production_cycle: res.detail.production_cycle,
+                production_cycle_status:
+                  res.detail.production_cycle_status == "1" ? true : false,
+                limit_buy: res.detail.limit_buy,
+                limit_buy_status:
+                  res.detail.limit_buy_status == "1" ? true : false,
+                freight: res.detail.freight,
+                freight_status: res.detail.freight_status == "1" ? true : false,
+                vip_buy_status: res.detail.vip_buy_status == "1" ? true : false,
+                shelf: res.detail.shelf == "1" ? true : false,
+                evaluate_status:
+                  res.detail.evaluate_status == "1" ? true : false
+              };
 
-                this.fileList = res.detail.imgs ? res.detail.imgs : [];
-                this.fileList[0] = res.detail.img;
-                this.data = res.detail.detail;
-                this.tableData = res.detail.data;
-                this.tableData.forEach(val => {
-                  val.selected = val.selected == "1" ? true : false;
-                });
+              this.fileList = res.detail.imgs ? res.detail.imgs : [];
+              this.fileList[0] = res.detail.img;
+              this.data = res.detail.detail;
+              this.tableData = res.detail.data;
+              this.tableData.forEach(val => {
+                val.selected = val.selected == "1" ? true : false;
               });
-            }
-          });
+            });
+          }
+        });
       } else {
         // 新增
         if (sessionStorage.getItem("product")) {
@@ -754,8 +764,7 @@ export default {
       this.loadProduct(this.classify_id, this.brand_id, this.title);
     },
     check(e) {},
-  
-   
+
     // 提交商品
     next3() {
       this.loading = true;
@@ -826,7 +835,7 @@ export default {
         } else {
           this.ruleForm.goods_attribute = this.tableData;
         }
-      goods_manage(this.ruleForm).then(res => {
+        goods_manage(this.ruleForm).then(res => {
           this.loading = false;
           if (res.code == 200) {
             this.$message.success(res.msg);
@@ -938,7 +947,7 @@ export default {
     },
 
     next2() {
-this.data=this.$refs.editor.content
+      this.data = this.$refs.editor.content;
 
       if (this.fileList.length <= 0) {
         return this.$message.error("请上传商品图");
@@ -1001,38 +1010,34 @@ this.data=this.$refs.editor.content
     },
     // 获取下拉数据
     getSeleData() {
-    goods_class_more({ page: 1, limit: 10000, pid: 0 })
-        .then(res => {
+      goods_class_more({ page: 1, limit: 10000, pid: 0 }).then(res => {
+        if (res.code == 200) {
+          this.classOnes = res.data.data;
+        } else {
+          this.$message.error(res.msg);
+        }
+      }),
+        brand_more({ page: 1, limit: 10000 }).then(res => {
           if (res.code == 200) {
-            this.classOnes = res.data.data;
-          } else {
-            this.$message.error(res.msg);
-          }
-        }),
-       brand_more( { page: 1, limit: 10000 })
-          .then(res => {
-            if (res.code == 200) {
-              this.brands = res.data.data;
-            } else {
-              this.$message.error(res.msg);
-            }
-          });
-    supplier_more( { page: 1, limit: 10000 })
-        .then(res => {
-          if (res.code == 200) {
-            this.suppliers = res.data.data;
+            this.brands = res.data.data;
           } else {
             this.$message.error(res.msg);
           }
         });
-    warehouse_more( { page: 1, limit: 10000 })
-        .then(res => {
-          if (res.code == 200) {
-            this.warehouses = res.data.data;
-          } else {
-            this.$message.error(res.msg);
-          }
-        });
+      supplier_more({ page: 1, limit: 10000 }).then(res => {
+        if (res.code == 200) {
+          this.suppliers = res.data.data;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+      warehouse_more({ page: 1, limit: 10000 }).then(res => {
+        if (res.code == 200) {
+          this.warehouses = res.data.data;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
     },
     loadClassTwo2(e) {
       this.classify_id2 = "";
@@ -1040,30 +1045,28 @@ this.data=this.$refs.editor.content
       if (e == "") {
         this.classify_id2 = "";
       } else {
-       goods_class_more( {
-            page: 1,
-            limit: 10000,
-            pid: e
-          })
-          .then(res => {
-            if (res.code == 200) {
-              this.classTwos2 = res.data.data;
-            } else {
-              this.$message.error(res.msg);
-            }
-          });
-      }
-    },
-    loadClassTwo(e) {
-      this.ruleForm.classify_id_two = "";
-     goods_class_more({ page: 1, limit: 10000, pid: e })
-        .then(res => {
+        goods_class_more({
+          page: 1,
+          limit: 10000,
+          pid: e
+        }).then(res => {
           if (res.code == 200) {
-            this.classTwos = res.data.data;
+            this.classTwos2 = res.data.data;
           } else {
             this.$message.error(res.msg);
           }
         });
+      }
+    },
+    loadClassTwo(e) {
+      this.ruleForm.classify_id_two = "";
+      goods_class_more({ page: 1, limit: 10000, pid: e }).then(res => {
+        if (res.code == 200) {
+          this.classTwos = res.data.data;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
     },
     // 下一步
     next() {
@@ -1131,7 +1134,7 @@ this.data=this.$refs.editor.content
 .demo-ruleForm {
   margin-top: 20px;
 }
-.inputForm /deep/ .el-input{
+.inputForm /deep/ .el-input {
   width: 90%;
 }
 </style>

@@ -11,7 +11,7 @@
           style="width:200px;"
         ></el-input>
       </div>
-        <el-button type="primary" @click="search">搜索</el-button>
+      <el-button type="primary" @click="search">搜索</el-button>
       <el-button type="primary" @click="add">添加</el-button>
       <el-button type="primary" :disabled="isDisable" @click="delAll">批量删除</el-button>
       <el-button type="primary" :disabled="isDisable" @click="closeAll(0)">批量关闭</el-button>
@@ -35,7 +35,7 @@
             </template>
           </template>
         </el-table-column>
- 
+
         <el-table-column prop="goods_num" label="商品数量"></el-table-column>
         <el-table-column prop="show" label="是否显示">
           <template slot-scope="scope">
@@ -49,9 +49,8 @@
           <template slot-scope="scope">
             <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
             <template v-if="scope.row.id!=27">
-               <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
+              <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
             </template>
-            
           </template>
         </el-table-column>
       </el-table>
@@ -75,7 +74,6 @@
             <el-upload
               class="avatar-uploader"
               :http-request="uploadFile"
-               
               action
               :show-file-list="false"
               :file-list="fileLists"
@@ -86,17 +84,20 @@
               <div class="el-upload__tip" slot="tip">图片尺寸为90*90比例，大小不能超过200kB,图片只能为jpg,png,gif格式</div>
             </el-upload>
           </el-form-item>
-            <el-form-item label="品牌封面图" :label-width="formLabelWidth" prop="logo">
+          <el-form-item label="品牌封面图" :label-width="formLabelWidth" prop="logo">
             <el-upload
               class="avatar-uploader"
               :http-request="uploadFile2"
-               
               action
               :show-file-list="false"
-    :before-upload="beforeAvatarUpload2"
-            
+              :before-upload="beforeAvatarUpload2"
             >
-              <img v-if="imageUrl2" :src="imageUrl2" class="avatar"  style="width:710px;height:272px;"/>
+              <img
+                v-if="imageUrl2"
+                :src="imageUrl2"
+                class="avatar"
+                style="width:710px;height:272px;"
+              />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               <div class="el-upload__tip" slot="tip">图片尺寸为710*272比例，大小不能超过200kB,图片只能为jpg,png,gif格式</div>
             </el-upload>
@@ -154,32 +155,31 @@ import axios from "axios";
 export default {
   data() {
     return {
-        isDisable:true,
-        serchTitle:"",
+      isDisable: true,
+      serchTitle: "",
       tableData: [],
-      tableData2:[],
-      multipleSelection:[],
+      tableData2: [],
+      multipleSelection: [],
       total: 0,
       total2: 0,
       title: "新增",
       fileLists: [],
       imageUrl: "",
-      imageUrl2:"",
-      showClass2:false,
+      imageUrl2: "",
+      SelectIndex: 1,
+      showClass2: false,
       form: {
         title: "",
-       img:'',
+        img: "",
         logo: "",
-        order:"",
+        order: "",
         show: true,
-        supply:true,
-       
+        supply: true
       },
-      selectId:"",
+      selectId: "",
       rules: {
         title: [{ required: true, message: "必填字段", trigger: "blur" }],
 
-       
         order: [{ required: true, message: "必填字段", trigger: "blur" }]
       },
       dialogFormVisible: false,
@@ -187,79 +187,78 @@ export default {
     };
   },
   created() {
-   
     this.getList(1, this.serchTitle);
   },
   methods: {
-    search(){
- this.getList(1, this.serchTitle);
+    search() {
+      this.getList(1, this.serchTitle);
     },
-    add(){
-     this.dialogFormVisible = true
-     this.title='新增'
-     this.form.id=''
+    add() {
+      this.dialogFormVisible = true;
+      this.title = "新增";
+      this.form.id = "";
     },
-      handleCurrentChange(e){
-       this.getList(e, this.serchTitle);
-     },
-        handleSelectionChange(val) {
-            
-        this.multipleSelection = val;
-        if( this.multipleSelection.length>0){
-            this.isDisable=false
-        }else{
-            this.isDisable=true 
-        }
-      },
+    handleCurrentChange(e) {
+      this.SelectIndex = e;
+      this.getList(e, this.serchTitle);
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+      if (this.multipleSelection.length > 0) {
+        this.isDisable = false;
+      } else {
+        this.isDisable = true;
+      }
+    },
     //   批量删除
-   delAll() {
-    this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning"
-    }).then(() => {
+    delAll() {
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        http
+          .post("admin/goods/batch_del", {
+            id: this.multipleSelection.map(val => val.id).toString(),
+            type: 1
+          })
+          .then(res => {
+            if (res.code == 200) {
+              this.getList(1, this.serchTitle);
+            } else {
+              this.$message.error(res.msg);
+            }
+          })
+          .catch(() => {});
+      });
+    },
+    // 批量开启、关闭
+    closeAll(e) {
       http
-        .post("admin/goods/batch_del", {
+        .post("admin/goods/brand_show", {
           id: this.multipleSelection.map(val => val.id).toString(),
-          type: 1
+          show: e
         })
         .then(res => {
           if (res.code == 200) {
             this.getList(1, this.serchTitle);
+            this.$message.success(res.msg);
           } else {
             this.$message.error(res.msg);
           }
-        })
-        .catch(() => {});
-    });
-  },
-    // 批量开启、关闭
-    closeAll(e) {
-    http
-      .post("admin/goods/brand_show", {
-        id: this.multipleSelection.map(val => val.id).toString(),
-        show: e
-      })
-      .then(res => {
-        if (res.code == 200) {
-          this.getList(1, this.serchTitle);
-          this.$message.success(res.msg);
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
-  },
+        });
+    },
 
-  handleClose(done) {
-    this.$confirm("确认关闭？")
-      .then(_ => {
-        done();
-        this.selectId = "";
-      })
-      .catch(_ => {});
-  },
-   
-      //删除
+    handleClose(done) {
+      this.$confirm("确认关闭？")
+        .then(_ => {
+          done();
+          this.selectId = "";
+        })
+        .catch(_ => {});
+    },
+
+    //删除
     delect(e) {
       this.$confirm("此操作将永久删除, 是否继续?", "提示", {
         confirmButtonText: "确定",
@@ -270,13 +269,11 @@ export default {
           http.post("admin/goods/brand_del", { id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              if(this.selectId){
-                this.getList(1,this.selectId);
-              }else{
-                 this.getList(1, 0);
+              if (this.selectId) {
+                this.getList(1, this.selectId);
+              } else {
+                this.getList(1, 0);
               }
-             
-                
             } else {
               this.$message.error(res.msg);
             }
@@ -284,86 +281,90 @@ export default {
         })
         .catch(() => {});
     },
-     cel() {
-    this.imageUrl = "";
-    this.imageUrl2 = "";
-    this.dialogFormVisible = false;
-    this.$refs["form"].resetFields();
-  },
+    cel() {
+      this.imageUrl = "";
+      this.imageUrl2 = "";
+      this.dialogFormVisible = false;
+      this.$refs["form"].resetFields();
+    },
     // 加载列表
-getList(page, title) {
-    http
-      .post("admin/goods/brand_more", {
-        page: page,
-        limit: 10,
-        title: title
-      })
-      .then(res => {
-        if (res.code == 200) {
-          this.tableData = res.data.data;
-          if(this.tableData.length>0){
-    
-   this.tableData= this.tableData.filter(val=>val.title!="其他")
+    getList(page, title) {
+      http
+        .post("admin/goods/brand_more", {
+          page: page,
+          limit: 10,
+          title: title
+        })
+        .then(res => {
+          if (res.code == 200) {
+            this.tableData = res.data.data;
+            if (this.tableData.length > 0) {
+              this.tableData = this.tableData.filter(
+                val => val.title != "其他"
+              );
 
-          this.total = res.data.count;
+              this.total = res.data.count;
+            }
+          } else {
+            this.$message.error(res.msg);
           }
-      
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
-  },
+        });
+    },
     // 编辑回显
-  edit(e) {
-    (this.dialogFormVisible = true),
-      http.post("admin/goods/brand_one", { id: e.id }).then(res => {
-        if (res.code == 200) {
-          this.title = "编辑";
+    edit(e) {
+      (this.dialogFormVisible = true),
+        http.post("admin/goods/brand_one", { id: e.id }).then(res => {
+          if (res.code == 200) {
+            this.title = "编辑";
 
-          this.$nextTick(() => {
-            this.imageUrl = res.data.logo;
-            this.imageUrl2=res.data.img
-            this.form = {
-              id: e.id,
+            this.$nextTick(() => {
+              this.imageUrl = res.data.logo;
+              this.imageUrl2 = res.data.img;
+              this.form = {
+                id: e.id,
 
-              title: res.data.title,
-              order: res.data.order,
-              logo: res.data.logo,
-              img:res.data.img,
-              show:
-                res.data.show == 1
-                  ? (res.data.show = true)
-                  : (res.data.show = false),
-              supply:
-                res.data.supply == 1
-                  ? (res.data.supply = true)
-                  : (res.data.supply = false)
-            };
-          });
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
-  },
+                title: res.data.title,
+                order: res.data.order,
+                logo: res.data.logo,
+                img: res.data.img,
+                show:
+                  res.data.show == 1
+                    ? (res.data.show = true)
+                    : (res.data.show = false),
+                supply:
+                  res.data.supply == 1
+                    ? (res.data.supply = true)
+                    : (res.data.supply = false)
+              };
+            });
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
+    },
     // 新增。编辑保存
     save() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          console.log(this.form)
-            this.form.show==true?this.form.show=1:this.form.show=0
-            this.form.logo=(/(http|https):\/\/([\w.]+\/?)\S*/).test(this.form.logo)?this.form.logo.split(this.form.logo.split("/upload")[0])[1]:this.form.logo
-         
-         http.post("admin/goods/brand_manage", this.form).then(res => {
+          console.log(this.form);
+          this.form.show == true ? (this.form.show = 1) : (this.form.show = 0);
+          this.form.logo = /(http|https):\/\/([\w.]+\/?)\S*/.test(
+            this.form.logo
+          )
+            ? this.form.logo.split(this.form.logo.split("/upload")[0])[1]
+            : this.form.logo;
+
+          http.post("admin/goods/brand_manage", this.form).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.imageUrl=''
+              this.imageUrl = "";
               this.dialogFormVisible = false;
-               if(this.selectId){
-                this.getList(1,this.selectId);
-              }else{
-                 this.getList(1, 0);
+              if (this.selectId) {
+                this.getList(this.SelectIndex, this.selectId);
+              } else {
+                this.getList(1, 0);
               }
-              this.$refs['form'].resetFields()
+              this.$refs["form"].resetFields();
             } else {
               this.$message.error(res.msg);
             }
@@ -371,9 +372,8 @@ getList(page, title) {
         }
       });
     },
-// 上传图片
+    // 上传图片
     uploadFile2(item) {
-      
       const formdata = new FormData();
       formdata.append("upload_img", item.file);
       formdata.append("type", 1);
@@ -392,8 +392,7 @@ getList(page, title) {
         })
         .catch(err => {});
     },
-       uploadFile(item) {
-      
+    uploadFile(item) {
       const formdata = new FormData();
       formdata.append("upload_img", item.file);
       formdata.append("type", 1);
@@ -413,22 +412,22 @@ getList(page, title) {
         .catch(err => {});
     },
     beforeAvatarUpload(file) {
-   // 上传图片前处理函数
-    const isJPG =
+      // 上传图片前处理函数
+      const isJPG =
         file.type === "image/jpeg" ||
         file.type === "image/png" ||
         file.type === "image/gif";
-    const isLt2M = file.size / 1024 / 1024  < 0.195; // 限制小于200KB
-    let that = this;
-    let isAllow = false;
-    if (!isJPG) {
+      const isLt2M = file.size / 1024 / 1024 < 0.195; // 限制小于200KB
+      let that = this;
+      let isAllow = false;
+      if (!isJPG) {
         this.$message.error("上传头像图片只能是 jpg、png、gif 格式!");
-    }
-    if (!isLt2M) {
+      }
+      if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 200KB!");
-    }
-    const isSize = new Promise(function(resolve, reject) {
-        let width =90;
+      }
+      const isSize = new Promise(function(resolve, reject) {
+        let width = 90;
         let height = 90;
         let _URL = window.URL || window.webkitURL;
         let image = new Image();
@@ -437,7 +436,7 @@ getList(page, title) {
           valid ? resolve() : reject();
         };
         image.src = _URL.createObjectURL(file);
-    }).then(
+      }).then(
         () => {
           return file;
         },
@@ -446,25 +445,25 @@ getList(page, title) {
           return Promise.reject();
         }
       );
-    return isJPG && isLt2M && isSize;
+      return isJPG && isLt2M && isSize;
     },
-     beforeAvatarUpload2(file) {
-   // 上传图片前处理函数
-    const isJPG =
+    beforeAvatarUpload2(file) {
+      // 上传图片前处理函数
+      const isJPG =
         file.type === "image/jpeg" ||
         file.type === "image/png" ||
         file.type === "image/gif";
-    const isLt2M = file.size / 1024 / 1024  < 0.195; // 限制小于200KB
-    let that = this;
-    let isAllow = false;
-    if (!isJPG) {
+      const isLt2M = file.size / 1024 / 1024 < 0.195; // 限制小于200KB
+      let that = this;
+      let isAllow = false;
+      if (!isJPG) {
         this.$message.error("上传头像图片只能是 jpg、png、gif 格式!");
-    }
-    if (!isLt2M) {
+      }
+      if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 200KB!");
-    }
-    const isSize = new Promise(function(resolve, reject) {
-        let width =710;
+      }
+      const isSize = new Promise(function(resolve, reject) {
+        let width = 710;
         let height = 272;
         let _URL = window.URL || window.webkitURL;
         let image = new Image();
@@ -473,7 +472,7 @@ getList(page, title) {
           valid ? resolve() : reject();
         };
         image.src = _URL.createObjectURL(file);
-    }).then(
+      }).then(
         () => {
           return file;
         },
@@ -482,7 +481,7 @@ getList(page, title) {
           return Promise.reject();
         }
       );
-    return isJPG && isLt2M && isSize;
+      return isJPG && isLt2M && isSize;
     }
   }
 };

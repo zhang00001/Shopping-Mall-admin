@@ -5,8 +5,6 @@
     </div>
 
     <template>
-
-
       <el-table :data="tableData" border style="width: 100%">
         <el-table-column prop="id" label="编号" width="180"></el-table-column>
         <el-table-column prop="name" label="分类名称" width="180"></el-table-column>
@@ -34,22 +32,14 @@
           <template slot-scope="scope">
             <el-button @click="subordinates(scope.row)" type="text" size="small">查看下级</el-button>
             <el-button type="text" size="small" @click="addClass(scope.row)">新增下级</el-button>
-  
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="设置" width="100">
           <template slot-scope="scope">
-
-
-
-               <template  v-if='scope.row.id!=id1&&scope.row.id!=id2&&scope.row.id!=id3' >
-                   <el-button    @click="edit(scope.row)" type="text" size="small">编辑</el-button>
-            <el-button    type="text" size="small" @click="delect(scope.row)">删除</el-button>
-              </template>
-
-
-
-          
+            <template v-if="scope.row.id!=id1&&scope.row.id!=id2&&scope.row.id!=id3">
+              <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
+              <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -61,7 +51,7 @@
         ></el-pagination>
       </div>
 
-      <el-dialog :title="title" :visible.sync="dialogFormVisible" :show-close='false'>
+      <el-dialog :title="title" :visible.sync="dialogFormVisible" :show-close="false">
         <el-form :model="form" ref="form" :rules="rules">
           <el-form-item label="分类名称" :label-width="formLabelWidth" prop="name">
             <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -97,13 +87,13 @@
         <el-table :data="tableData2" border style="width: 100%">
           <el-table-column prop="id" label="编号" width="180"></el-table-column>
           <el-table-column prop="name" label="分类名称" width="180"></el-table-column>
- <el-table-column prop="name" label="分类图标" width="180">
-          <template slot-scope="scope">
-            <template v-if="scope.row.icon">
-              <img :src="scope.row.icon" alt style="width:30px;height:30px;" />
+          <el-table-column prop="name" label="分类图标" width="180">
+            <template slot-scope="scope">
+              <template v-if="scope.row.icon">
+                <img :src="scope.row.icon" alt style="width:30px;height:30px;" />
+              </template>
             </template>
-          </template>
-        </el-table-column>
+          </el-table-column>
           <el-table-column prop="pid" label="级别">
             <template slot-scope="scope">
               <template v-if="scope.row.pid">二级</template>
@@ -120,15 +110,18 @@
 
           <el-table-column fixed="right" label="设置" width="100">
             <template slot-scope="scope">
-           
-           <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
+              <el-button @click="edit(scope.row)" type="text" size="small">编辑</el-button>
               <el-button type="text" size="small" @click="delect(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
-         
+
         <div class="block">
-          <el-pagination layout="prev, pager, next" :total="total2"   @current-change="handleCurrentChange2"></el-pagination>
+          <el-pagination
+            layout="prev, pager, next"
+            :total="total2"
+            @current-change="handleCurrentChange2"
+          ></el-pagination>
         </div>
       </el-dialog>
     </template>
@@ -138,7 +131,7 @@
 <script>
 import http from "@/utils/request";
 import axios from "axios";
-import {classify} from "@/api/index"
+import { classify } from "@/api/index";
 export default {
   data() {
     return {
@@ -148,7 +141,13 @@ export default {
       total2: 0,
       title: "新增",
       fileLists: [],
-      imageUrl: "",class_more:null,id1:"",id2:"",id3:"",
+      SelectIndex: 1,
+
+      imageUrl: "",
+      class_more: null,
+      id1: "",
+      id2: "",
+      id3: "",
       showClass2: false,
       form: {
         name: "",
@@ -170,47 +169,45 @@ export default {
   },
   created() {
     this.getList(1, 0);
-    this.getClass()
+    this.getClass();
   },
   methods: {
-    getClass(){
- classify({}).then(res => {
-     
- this.id1= res.data.map(val=>val.id)[0];
-      this.id2= res.data.map(val=>val.id)[1];   
-        this.id3= res.data.map(val=>val.id)[2]; 
-        })
+    getClass() {
+      classify({}).then(res => {
+        this.id1 = res.data.map(val => val.id)[0];
+        this.id2 = res.data.map(val => val.id)[1];
+        this.id3 = res.data.map(val => val.id)[2];
+      });
     },
     handleCurrentChange(e) {
+      this.SelectIndex = e;
       this.getList(e, 0);
     },
-    handleCurrentChange2(e){
-   this.getList(e, this.selectId);
+    handleCurrentChange2(e) {
+      this.showClass2 = e;
+      this.getList(e, this.selectId);
     },
     //  新增下级
     addClass(e) {
-      this.title='新增下级'
- 
+      this.title = "新增下级";
+
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         this.form.pid = e.id;
-        this.form.id=''
+        this.form.id = "";
       });
     },
     // 新增一级
     add1() {
-           this.title='新增分类';
+      this.title = "新增分类";
       (this.dialogFormVisible = true), (this.selectId = "");
-      this.$nextTick(()=>{
-        this.form.id='',
-         this.form.pid = 0;
-      })
+      this.$nextTick(() => {
+        (this.form.id = ""), (this.form.pid = 0);
+      });
     },
     handleClose(done) {
-      
-          done();
-          this.selectId = "";
-       
+      done();
+      this.selectId = "";
     },
     //   查看下级
     subordinates(e) {
@@ -230,7 +227,7 @@ export default {
             if (res.code == 200) {
               this.$message.success(res.msg);
               if (this.selectId) {
-                this.getList(1, this.selectId);
+                this.getList(this.SelectIndex, this.selectId);
               } else {
                 this.getList(1, 0);
               }
@@ -296,20 +293,21 @@ export default {
     },
     // 新增。编辑保存
     save() {
-     
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.form.show == true ? (this.form.show = 0) : (this.form.show = 1);
-         if((/(http|https):\/\/([\w.]+\/?)\S*/).test(this.form.icon)){
-       this.form.icon=    this.form.icon.split( this.form.icon.split("/upload")[0])[1]
-         }
+          if (/(http|https):\/\/([\w.]+\/?)\S*/.test(this.form.icon)) {
+            this.form.icon = this.form.icon.split(
+              this.form.icon.split("/upload")[0]
+            )[1];
+          }
           http.post("admin/goods/goods_class_manage", this.form).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
               this.imageUrl = "";
               this.dialogFormVisible = false;
               if (this.selectId) {
-                this.getList(1, this.selectId);
+                this.getList(this.SelectIndex, this.selectId);
               } else {
                 this.getList(1, 0);
               }
@@ -330,13 +328,10 @@ export default {
         .post(process.env.BASE_API + "index/base/upload", formdata)
         .then(res => {
           if (res.data.code == 200) {
-
             this.$message({
-
-             
-	message: res.data.msg,
-	type: 'success',
-	duration: 500
+              message: res.data.msg,
+              type: "success",
+              duration: 500
             });
             this.imageUrl = res.data.data.http_image;
             this.$nextTick(() => {
@@ -349,22 +344,22 @@ export default {
         .catch(err => {});
     },
     beforeAvatarUpload(file) {
-   // 上传图片前处理函数
-    const isJPG =
+      // 上传图片前处理函数
+      const isJPG =
         file.type === "image/jpeg" ||
         file.type === "image/png" ||
         file.type === "image/gif";
-    const isLt2M = file.size / 1024 / 1024  < 0.195; // 限制小于200KB
-    let that = this;
-    let isAllow = false;
-    if (!isJPG) {
+      const isLt2M = file.size / 1024 / 1024 < 0.195; // 限制小于200KB
+      let that = this;
+      let isAllow = false;
+      if (!isJPG) {
         this.$message.error("上传头像图片只能是 jpg、png、gif 格式!");
-    }
-    if (!isLt2M) {
+      }
+      if (!isLt2M) {
         this.$message.error("上传头像图片大小不能超过 200KB!");
-    }
-    const isSize = new Promise(function(resolve, reject) {
-        let width =90;
+      }
+      const isSize = new Promise(function(resolve, reject) {
+        let width = 90;
         let height = 90;
         let _URL = window.URL || window.webkitURL;
         let image = new Image();
@@ -373,7 +368,7 @@ export default {
           valid ? resolve() : reject();
         };
         image.src = _URL.createObjectURL(file);
-    }).then(
+      }).then(
         () => {
           return file;
         },
@@ -382,7 +377,7 @@ export default {
           return Promise.reject();
         }
       );
-    return isJPG && isLt2M && isSize;
+      return isJPG && isLt2M && isSize;
     }
   }
 };

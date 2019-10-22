@@ -15,7 +15,8 @@
             <template v-if="userInfo.vip_grade==3">超级店长</template>
           </p>
           <p>
-            <el-button @click="dialogVisible = true" size="mini">赠送积分</el-button>
+            <el-button @click="dialogVisible = true" size="mini" type="text">赠送积分</el-button>
+            <el-button @click="dialogVisible6 = true" size="mini" type="text">充值</el-button>
             <!-- <i @click="dialogVisible = true" class="el-icon-edit"></i> -->
           </p>
         </el-col>
@@ -51,17 +52,17 @@
             <span>{{userInfo.pid}}</span>
           </div>
           <div class="info">
-            <p>推荐人微信：</p>
+            <p>推荐人昵称：{{userInfo.pid_nick}}</p>
             <span></span>
           </div>
         </el-col>
         <el-col :span="4">
           <div class="info">
-            <p>开户行：</p>
+            <p>开户行：{{userInfo.bank_info?userInfo.bank_info.subordinate:""}}</p>
             <span></span>
           </div>
           <div class="info">
-            <p>银行卡号：</p>
+            <p>银行卡号：{{userInfo.bank_info?userInfo.bank_info.bankcard:""}}</p>
             <span></span>
           </div>
           <div class="info">
@@ -69,7 +70,7 @@
             <span></span>
           </div>
           <div class="info">
-            <p>可用余额：</p>
+            <p>可用余额：{{userInfo.money}}</p>
             <span></span>
           </div>
         </el-col>
@@ -93,17 +94,20 @@
                 <el-col :span="4" class="overview-item-title">潜在人脉</el-col>
               </el-row>
               <el-row>
+                <el-col :span="4" class="color-danger overview-item-value">{{userInfo.integral}}</el-col>
                 <el-col
                   :span="4"
                   class="color-danger overview-item-value"
-                >{{userInfo.tongji.integral}}</el-col>
-                <el-col
-                  :span="4"
-                  class="color-danger overview-item-value"
-                >{{userInfo.tongji.collect}}</el-col>
-                <el-col :span="4" class="color-danger overview-item-value">{{userInfo.tongji.one}}</el-col>
-                <el-col :span="4" class="color-danger overview-item-value">{{userInfo.tongji.two}}</el-col>
-                <el-col :span="4" class="color-danger overview-item-value">{{userInfo.tongji.three}}</el-col>
+                >{{userInfo.tongji?userInfo.tongji.collect:""}}</el-col>
+                <el-col :span="4" class="color-danger overview-item-value">
+                  <span @click="Connections(1)">{{userInfo.tongji?userInfo.tongji.one:""}}</span>
+                </el-col>
+                <el-col :span="4" class="color-danger overview-item-value">
+                  <span @click="Connections(2)">{{userInfo.tongji?userInfo.tongji.two:""}}</span>
+                </el-col>
+                <el-col :span="4" class="color-danger overview-item-value">
+                  <span @click="Connections(3)">{{userInfo.tongji?userInfo.tongji.three:""}}</span>
+                </el-col>
               </el-row>
             </div>
           </div>
@@ -288,6 +292,34 @@
         @current-change="handleCurrentChange3"
       ></el-pagination>
     </el-dialog>
+    <el-dialog title="人脉" :visible.sync="dialogVisible5" width="50%">
+      <el-table :data="tableFriend" style="width: 100%">
+        <el-table-column prop="nick" label="昵称"></el-table-column>
+        <el-table-column prop="avatar" label="头像">
+          <template slot-scope="scope">
+            <img :src="scope.row.avatar" alt style="width:50px;" />
+          </template>
+        </el-table-column>
+        <el-table-column prop="mobile" label="手机号"></el-table-column>
+        <el-table-column prop="vip_grade" label="Vip等级"></el-table-column>
+      </el-table>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="totalFriend"
+        @current-change="handleCurrentChange4"
+      ></el-pagination>
+    </el-dialog>
+    <el-dialog title="充值" :visible.sync="dialogVisible6" width="30%">
+      <el-form :model="form">
+        <el-form-item label="充值金额">
+          <el-input v-model="money" type="number"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible6 = false">取 消</el-button>
+        <el-button type="primary" @click="charge_money">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -299,7 +331,9 @@ import {
   user_money,
   user_money_right,
   user_address,
-  user_order
+  user_order,
+  friend_list,
+  charge_money_huokuan_use
 } from "@/api/index";
 export default {
   data() {
@@ -307,13 +341,21 @@ export default {
       memberId: "",
       total3: 0,
       total2: 0,
-      userInfo: null,
+      dialogVisible5: false,
+      dialogVisible6: false,
+      userInfo: {
+        nick: "",
+        integral: "",
+        month_one: ""
+      },
+      money: "",
       tableDataMoney: [],
       tableDataGrade: [],
-      monthData: null,
+      monthData: {},
       tableData: [],
       orderTotal: 0,
       addressData: [],
+      tableFriend: [],
       addressTotal: 0,
       tableDataIntegral: [],
       totalIntegral: 0,
@@ -334,6 +376,8 @@ export default {
         desc: ""
       },
       formLabelWidth: "120px",
+      totalFriend: 0,
+      selectFriend: "",
       circleUrl:
         "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
     };
@@ -342,6 +386,36 @@ export default {
     this.getData();
   },
   methods: {
+    charge_money() {
+      charge_money_huokuan_use({
+        user_id: this.$route.query.id,
+        money: this.money
+      }).then(res => {
+        if (res.code == 200) {
+          this.$message.success(res.msg);
+          this.dialogVisible6 = false;
+          this.getData();
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    handleCurrentChange4(e) {
+      this.Connections(this.selectFriend, e);
+    },
+    Connections(e, page) {
+      this.dialogVisible5 = true;
+      this.selectFriend = e;
+      friend_list({
+        page: page ? page : 1,
+        limit: 10,
+        type: e,
+        user_id: this.$route.query.id
+      }).then(res => {
+        this.tableFriend = res.data.data;
+        this.totalFriend = res.data.count;
+      });
+    },
     changeMonth(e) {
       console.log(e);
       this.getMoneyList(
