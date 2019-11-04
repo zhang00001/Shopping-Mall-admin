@@ -80,6 +80,7 @@
         <el-pagination
           layout="prev, pager, next"
           :total="total"
+          :current-page.sync="page"
           @current-change="handleCurrentChange"
         ></el-pagination>
       </div>
@@ -142,7 +143,7 @@ export default {
 
       title: "新增",
       fileLists: [],
-
+      page: 1,
       form: {
         mobile: "",
         name: "",
@@ -160,13 +161,21 @@ export default {
     };
   },
   created() {
-    this.getList(1, this.vip_grade, this.searchTitle, this.searchTime);
+    if (this.$route.query.page) {
+      this.page = Number(this.$route.query.page);
+    }
+    this.getList(this.page, this.vip_grade, this.searchTitle, this.searchTime);
   },
   methods: {
     save() {
       Updateremarks({ id: this.selectId, remarks: this.remarks }).then(res => {
         this.handleClose();
-        this.getList(1, this.vip_grade, this.searchTitle, this.searchTime);
+        this.getList(
+          this.page,
+          this.vip_grade,
+          this.searchTitle,
+          this.searchTime
+        );
       });
     },
     handleClose() {
@@ -200,7 +209,13 @@ export default {
         });
     },
     handleCurrentChange(e) {
-      this.getList(e, this.vip_grade, this.searchTitle, this.searchTime);
+      this.page = e;
+      this.getList(
+        this.page,
+        this.vip_grade,
+        this.searchTitle,
+        this.searchTime
+      );
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -212,7 +227,12 @@ export default {
     },
 
     search() {
-      this.getList(1, this.vip_grade, this.searchTitle, this.searchTime);
+      this.getList(
+        this.page,
+        this.vip_grade,
+        this.searchTitle,
+        this.searchTime
+      );
     },
 
     toggleSelection() {
@@ -254,7 +274,10 @@ export default {
     },
     // 编辑回显
     edit(e) {
-      this.$router.push({ path: "detail", query: { id: e.id } });
+      this.$router.push({
+        path: "detail",
+        query: { id: e.id, page: this.page }
+      });
     }
   }
 };

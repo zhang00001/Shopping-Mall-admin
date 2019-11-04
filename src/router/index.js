@@ -16,89 +16,89 @@ Vue.use(Router)
 /* Layout */
 import Layout from '../views/layout/Layout'
 const Login = () =>
-    import ('@/views/login/login')
+    import('@/views/login/login')
 const whiteList = ['/login', "/file"] // 不重定向白名单
-    /**
-     * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
-     * alwaysShow: true               if set true, will always show the root menu, whatever its child routes length
-     *                                if not set alwaysShow, only more than one route under the children
-     *                                it will becomes nested mode, otherwise not show the root menu
-     * redirect: noredirect           if `redirect:noredirect` will no redirct in the breadcrumb
-     * name:'router-name'             the name is used by <keep-alive> (must set!!!)
-     * meta : {
-        title: 'title'               the name show in submenu and breadcrumb (recommend set)
-        icon: 'svg-name'             the icon show in the sidebar,
-      }
-     **/
+/**
+ * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
+ * alwaysShow: true               if set true, will always show the root menu, whatever its child routes length
+ *                                if not set alwaysShow, only more than one route under the children
+ *                                it will becomes nested mode, otherwise not show the root menu
+ * redirect: noredirect           if `redirect:noredirect` will no redirct in the breadcrumb
+ * name:'router-name'             the name is used by <keep-alive> (must set!!!)
+ * meta : {
+    title: 'title'               the name show in submenu and breadcrumb (recommend set)
+    icon: 'svg-name'             the icon show in the sidebar,
+  }
+ **/
 
 
 const routes = new Router({
 
     routes: [{
-            path: '/home',
-            component: Layout,
-            redirect: '/home/index',
-            meta: { title: '首页', icon: 'el-icon-s-home', hidden: false },
-            children: [...HOME_ROUTERS]
-        },
-        {
+        path: '/home',
+        component: Layout,
+        redirect: '/home/index',
+        meta: { title: '首页', icon: 'el-icon-s-home', hidden: false },
+        children: [...HOME_ROUTERS]
+    },
+    {
 
-            path: '/commodity',
-            component: Layout,
-            redirect: '/commodity/list',
-            meta: { title: '商品', icon: 'el-icon-s-home', hidden: false },
-            children: [
-                ...COMMODITY_ROUTERS
-            ],
-        },
-        {
+        path: '/commodity',
+        component: Layout,
+        redirect: '/commodity/list',
+        meta: { title: '商品', icon: 'el-icon-s-home', hidden: false },
+        children: [
+            ...COMMODITY_ROUTERS
+        ],
+    },
+    {
 
-            path: '/order',
-            component: Layout,
-            redirect: '/order/list',
-            meta: { title: '订单', icon: 'el-icon-s-home', hidden: false },
-            children: [
-                ...ORDER_ROUTERS
-            ],
+        path: '/order',
+        component: Layout,
+        redirect: '/order/list',
+        meta: { title: '订单', icon: 'el-icon-s-home', hidden: false },
+        children: [
+            ...ORDER_ROUTERS
+        ],
 
 
 
-        },
-        {
+    },
+    {
 
-            path: '/member',
-            component: Layout,
-            redirect: '/member/list',
-            meta: { title: '用户', icon: 'el-icon-s-home', hidden: false },
-            children: [
-                ...MEMBER_ROUTERS
-            ],
-        },
-        {
-            path: '/operate',
-            component: Layout,
-            meta: { title: '运营', icon: 'el-icon-s-home', hidden: false },
-            children: [
-                ...OPERATE_ROUTERS
-            ],
-        },
-        {
-            path: '/',
-            component: Layout,
+        path: '/member',
+        component: Layout,
+        redirect: '/member/list',
+        meta: { title: '用户', icon: 'el-icon-s-home', hidden: false },
+        children: [
+            ...MEMBER_ROUTERS
+        ],
+    },
+    {
+        path: '/operate',
+        component: Layout,
+        meta: { title: '运营', icon: 'el-icon-s-home', hidden: false },
+        children: [
+            ...OPERATE_ROUTERS
+        ],
+    },
+    {
+        path: '/',
+        component: Layout,
 
-            meta: { title: '设置', icon: 'el-icon-s-home', hidden: true },
-            children: [
+        meta: { title: '设置', icon: 'el-icon-s-home', hidden: true },
+        children: [
 
-            ],
-        },
-        {
-            path: '/login',
-            component: Login,
-            meta: { hidden: true },
+        ],
+    },
+    {
+        path: '/login',
+        component: Login,
+        meta: { hidden: true },
 
-        },
-        { path: '*', redirect: '/404', meta: { hidden: true }, },
-        { path: '/', redirect: '/home', meta: { hidden: true }, },
+    },
+    { path: '*', redirect: '/404', meta: { hidden: true }, },
+    { path: '/', redirect: '/home', meta: { hidden: true }, },
     ]
 
 })

@@ -333,9 +333,12 @@ export default {
                 show: res.data.show
               };
               this.data = res.data.detail;
-              this.fileList = res.data.imgs ? res.data.imgs : [];
-              this.fileList[0] = res.detail.img;
-              (this.imageUrl = res.data.show), (this.data = res.data.detail);
+              this.fileList = res.data.img ? res.data.img : [];
+
+              this.fileList[0] = res.data.img[0];
+              this.imageUrl = res.data.show;
+
+              this.data = res.data.detail;
             });
           } else {
             this.$message.error(res.msg);

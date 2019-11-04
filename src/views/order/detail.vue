@@ -12,7 +12,7 @@
       <el-button
         size="mini"
         type="primary"
-        v-if="data.total_status==7&&data.yes==0"
+        v-if="data.total_status==7&&data.subscribe==0"
         @click="send2(1)"
       >设置退单物流</el-button>
       <el-button
@@ -258,7 +258,10 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.go(-1);
+      this.$router.push({
+        path: "/order/index",
+        query: { page: this.$route.query.page }
+      });
     },
     // 取消订单
     cancel() {

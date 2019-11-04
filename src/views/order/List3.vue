@@ -131,6 +131,7 @@
         <el-pagination
           layout="prev, pager, next"
           :total="total"
+          :current-page.sync="page"
           @current-change="handleCurrentChange"
         ></el-pagination>
       </div>
@@ -180,6 +181,7 @@ export default {
         }
       ],
       value: "",
+      page: 1,
       orderType: [
         { value: "0", label: "全部订单" },
         { value: "1", label: "待付款" },
@@ -232,14 +234,18 @@ export default {
     } else {
       this.radio1 = "0";
     }
-    this.getList(1);
+    if (this.$route.query.page) {
+      this.page = Number(this.$route.query.page);
+    }
+    this.getList(this.page);
   },
   methods: {
     changeRadio() {
-      this.getList(1);
+      this.getList(this.page);
     },
     handleCurrentChange(e) {
-      this.getList(e, this.searchTitle);
+      this.page = e;
+      this.getList(this.page, this.searchTitle);
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -254,7 +260,7 @@ export default {
       this.dialogFormVisible = false;
     },
     search() {
-      this.getList(1);
+      this.getList(this.page);
     },
 
     toggleSelection() {
@@ -309,7 +315,7 @@ export default {
           .post(url, data)
           .then(res => {
             if (res.code == 200) {
-              this.getList(1);
+              this.getList(this.page);
             } else {
               this.$message.error(res.msg);
             }
@@ -328,7 +334,7 @@ export default {
           http.post("admin/goods/goods_del", { id: e.id }).then(res => {
             if (res.code == 200) {
               this.$message.success(res.msg);
-              this.getList(1);
+              this.getList(this.page);
             } else {
               this.$message.error(res.msg);
             }
@@ -364,7 +370,10 @@ export default {
     },
     // 编辑回显
     edit(e) {
-      this.$router.push({ path: "index3/detail3", query: { id: e.id } });
+      this.$router.push({
+        path: "index3/detail3",
+        query: { id: e.id, page: this.page }
+      });
       // http.post("admin/goods/goods_one", { id: e.id }).then(res => {
       //   if (res.code == 200) {
       //    sessionStorage.setItem("edit",JSON.stringify(res.detail))
@@ -383,7 +392,7 @@ export default {
               this.$message.success(res.msg);
 
               this.dialogFormVisible = false;
-              this.getList(1);
+              this.getList(this.page);
 
               this.$refs["form"].resetFields();
             } else {

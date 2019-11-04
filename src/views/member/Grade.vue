@@ -166,7 +166,7 @@ export default {
       selectId: "",
       title: "新增",
       fileLists: [],
-
+      page: 1,
       form: {
         mobile: "",
         name: "",
@@ -184,7 +184,12 @@ export default {
     };
   },
   created() {
-    this.getList(1, this.vip_grade, this.searchTitle, this.searchTime);
+    this.getList(
+      this.SelectIndex,
+      this.vip_grade,
+      this.searchTitle,
+      this.searchTime
+    );
   },
   methods: {
     mall(e) {
@@ -214,7 +219,12 @@ export default {
       this.dialogFormVisible = false;
     },
     search() {
-      this.getList(1, this.vip_grade, this.searchTitle, this.searchTime);
+      this.getList(
+        this.SelectIndex,
+        this.vip_grade,
+        this.searchTitle,
+        this.searchTime
+      );
     },
 
     toggleSelection() {
@@ -297,7 +307,7 @@ export default {
     getmanage_confirm(id, status, type) {
       manage_confirm({ id: id, status: status, type: type }).then(res => {
         if (res.code == 200) {
-          this.getList(1);
+          this.getList(this.SelectIndex);
           this.dialogFormVisible2 = false;
           this.dialogFormVisible1 = false;
           this.dialogFormVisible = false;

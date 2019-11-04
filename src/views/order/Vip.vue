@@ -33,7 +33,12 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination layout="prev, pager, next" :total="total" @current-change="handleCurrentChange"></el-pagination>
+    <el-pagination
+      layout="prev, pager, next"
+      :total="total"
+      @current-change="handleCurrentChange"
+      :current-page.sync="page"
+    ></el-pagination>
   </div>
 </template>
 <script>
@@ -50,21 +55,29 @@ export default {
         { value: "1", label: "已发货" },
         { value: "2", label: "已完成" }
       ],
-      total: 0
+      total: 0,
+      page: 1
     };
   },
   created() {
-    this.getOrder(1);
+    if (this.$route.query.page) {
+      this.page = Number(this.$route.query.page);
+    }
+    this.getOrder(this.page);
   },
   methods: {
     changeRadio() {
-      this.getOrder(1);
+      this.getOrder(this.page);
     },
     handleCurrentChange(e) {
-      this.getOrder(e);
+      this.page = e;
+      this.getOrder(this.page);
     },
     handleClick(e) {
-      this.$router.push({ path: "vip/detail", query: { id: e.id } });
+      this.$router.push({
+        path: "vip/detail",
+        query: { id: e.id, page: this.page }
+      });
     },
     getOrder(page) {
       order_vip_more({

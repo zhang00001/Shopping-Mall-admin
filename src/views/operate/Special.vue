@@ -152,6 +152,7 @@ export default {
   data() {
     return {
       SelectIndex: 1,
+      SelectIndex2: 1,
       imageUrl: "",
       moreClass: [],
       isDisable: true,
@@ -195,7 +196,7 @@ export default {
       this.selectId = e.id;
       this.dialogFormVisible3 = true;
 
-      this.getspecial_goods_data(1);
+      this.getspecial_goods_data(this.SelectIndex2);
     },
     addGood(e) {
       this.selectId = e.id;
@@ -248,7 +249,8 @@ export default {
       this.getList(e, this.searchTitle);
     },
     handleCurrentChange2(e) {
-      this.getspecial_goods_data(e);
+      this.SelectIndex2 = e;
+      this.getspecial_goods_data(this.SelectIndex2);
     },
     search() {
       this.getList(this.SelectIndex, this.searchTitle);
@@ -276,7 +278,7 @@ export default {
       }).then(res => {
         if (res.code == 200) {
           this.$message.success(res.msg);
-          this.getspecial_goods_data(1);
+          this.getspecial_goods_data(this.SelectIndex2);
         } else {
           this.$message.error(res.msg);
         }

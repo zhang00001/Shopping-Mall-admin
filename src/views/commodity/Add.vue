@@ -1,5 +1,7 @@
 <template>
   <div>
+    <el-page-header @back="goBack" v-if="$route.query.id" style="margin-top: 20px;" content></el-page-header>
+
     <div
       class="con"
       v-loading="loading"
@@ -603,7 +605,10 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.go(-1);
+      this.$router.push({
+        path: "list",
+        query: { page: this.$route.query.page }
+      });
     },
     // 批量添加价格
     okMoney() {

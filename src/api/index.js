@@ -101,6 +101,8 @@ export const friend_list = data => http.post('/admin/user/friend_list', data); /
 export const Updateremarks = data => http.post('/admin/user/remarks', data); //好友明细
 
 export const charge_money_huokuan_use = data => http.post('/admin/user/charge_money_huokuan_use', data); //充值
+export const order_look_excel = data => http.get('/admin/order/order_look_excel', { params: data }); //导出 
+
 
 
 

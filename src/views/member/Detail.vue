@@ -562,7 +562,10 @@ export default {
       }
     },
     goBack() {
-      this.$router.go(-1);
+      this.$router.push({
+        path: "/member/list",
+        query: { page: this.$route.query.page }
+      });
     }
   }
 };

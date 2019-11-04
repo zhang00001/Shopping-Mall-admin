@@ -134,6 +134,7 @@
         <el-pagination
           layout="prev, pager, next"
           :total="total"
+          :current-page.sync="page"
           @current-change="handleCurrentChange"
         ></el-pagination>
       </div>
@@ -201,7 +202,7 @@ export default {
       warehouses: [],
       suppliers: [],
       total: 0,
-
+      page: 1,
       title: "新增",
       fileLists: [],
 
@@ -221,9 +222,13 @@ export default {
       formLabelWidth: "120px"
     };
   },
+  watch: {},
   created() {
+    if (this.$route.query.page) {
+      this.page = Number(this.$route.query.page);
+    }
     this.getList(
-      1,
+      this.page,
       this.searchTitle,
       this.classify_id,
       this.type,
@@ -237,8 +242,9 @@ export default {
   },
   methods: {
     handleCurrentChange(e) {
+      this.page = e;
       this.getList(
-        e,
+        this.page,
         this.searchTitle,
         this.classify_id,
         this.type,
@@ -249,7 +255,7 @@ export default {
       );
     },
     Add() {
-      this.$router.push({ path: "add", query: {} });
+      this.$router.push({ path: "add", query: { page: this.page } });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -265,7 +271,7 @@ export default {
     },
     search() {
       this.getList(
-        1,
+        this.page,
         this.searchTitle,
         this.classify_id,
         this.type,
@@ -359,7 +365,7 @@ export default {
           .then(res => {
             if (res.code == 200) {
               this.getList(
-                1,
+                this.page,
                 this.searchTitle,
                 this.classify_id,
                 this.type,
@@ -387,7 +393,7 @@ export default {
             if (res.code == 200) {
               this.$message.success(res.msg);
               this.getList(
-                1,
+                this.page,
                 this.searchTitle,
                 this.classify_id,
                 this.type,
@@ -439,7 +445,7 @@ export default {
     },
     // 编辑回显
     edit(e) {
-      this.$router.push({ path: "edit", query: { id: e.id } });
+      this.$router.push({ path: "edit", query: { id: e.id, page: this.page } });
       // http.post("admin/goods/goods_one", { id: e.id }).then(res => {
       //   if (res.code == 200) {
       //    sessionStorage.setItem("edit",JSON.stringify(res.detail))
@@ -459,7 +465,7 @@ export default {
 
               this.dialogFormVisible = false;
               this.getList(
-                1,
+                this.page,
                 this.searchTitle,
                 this.classify_id,
                 this.type,
